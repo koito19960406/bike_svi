@@ -1,12 +1,3 @@
-# encoding: utf-8
-# author: zhaotianhong
-# contact: zhaoteanhong@gmail.com
-# file: tool.py
-# time: 2022/1/22 10:15
-
-
-import os
-import sys
 import cv2
 import numpy as np
 

@@ -9,16 +9,14 @@ import random
 import time
 from src.data.get_img.utils.imtool import ImageTool
 import datetime
+import pandas as pd
 
 
 
 def read_pids(path_pid):
-    pids = []
-    with open(path_pid, 'r') as f:
-        # f.__next__()
-        for line in f:
-            line_arr = line[:-1].split(',')
-            pids.append(line_arr[0])
+    pid_df = pd.read_csv(path_pid)
+    # get unique pids as a list
+    pids = pid_df.iloc[:,0].unique().tolist()
     return pids
 
 
@@ -88,7 +86,7 @@ def main(UA, path_pid, dir_save, log_path, nthreads):
     full = True
 
     panoids = read_pids(path_pid)
-    panoids_rest = check_already(dir_save_c, panoids)
+    panoids_rest = check_already(dir_save, panoids)
 
     # random.shuffle(panoids_rest)
     task_pids, errors, img_num = [], 0, 0
@@ -101,7 +99,7 @@ def main(UA, path_pid, dir_save, log_path, nthreads):
             try:
                 tool.dwl_multiple(task_pids, task_pids, nthreads, zoom, v_tiles, h_tiles, dir_save, UAs, cropped, full)
                 img_num += nthreads
-                print(datetime.datetime.now(), "Task:", i, "/ ", len(panoids_rest),"got:",img_num, "errors:", errors,dir_save)
+                print(datetime.datetime.now(), "Task:", i, "/ ", len(panoids_rest),"got:",img_num, "errors:", errors, dir_save)
 
             except Exception as e:
                 print(e)

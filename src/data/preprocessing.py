@@ -5,31 +5,44 @@ import os
 import streetview
 import multiprocessing
 from multiprocessing.pool import ThreadPool
-# from geopy import distance
+from geopy import distance
+from get_img import my_task
+from perspective.tool import Equirectangular
+import cv2
+import threading
 
 class DataProcessor:
     """
     Class for reading, processing, and writing data from the UCI
     `Condition monitoring of hydraulic systems` dataset.
     """
-    def __init__(self, input_folder, output_folder):
+    def __init__(self, input_folder, output_folder, city_name):
+        # set and create directories
         self.input_folder = input_folder
         self.output_folder = output_folder
-        self.gsv_output_folder = os.path.join(self.output_folder,"gsv")
+        self.city_name = city_name
+        self.city_input_folder = os.path.join(input_folder, city_name)
+        self.city_output_folder = os.path.join(self.output_folder, self.city_name)
+        self.gsv_output_folder = os.path.join(self.city_output_folder,"gsv")
         self.gsv_metadata_output_folder = os.path.join(self.gsv_output_folder,"metadata")
         self.gsv_image_output_folder = os.path.join(self.gsv_output_folder,"image")
-        os.makedirs(self.gsv_metadata_output_folder)
-        os.makedirs(self.gsv_image_output_folder)
+        os.makedirs(self.gsv_metadata_output_folder, exist_ok = True)
+        os.makedirs(self.gsv_image_output_folder, exist_ok = True)
+        if os.path.exists(os.path.join(self.gsv_metadata_output_folder, "gsv_metadata.csv")):
+            self.gsv_metadata = pd.read_csv(os.path.join(self.gsv_metadata_output_folder, "gsv_metadata.csv"))
+            
+        # get number of cpus
+        self.cpu_num = os.cpu_count()
         pass
 
     def read_data(self):
         """Read raw data into DataProcessor."""
-        self.count_station = pd.read_csv(os.path.join(self.input_folder,"dft_countpoints_region_id_6.csv"))
+        self.count_station = pd.read_csv(os.path.join(self.city_input_folder,"count_station.csv"))
         self.count_station_gdf = gpd.GeoDataFrame(self.count_station, 
                                     geometry=gpd.points_from_xy(self.count_station.longitude, self.count_station.latitude),
                                     crs=4326)
         
-        self.count_data = pd.read_csv(os.path.join(self.input_folder,"dft_aadf_region_id_6.csv"))
+        self.count_data = pd.read_csv(os.path.join(self.city_input_folder,"count_data.csv"))
         
     def get_gsv_metadata_multiprocessing(self, point_gdf = None):
         """get GSV metadata (e.g., panoids, years, months, etc) for each location and store the result as self.panoids
@@ -68,20 +81,21 @@ class DataProcessor:
         
         # split the input df and map the input function
         def parallelize_dataframe(input_df, outer_func):
-            num_processes = multiprocessing.cpu_count()
+            num_processes = self.cpu_num
             pool = ThreadPool(processes=num_processes)
             input_df_split = np.array_split(input_df, num_processes)
             output_df = pd.concat(pool.map(outer_func, input_df_split), ignore_index = True)
             return output_df
         
-        # run the parallelized functions
-        df_output = parallelize_dataframe(point_gdf, parallelize_function)
+        # run the parallelized functions if the metadata doesn't exist yet
+        if not os.path.exists(os.path.join(self.gsv_metadata_output_folder, "gsv_metadata.csv")):
+            df_output = parallelize_dataframe(point_gdf, parallelize_function)
         
-        # save df_output
-        df_output.to_csv(os.path.join(self.output_folder, "gsv_metadata.csv"), index = False)
-        
-        # store as property
-        self.gsv_metadata = df_output
+            # save df_output
+            df_output.to_csv(os.path.join(self.gsv_metadata_output_folder, "gsv_metadata.csv"), index = False)
+            
+            # store as property
+            self.gsv_metadata = df_output
         
     
     # calculate the distance from the original input location
@@ -90,22 +104,88 @@ class DataProcessor:
         gsv_metadata = self.gsv_metadata
         # define a function that takes two sets of lat and lon and return distance
         def calc_dist_row(row):
-            distance = distance.distance((row.lat,row.lon), (row.input_lat,row.input_lon)).meters
-            return distance
+            dist = distance.distance((row["lat"],row["lon"]), (row["input_lat"],row["input_lon"])).meters
+            return dist
         
-        gsv_metadata["distance"] = gsv_metadata.apply(lambda row: calc_dist_row(row))
+        gsv_metadata["distance"] = gsv_metadata.apply(lambda row: calc_dist_row(row), axis=1)
         
         # save df_output
-        gsv_metadata.to_csv(os.path.join(self.output_folder, "gsv_metadata.csv"), index = False)
+        gsv_metadata.to_csv(os.path.join(self.gsv_metadata_output_folder, "gsv_metadata.csv"), index = False)
         
         # update self.gsv_metadata
         self.gsv_metadata = gsv_metadata
         
-    
-    def process_data(self, stable=True):
-        """Process raw data into useful files for model."""
-        # do processing things
+    def download_gsv(self):
+        # create output folders
+        dir_save = os.path.join(self.gsv_image_output_folder,"panorama")
+        os.makedirs(dir_save, exist_ok = True)
+        # set path to the pid csv file
+        path_pid = os.path.join(self.gsv_metadata_output_folder,"gsv_metadata.csv")
+        # set path to user agent info csv file
+        ua_path = "src/data/get_img/utils/UserAgent.csv"
+        # set path to the 1st error log csv file
+        log_path = os.path.join(self.gsv_metadata_output_folder,"gsv_metadata_error_1.csv")
+        # Number of threads: num of cpus
+        nthreads = self.cpu_num
+        # set user agent to avoid gettting banned
+        UA = my_task.get_ua(path=ua_path)
+        # run the main function to download gsv as the 1st try
+        my_task.main(UA, path_pid, dir_save, log_path, nthreads)
+        # some good pids will be missed when 1 bad pid is found in multithreading
+        # so run again the main function with error log file and only 1 thread
+        log_path_2 = os.path.join(self.gsv_metadata_output_folder,"gsv_metadata_error_2.csv")
+        my_task.main(UA, log_path, dir_save, log_path_2, 1)
+            
+            
+    def transform_pano_to_perspective(self):
+        # define function to run in the threading
+        def run(path_input_raw, path_output_c,show_size):
+            # get perspective at each 90 degree
+            thetas = [0, 90, 180, 270]
+            FOV = 90
 
-    def write_data(self, processed_data_path):
-        """Write processed data to directory."""
-        # do writing things
+            # set aspect as 9 to 16
+            aspects_v = (2.25, 4)
+            aspects = (9, 16)
+
+            img_raw = cv2.imread(path_input_raw, cv2.IMREAD_COLOR)
+            equ_raw = Equirectangular(img_raw)
+
+            for theta in thetas:
+                height = int(aspects_v[0] * show_size)
+                width = int(aspects_v[1] * show_size)
+                aspect_name = '%s--%s'%(aspects[0], aspects[1])
+                img_raw = equ_raw.GetPerspective(FOV, theta, 0, height, width)
+                path_output = path_output_c[:]
+                path_output_raw = path_output.replace('.png', '_Direction_%s_FOV_%s_aspect_%s_raw.png'%(theta, FOV, aspect_name))
+                cv2.imwrite(path_output_raw, img_raw)
+        
+        # set and create directories       
+        dir_input_raw = os.path.join(self.gsv_image_output_folder,"panorama")
+        dir_out_show = os.path.join(self.gsv_image_output_folder,"perspective")
+        os.makedirs(dir_out_show)
+
+        # set parameters
+        index = 0
+        show_size = 50  # 像素大小 * 4 或者 3
+        threads = []
+        num_thread = self.cpu_num
+
+        for name in os.listdir(dir_input_raw):
+            index += 1
+
+            path_input_raw = os.path.join(dir_input_raw, name)
+            path_output = os.path.join(dir_out_show, name.replace('jpg','png'))
+
+            if index % num_thread == 0:
+                print('Now:', index)
+                t = threading.Thread(target=run, args=(path_input_raw, path_output, show_size,))
+                threads.append(t)
+                for t in threads:
+                    t.setDaemon(True)
+                    t.start()
+                t.join()
+                threads = []
+            else:
+                t = threading.Thread(target=run, args=(path_input_raw, path_output, show_size,))
+                threads.append(t)
