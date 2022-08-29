@@ -13,16 +13,19 @@ import cv2
 import numpy as np
 import albumentations as aug
 from data_preparation import ImageSegmentationDataset
+from transformers import DetrFeatureExtractor, DetrForObjectDetection
+import glob
 
-class ImageFeatureExtractor:
-    """class for extracting features from street view images.
-    - objective features will be extracted through 
+"""- objective features will be extracted through 
         - segmentation with Segformer trained on Mapillary Vistas v2.0 (https://www.mapillary.com/dataset/vistas)
             - reference: https://medium.com/geekculture/semantic-segmentation-with-segformer-2501543d2be4
             - https://blog.roboflow.com/how-to-train-segformer-on-a-custom-dataset-with-pytorch-lightning/
         - object detection with DETR model pre-trained on COCO dataset
     - subjective features will be extracted through perception 
         - image regression with ViT model trained on Place Pulse 2.0 (https://www.dropbox.com/s/grzoiwsaeqrmc1l/place-pulse-2.0.zip?dl=0)
+"""
+class ImageSegmenter:
+    """class for segmenting street view images.
     """
     def __init__(self, input_folder, model_folder):
         self.root_dir = input_folder
@@ -144,3 +147,60 @@ class ImageFeatureExtractor:
         
         # save the trained model
         torch.save(model, os.path.join(self.model_folder,"segmentation.pt"))
+        
+class ImageDetector:
+    """Object detect SVI (only use a pretrained model since the objective is to get vehicles and bicycles)
+    """
+    
+    def __init__(self, input_folder, output_folder, pretrained_model = "facebook/detr-resnet-50"):
+        self.pretrained_model = pretrained_model
+        self.input_folder = input_folder
+        self.output_folder = output_folder
+        pass
+    
+    def detect_object(self):
+        # load and create a model
+        feature_extractor = DetrFeatureExtractor.from_pretrained(self.pretrained_model)
+        model = DetrForObjectDetection.from_pretrained(self.pretrained_model)
+        
+        # initialize df to save the result
+        result_list_agg = []
+        # loop through images for inference
+        for image_file in glob.glob(os.path.join(self.input_folder, "*/.png")):
+            # get pid
+            #TODO
+            # initialize a list to save the result
+            result_list = []
+            # create input and output
+            image = Image.open(image_file)
+            inputs = feature_extractor(images=image, return_tensors="pt")
+            outputs = model(**inputs)
+            
+            # resize and infer
+            target_sizes = torch.tensor([image.size[::-1]])
+            results = feature_extractor.post_process(outputs, target_sizes=target_sizes)[0]
+            
+            for score, label in zip(results["scores"], results["labels"]):
+                box = [round(i, 2) for i in box.tolist()]
+                # let's only keep detections with score > 0.9
+                if score > 0.9:
+                    #TODO add pid in the list
+                    result_list = [score, label, pid]
+                    print(
+                        f"Detected {model.config.id2label[label.item()]} with confidence "
+                        f"{round(score.item(), 3)} at location {box}"
+                    )
+                    result_list.append(result_list_agg)
+                    
+        # convert the result_list_agg to df and save as csv
+        result_df = pd.DataFrame(result_list_agg)
+        result_df.to_csv(os.path.join(self.output_folder, "object_detection.csv"), index = False)
+    
+    def count_vehicle_bicycle():
+        # TODO
+        pass
+                
+
+
+        
+        
