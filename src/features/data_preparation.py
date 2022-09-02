@@ -17,9 +17,9 @@ class ImageSegmentationDataset(Dataset):
         self.train = train
         self.transforms = transforms
 
-        sub_path = "train" if self.train else "test"
-        self.img_dir = os.path.join(self.root_dir, "images", sub_path)
-        self.ann_dir = os.path.join(self.root_dir, "mask", sub_path)
+        sub_path = "training" if self.train else "validation"
+        self.img_dir = os.path.join(self.root_dir, sub_path, "images")
+        self.ann_dir = os.path.join(self.root_dir, sub_path, "v2.0/labels")
         
         # read images
         image_file_names = []

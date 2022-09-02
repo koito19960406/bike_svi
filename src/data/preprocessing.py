@@ -3,7 +3,6 @@ import numpy as np
 import geopandas as gpd
 import os
 import streetview
-import multiprocessing
 from multiprocessing.pool import ThreadPool
 from geopy import distance
 from get_img import my_task
@@ -163,7 +162,7 @@ class DataProcessor:
         # set and create directories       
         dir_input_raw = os.path.join(self.gsv_image_output_folder,"panorama")
         dir_out_show = os.path.join(self.gsv_image_output_folder,"perspective")
-        os.makedirs(dir_out_show)
+        os.makedirs(dir_out_show, exist_ok = True)
 
         # set parameters
         index = 0
