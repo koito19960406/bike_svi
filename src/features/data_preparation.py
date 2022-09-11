@@ -19,13 +19,14 @@ class ImageSegmentationDataset(Dataset):
 
         sub_path = "training" if self.train else "validation"
         self.img_dir = os.path.join(self.root_dir, sub_path, "images")
-        self.ann_dir = os.path.join(self.root_dir, sub_path, "v2.0/labels")
+        self.ann_dir = os.path.join(self.root_dir, sub_path, "labels")
         
         # read images
         image_file_names = []
         for root, dirs, files in os.walk(self.img_dir):
             image_file_names.extend(files)
         self.images = sorted(image_file_names)
+        print(self.images)
         
         # read annotations
         annotation_file_names = []

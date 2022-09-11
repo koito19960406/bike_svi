@@ -43,7 +43,7 @@ class DataProcessor:
         
         self.count_data = pd.read_csv(os.path.join(self.city_input_folder,"count_data.csv"))
         
-    def get_gsv_metadata_multiprocessing(self, point_gdf = None):
+    def get_gsv_metadata_multiprocessing(self, point_gdf = None, update = False):
         """get GSV metadata (e.g., panoids, years, months, etc) for each location and store the result as self.panoids
             Args:
                 point_gdf (geodataframe): point locations to retrieve GSV metadata. If None, then use count_station_gdf
@@ -64,6 +64,7 @@ class DataProcessor:
                 panoids = panoids.dropna(subset=["year"])
                 panoids["input_lat"] = row.geometry.y
                 panoids["input_lon"] = row.geometry.x
+                panoids["count_point_id"] = row["count_point_id"]
                 return panoids
             except:
                 print(row.geometry.y,row.geometry.x)
@@ -87,7 +88,9 @@ class DataProcessor:
             return output_df
         
         # run the parallelized functions if the metadata doesn't exist yet
-        if not os.path.exists(os.path.join(self.gsv_metadata_output_folder, "gsv_metadata.csv")):
+        if not update and os.path.exists(os.path.join(self.gsv_metadata_output_folder, "gsv_metadata.csv")):
+            print("The output file already exists, please set update to True if you want to update it")
+        else:
             df_output = parallelize_dataframe(point_gdf, parallelize_function)
         
             # save df_output
@@ -98,21 +101,21 @@ class DataProcessor:
         
     
     # calculate the distance from the original input location
-    def calc_dist(self):
-        # assign gsv_metadata to gsv_metadata
-        gsv_metadata = self.gsv_metadata
-        # define a function that takes two sets of lat and lon and return distance
-        def calc_dist_row(row):
-            dist = distance.distance((row["lat"],row["lon"]), (row["input_lat"],row["input_lon"])).meters
-            return dist
-        
-        gsv_metadata["distance"] = gsv_metadata.apply(lambda row: calc_dist_row(row), axis=1)
-        
-        # save df_output
-        gsv_metadata.to_csv(os.path.join(self.gsv_metadata_output_folder, "gsv_metadata.csv"), index = False)
-        
-        # update self.gsv_metadata
-        self.gsv_metadata = gsv_metadata
+    def calc_dist(self, update = False):
+        if not update and os.path.join(self.gsv_metadata_output_folder, "gsv_metadata_dist.csv"):
+            print("The output file already exists, please set update to True if you want to update it")
+        else:
+            # assign gsv_metadata to gsv_metadata
+            gsv_metadata = self.gsv_metadata
+            # define a function that takes two sets of lat and lon and return distance
+            def calc_dist_row(row):
+                dist = distance.distance((row["lat"],row["lon"]), (row["input_lat"],row["input_lon"])).meters
+                return dist
+            
+            gsv_metadata["distance"] = gsv_metadata.apply(lambda row: calc_dist_row(row), axis=1)
+            
+            # save df_output
+            gsv_metadata.to_csv(os.path.join(self.gsv_metadata_output_folder, "gsv_metadata_dist.csv"), index = False)
         
     def download_gsv(self):
         # create output folders
@@ -166,7 +169,7 @@ class DataProcessor:
 
         # set parameters
         index = 0
-        show_size = 50  # 像素大小 * 4 或者 3
+        show_size = 100  # 像素大小 * 4 或者 3
         threads = []
         num_thread = self.cpu_num
 

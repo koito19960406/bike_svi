@@ -47,11 +47,11 @@ if __name__ == '__main__':
     # find .env automagically by walking up directories until it's found, then
     # load up the .env entries as environment variables
     load_dotenv(find_dotenv())
-    data_folder = "/Volumes/Extreme SSD/bike_svi/data"
+    data_folder = "/Volumes/exfat/bike_svi/data"
     input_folder = os.path.join(data_folder,"external/cities")
     output_folder = os.path.join(data_folder,"raw/cities")
     city_list = []
-    with open(os.path.join(input_folder,"city_list.txt"), "r") as f:
+    with open(os.path.join(data_folder,"external/city_list.txt"), "r") as f:
         for line in f:
             city_list.append(line.strip())
     for city in city_list:

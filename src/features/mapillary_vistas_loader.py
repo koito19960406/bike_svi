@@ -23,7 +23,7 @@ class mapillaryVistasLoader(data.Dataset):
         self.split = split
         self.is_transform = is_transform
         self.augmentations = augmentations
-        self.n_classes = 9
+        self.n_classes = 9 #TODO understand this
 
         self.img_size = img_size if isinstance(img_size, tuple) else (img_size, img_size)
         self.mean = np.array([80.5423, 91.3162, 81.4312])
@@ -31,36 +31,36 @@ class mapillaryVistasLoader(data.Dataset):
 
         if not test_mode:
             self.images_base = os.path.join(self.root, self.split, "images")
-            self.annotations_base = os.path.join(self.root, self.split, "labels")
+            self.annotations_base = os.path.join(self.root, self.split, "v2.0/labels")
             self.files[split] = recursive_glob(rootdir=self.images_base, suffix=".jpg")
             if not self.files[split]:
                 raise Exception("No files for split=[%s] found in %s" % (split, self.images_base))
 
             print("Found %d %s images" % (len(self.files[split]), split))
-        self.class_names, self.class_ids, self.class_colors, self.class_major_ids = self.parse_config()
+        self.class_names, self.class_ids, self.class_evaluate, self.class_colors = self.parse_config()
 
         self.ignore_id = 250
 
 
 
     def parse_config(self):
-        with open(os.path.join(self.root, "config.json")) as config_file:
+        with open(os.path.join(self.root, "config_v2.0.json")) as config_file:
             config = json.load(config_file)
 
         labels = config["labels"]
 
         class_names = []
         class_ids = []
+        class_evaluate = []
         class_colors = []
-        class_major_ids = []
 
         for label_id, label in enumerate(labels):
             class_names.append(label["readable"])
             class_ids.append(label_id)
+            class_evaluate.append(label["evaluate"])
             class_colors.append(label["color"])
-            class_major_ids.append(label['majorclass'])
-        print("There are {} labels in the config file".format(len(set(class_major_ids))))
-        return class_names, class_ids, class_colors, class_major_ids
+        print("There are {} labels in the config file".format(len(set(class_ids))))
+        return class_names, class_ids, class_evaluate, class_colors
 
     def __len__(self):
         """__len__"""
@@ -104,6 +104,14 @@ class mapillaryVistasLoader(data.Dataset):
         return img, lbl
 
     def decode_segmap(self, temp):
+        """function to decode segmentation result to color
+
+        Args:
+            temp (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         class_major_colors = [[0, 0, 0],
                               [70, 70, 70],
                               [180, 165, 180],
