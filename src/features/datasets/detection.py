@@ -8,16 +8,16 @@ import tqdm
 from multiprocessing.pool import ThreadPool
 import numpy as np
 
-class SimpleSegmentationInferDataset(Dataset):
-    def __init__(self, img_dir, gsv_invalid_file, feature_extractor, segmented_dir):
+class DetectionInferDataset(Dataset):
+    def __init__(self, img_dir, gsv_invalid_file, feature_extractor, object_detection_raw_file):
         super().__init__()
         global segmented_image_file_list
         global gsv_invalid_df
         # set variables
         self.img_dir = img_dir
         self.feature_extractor = feature_extractor
-        self.segmented_dir = segmented_dir
-        segmented_image_file_list = pd.Series(os.listdir(self.segmented_dir))
+        self.object_detection_raw = pd.read_csv(object_detection_raw_file)
+        detected_image_file_list = self.object_detection_raw["file_name"]
         gsv_invalid_df = pd.read_csv(gsv_invalid_file)
         self.cpu_num = os.cpu_count()
         # # load images and pass to feature extractor
@@ -43,9 +43,9 @@ class SimpleSegmentationInferDataset(Dataset):
             file_name_key = image_file[:-4]
             if not gsv_invalid_df["file_name"].str.contains(file_name_key).any():
                 # run the following only if the file_name doesn't exist in the file yet
-                if len(segmented_image_file_list) > 0:
+                if len(detected_image_file_list) > 0:
                     # skip if it's already been sgemented or invalids
-                    if not segmented_image_file_list.str.contains(file_name_key).any():
+                    if not detected_image_file_list.str.contains(file_name_key).any():
                         return os.path.join(self.img_dir,image_file)
                     else:
                         return
@@ -75,10 +75,7 @@ class SimpleSegmentationInferDataset(Dataset):
         self.images = output_list
 
     def __len__(self):
-        try:
-            return len(self.images)
-        except TypeError:
-            return 0
+        return len(self.images)
 
     def __getitem__(self, idx):
         image = cv2.imread(self.images[idx])

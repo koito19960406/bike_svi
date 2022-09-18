@@ -1,4 +1,4 @@
-from curses import def_prog_mode
+# from curses import def_prog_mode
 from torch.utils.data import Dataset, DataLoader
 from transformers import AdamW
 import torch
@@ -20,14 +20,21 @@ import tqdm
 import json
 import shutil
 from transformers import DetrFeatureExtractor, DetrForSegmentation
-from detectron2.data import MetadataCatalog
+# from detectron2.data import MetadataCatalog
 from transformers.models.detr.feature_extraction_detr import rgb_to_id, id_to_rgb
 import io
 from copy import deepcopy
-from detectron2.utils.visualizer import Visualizer
+# from detectron2.utils.visualizer import Visualizer
 from multiprocessing.pool import ThreadPool
+from threading import Thread
+from queue import Queue
+import csv 
+from pyarrow import feather
+import dask
+import dask.dataframe as dd
 
-from datasets.simple_segmentation import SimpleSegmentationInferDataset 
+from datasets.simple_segmentation import SimpleSegmentationInferDataset
+from datasets.detection import DetectionInferDataset
 from color_maps import cityscapes
 
 """- objective features will be extracted through 
@@ -92,7 +99,7 @@ class ImageSegmentationSimple:
                                                 pin_memory=True)
         
         with torch.no_grad():
-            for inputs, file_name in infer_loader:
+            for inputs, file_name in tqdm.tqdm(infer_loader, total = len(infer_loader)):
                 # produce logits from the model
                 inputs = inputs.to(self.device)
                 outputs = model(pixel_values = inputs)
@@ -105,112 +112,124 @@ class ImageSegmentationSimple:
                 # Second, apply argmax on the class dimension
                 seg = upsampled_logits.argmax(dim=1)[0].numpy()
                 # save it to png
-                cv2.imwrite(os.path.join(self.img_output_folder,file_name[0]+".png"), seg)
+                cv2.imwrite(os.path.join(self.img_output_folder, "segmented", file_name[0]+".png"), seg)
 
         
-#     def calculate_ratio(self):
-#         #TODO modfy this 
+    def calculate_ratio(self, update = False):
+        # create output folder for the colored segmentation results
+        os.makedirs(os.path.join(self.img_output_folder, "segmented_color"), exist_ok = True)
         
-#         # initialize the df to store pixel ratios
-#         segment_pixel_ratio_df = pd.DataFrame(columns = ["file_name",
-#                                                         "classes",
-#                                                         "sum",
-#                                                         "total_pixel",
-#                                                         "pixel_ratio"])
-#         # calculate the pixel ratios for different categories
-#                 processed_sizes = torch.as_tensor(inputs['pixel_values'].shape[-2:]).unsqueeze(0)
-#                 result = feature_extractor.post_process_panoptic(outputs, processed_sizes)[0]
-#                 segments_info = result["segments_info"]
-#                 # continue to the next loop when segments_info is empty
-#                 if len(segments_info) == 0:
-#                     continue
-#                 for i in range(len(segments_info)):
-#                     c = segments_info[i]["category_id"]
-#                     segments_info[i]["category_id"] = meta.thing_dataset_id_to_contiguous_id[c] if segments_info[i]["isthing"] else meta.stuff_dataset_id_to_contiguous_id[c]
-#                     segments_info[i]["classes"] = meta.thing_classes[segments_info[i]["category_id"]] if segments_info[i]["isthing"] else meta.stuff_classes[segments_info[i]["category_id"]] 
-#                 segments_info_df = (pd.DataFrame.from_dict(segments_info).
-#                                     groupby(["classes"])["area"].
-#                                     agg(["sum"]).
-#                                     reset_index().
-#                                     assign(file_name = file_name).
-#                                     assign(total_pixel =  processed_sizes.numpy()[0][0] * processed_sizes.numpy()[0][1]).
-#                                     assign(pixel_ratio = lambda dataframe: dataframe["sum"] / dataframe["total_pixel"]))
-#                 # concatenate the resu
-#                 segment_pixel_ratio_df = segment_pixel_ratio_df.append(segments_info_df)
-#                 segment_pixel_ratio_df.to_csv(os.path.join(self.output_folder, "segment_pixel_ratio_df_checkpoint.csv"), index=False)
-#                 if not os.path.exists(os.path.join(self.output_folder,"segmented",file_name)):
-#                     # visualize segementation results
-#                     # We extract the segments info and the panoptic result from DETR's prediction
-#                     segments_info = deepcopy(result["segments_info"])
-#                     # Panoptic predictions are stored in a special format png
-#                     panoptic_seg = Image.open(io.BytesIO(result['png_string']))
-#                     final_w, final_h = panoptic_seg.size
-#                     # We convert the png into an segment id map
-#                     panoptic_seg = np.array(panoptic_seg, dtype=np.uint8)
-#                     panoptic_seg = torch.from_numpy(rgb_to_id(panoptic_seg))
-                    
-#                     # Finally we visualize the prediction
-#                     color_seg = np.zeros((seg.shape[0], seg.shape[1], 3), dtype=np.uint8)
-#                 for label, color in enumerate(self.colormaps):
-#                     color_seg[seg == label, :] = color
-#                     v = Visualizer(np.array(image.copy().resize((final_w, final_h)))[:, :, ::-1], meta, scale=1.0)
-#                     v._default_font_size = 20
-#                     v = v.draw_panoptic_seg_predictions(panoptic_seg, segments_info, area_threshold=0)
-#                     v_image = Image.fromarray(v.get_image())
-#                     # save as jpg
-#                     v_image.save(os.path.join(self.output_folder,"segmented",file_name))
-#         # transform segment_pixel_ratio_df to wide format
-#         segment_pixel_ratio_df = pd.read_csv(os.path.join(self.output_folder, "segment_pixel_ratio_df_checkpoint.csv"))
-#         segment_pixel_ratio_df = (segment_pixel_ratio_df.pivot_table(index='file_name', columns='classes', values='pixel_ratio').
-#                                 reset_index().
-#                                 fillna(0))
-#         # save as a csv file
-#         segment_pixel_ratio_df.to_csv(os.path.join(self.output_folder, "segmentation_pixel_ratio.csv"))
-#         #TODO above are some elements from the previous code
-#         # define a function to retrieve GSV metadata based on each row of the input GeoDataFrame
-#         def get_gsv_metadata(row):
-#             try:
-#                 panoids = streetview.panoids(lat=row.geometry.y, lon=row.geometry.x)
-#                 panoids = pd.DataFrame.from_dict(panoids)
-#                 # query to get years available
-#                 panoids = panoids.dropna(subset=["year"])
-#                 panoids["input_lat"] = row.geometry.y
-#                 panoids["input_lon"] = row.geometry.x
-#                 panoids["count_point_id"] = row["count_point_id"]
-#                 return panoids
-#             except:
-#                 print(row.geometry.y,row.geometry.x)
-#                 print(panoids)
-#                 return
-            
-#         # apply the function to each row
-#         def parallelize_function(input_df):
-#             output_df = pd.DataFrame()
-#             for _, row in input_df.iterrows():
-#                 output_df_temp = get_gsv_metadata(row)
-#                 output_df = pd.concat([output_df,output_df_temp], ignore_index = True)
-#             return output_df
+
+        # dedicated file writing taskS
+        def file_writer(index, output_folder, queue):
+            # create progress bar
+            pbar = tqdm.tqdm(total=queue.qsize())
+            # set partition tracker
+            partition = 1
+            while True:
+                if queue.empty():
+                    print(f"thread {index} is now empty")
+                    # save and exit 
+                    try:
+                        df.to_feather(os.path.join(output_folder, f"{file_name}.feather"))
+                    except UnboundLocalError:
+                        print(f"thread thread {index} doesn't have anything to save")
+                        break
+                    finally:
+                        # exit the loop
+                        break
+                # get an image file from the queue
+                image_file = queue.get()
+                try:
+                    # get the file name
+                    file_name = os.path.basename(image_file)[:-4]
+                    seg = cv2.imread(image_file, cv2.IMREAD_GRAYSCALE)
+                    if seg is None:
+                        print("Got an empty image")
+                        continue
+                    # calculate the total pixels
+                    total_pixel = seg.shape[0] * seg.shape[1]
+                    # Finally we visualize the prediction
+                    color_seg = np.zeros((seg.shape[0], seg.shape[1], 3), dtype=np.uint8)
+                    # get an array of unique ids
+                    unique_id_array = np.unique(seg)
+                    # empty df
+                    if partition == 1:
+                        df = pd.DataFrame(columns = ["file_name", "name", "pixel_ratio"])
+                        
+                    for unique_id in unique_id_array:
+                        # filter to get a respective label
+                        label = list(filter(lambda label: label.trainId == unique_id, self.labels))[0]
+                        # give color to color_seg
+                        color_seg[seg == unique_id, :] = label.color
+                        # calculate the number of pixel for each class
+                        pixel_num = np.sum((seg==unique_id))
+                        pixel_ratio = pixel_num / total_pixel
+                        # write.writerow([file_name, label.name, pixel_ratio])
+                        df = pd.concat([df, pd.DataFrame([[file_name, label.name, pixel_ratio]], columns=["file_name", "name", "pixel_ratio"])], ignore_index=True)
+                    if partition == 500:
+                        df.to_feather(os.path.join(output_folder, f"{file_name}.feather"))
+                        df = None
+                        partition = 0
+                    partition += 1
+                    # save as png
+                    cv2.imwrite(os.path.join(self.img_output_folder, "segmented_color", file_name + ".png"), color_seg)
+                except:
+                    print(f"You got an error for {image_file}")
+                # mark the unit of work complete
+                queue.task_done()
+                # update pbar
+                pbar.update(1)
+            # mark the exit signal as processed, after the file was closed
+            queue.task_done()
+
+        # define the shared file path
+        output_folder = os.path.join(self.csv_output_folder, 'segmentation_pixel_ratio')
+        os.makedirs(output_folder, exist_ok = True)
+    
+        feather_list = glob.glob(os.path.join(output_folder, "*.feather"))
+        try:
+            dfs = [dask.delayed(feather.read_feather)(f) for f in feather_list]
+            df = dd.from_delayed(dfs)
+            filename_set = set(df.iloc[:,0].unique().compute())
+            print("successfully read the file")
+        except FileNotFoundError:
+            print("file not found")
+            filename_set = set()
+        except IndexError:
+            print("index error")
+            filename_set = set()
+        # create the shared queue
+        segmented_img_list = glob.glob(os.path.join(self.img_output_folder, "segmented/*.png"))
+        print("image list read")
+        queue = Queue()
+        [queue.put(i) for i in tqdm.tqdm(segmented_img_list) if os.path.basename(i)[:-4] not in filename_set]
+        if queue.qsize() > self.cpu_num:
+            # create and start the file writer thread
+            threads = [Thread(target=file_writer, args=(index, output_folder, queue), daemon=True) for index in tqdm.tqdm(range(self.cpu_num))]
+        else:
+            threads = [Thread(target=file_writer, args=(index, output_folder, queue), daemon=True) for index in tqdm.tqdm(range(queue.qsize()))]
+        for thread in threads:
+            thread.start()
+        # wait for threads to finish
+        for thread in threads:
+            thread.join()
+        # wait for all tasks in the queue to be processed
+        queue.join()
+                
+        # transform the csv to wide format
+        dfs = [dask.delayed(feather.read_feather)(f) for f in feather_list]
+        df = dd.from_delayed(dfs)
+        segment_pixel_ratio_df = df.drop_duplicates().compute()
+        # create pid
+        segment_pixel_ratio_df["pid"] = segment_pixel_ratio_df["file_name"].str.extract("(.*)(?<=_Direction)")
+        segment_pixel_ratio_df["pid"] = segment_pixel_ratio_df["pid"].str.replace("_Direction", "")
+        segment_pixel_ratio_df = (segment_pixel_ratio_df.pivot_table(index="pid", columns= "name", values='pixel_ratio', aggfunc=np.mean).
+                                        reset_index().
+                                        fillna(0))
+        # save as csv
+        segment_pixel_ratio_df.to_csv(os.path.join(self.csv_output_folder, "segmentation_pixel_ratio_wide.csv"), index = False)
         
-#         # split the input df and map the input function
-#         def parallelize_list(cpu_num, input_list, outer_func):
-#             num_processes = cpu_num
-#             pool = ThreadPool(processes=num_processes)
-#             input_list_split = np.array_split(input_list, num_processes)
-#             output_df = pd.concat(pool.map(outer_func, input_df_split), ignore_index = True)
-#             return output_df
-        
-#         # run the parallelized functions if the metadata doesn't exist yet
-#         if not update and os.path.exists(os.path.join(self.gsv_metadata_output_folder, "gsv_metadata.csv")):
-#             print("The output file already exists, please set update to True if you want to update it")
-#         else:
-#             df_output = parallelize_dataframe(point_gdf, parallelize_function)
-        
-#             # save df_output
-#             df_output.to_csv(os.path.join(self.gsv_metadata_output_folder, "gsv_metadata.csv"), index = False)
-            
-#             # store as property
-#             self.gsv_metadata = df_output
-            
 # class ImageSegmenterBikeLane:
 #     """class for segmenting street view images.
 #     """
@@ -450,7 +469,7 @@ class ImageDetector:
         feature_extractor = DetrFeatureExtractor.from_pretrained(self.pretrained_model).to(self.device)
         model = DetrForObjectDetection.from_pretrained(self.pretrained_model)
         
-        infer_data = SimpleSegmentationInferDataset(self.input_folder, gsv_invalid_file, feature_extractor, self.img_output_folder)
+        infer_data = DetectionInferDataset(self.input_folder, gsv_invalid_file, feature_extractor, os.path.join(self.output_folder, "object_detection_raw.csv"))
         infer_loader = torch.utils.data.DataLoader(infer_data,
                                                 batch_size=1,
                                                 shuffle=False,
@@ -458,7 +477,7 @@ class ImageDetector:
                                                 pin_memory=True)
         
         with torch.no_grad():
-            for inputs, file_name in infer_loader:
+            for inputs, file_name in tqdm.tqdm(infer_loader, total = len(infer_loader)):
                 try:
                     result_df = pd.read_csv(os.path.join(self.output_folder, "object_detection_raw.csv"))
                 except FileNotFoundError:
@@ -476,7 +495,7 @@ class ImageDetector:
                 for score, label in zip(results["scores"], results["labels"]):
                     # let's only keep detections with score > 0.8
                     if score > 0.8:
-                        result_list = [pid, model.config.id2label[label.item()], score.item()]
+                        result_list = [file_name, pid, model.config.id2label[label.item()], score.item()]
                         print(
                             f"Detected {model.config.id2label[label.item()]} with confidence "
                             f"{round(score.item(), 3)}"
@@ -484,11 +503,11 @@ class ImageDetector:
                         result_list_agg.append(result_list)
                 # if there's no result, then append only pid
                 if len(result_list_agg) == 0:
-                    result_list_agg.append([pid,None,None])
-            # convert the result_list_agg to df and save as csv
-            result_list_agg_df = pd.DataFrame(result_list_agg, columns=["pid","label","score"])
-            result_df = pd.concat([result_df.reset_index(drop=True), result_list_agg_df.reset_index(drop=True)])
-            result_df.to_csv(os.path.join(self.output_folder, "object_detection_raw.csv"), index = False)
+                    result_list_agg.append([file_name, pid,None,None])
+                # convert the result_list_agg to df and save as csv
+                result_list_agg_df = pd.DataFrame(result_list_agg, columns=["file_name","pid","label","score"])
+                result_df = pd.concat([result_df.reset_index(drop=True), result_list_agg_df.reset_index(drop=True)])
+                result_df.to_csv(os.path.join(self.output_folder, "object_detection_raw.csv"), index = False)
                 
     
     def count_vehicle_bicycle(self):
@@ -498,7 +517,7 @@ class ImageDetector:
         result_df = pd.read_csv(os.path.join(self.output_folder, "object_detection.csv"))
         # filter with bicycle and group by pid
         result_bicycle = (result_df.
-                          query("pid == 'bicycle'").
+                          query("label == 'bicycle'").
                           groupby("pid").
                           agg(["sum"]).
                           reset_index()
@@ -506,7 +525,7 @@ class ImageDetector:
         print(result_bicycle)
         # filter with vehicles (car, motorcycle, bus, truck) and group by pid
         result_vehicle = (result_df.
-                          query("pid == 'car' | pid == 'motorcycle' | pid == 'bus' | pid == 'truck'").
+                          query("label == 'car' | label == 'motorcycle' | label == 'bus' | label == 'truck'").
                           groupby("pid").
                           agg(["sum"]).
                           reset_index()

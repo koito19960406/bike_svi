@@ -17,14 +17,30 @@ class ControlVariables:
                                     geometry=gpd.points_from_xy(self.count_station.longitude, self.count_station.latitude),
                                     crs=4326)
         #TODO modify file path and worksheet
-        self.population = pd.read_excel(os.path.join(self.input_folder, "population.xlsx"), sheet=1)
-        self.deprivation = pd.read_excel(os.path.join(self.input_folder, "deprivation.xlsx"), sheet=1)
-        self.lsoa_gdf = gpd.read_file(os.path.join(self.input_folder, "lsoa.shp")).to_crs("EPSG:4326")
+        # load population and cut off empty margin
+        self.population = pd.read_excel(os.path.join(self.input_folder, "control_variables/sape23dt10amid2020coaunformattedsyoaestimateslondon.xlsx"), sheet_name="Mid-2020 Persons").iloc[4:,:]
+        # set column names
+        self.population.columns = self.population.iloc[0,:]
+        # remove the 1st row
+        self.population = self.population.iloc[1:,:]
+        # load deprivation data
+        self.deprivation_2019 = pd.read_excel(os.path.join(self.input_folder, "control_variables/deprivation/ID 2019 for London.xlsx"), sheet_name="IMD 2019")
+        self.deprivation_2015 = pd.read_excel(os.path.join(self.input_folder, "control_variables/deprivation/ID 2015 for London.xlsx"), sheet_name="IMD 2015")
+        self.deprivation_2010 = pd.read_excel(os.path.join(self.input_folder, "control_variables/deprivation/id-2010-for-london.xls"), sheet_name="IMD 2010")
+        self.lsoa_gdf = gpd.read_file(os.path.join(self.input_folder, "control_variables/statistical-gis-boundaries-london/ESRI/LSOA_2011_London_gen_MHW.shp")).to_crs("EPSG:4326")
         
     def convert_to_spatial(self):
         """convert pandas df to geopandas gdf by joining on lsoa code"""
         #TODO modify key column names and filter to get necessary columns only
-        self.population_gdf = pd.merge(self.lsoa_gdf, self.population, left_on = "KEY", right_on = "KEY", how = "left")
+        self.population_2019_gdf = pd.merge(self.lsoa_gdf, self.population, left_on = "KEY", right_on = "KEY", how = "left")
+        self.population_2019_gdf = pd.merge(self.lsoa_gdf, self.population, left_on = "KEY", right_on = "KEY", how = "left")
+        self.population_2019_gdf = pd.merge(self.lsoa_gdf, self.population, left_on = "KEY", right_on = "KEY", how = "left")
+        self.population_2019_gdf = pd.merge(self.lsoa_gdf, self.population, left_on = "KEY", right_on = "KEY", how = "left")
+        self.population_2019_gdf = pd.merge(self.lsoa_gdf, self.population, left_on = "KEY", right_on = "KEY", how = "left")
+        self.population_2019_gdf = pd.merge(self.lsoa_gdf, self.population, left_on = "KEY", right_on = "KEY", how = "left")
+        self.population_2019_gdf = pd.merge(self.lsoa_gdf, self.population, left_on = "KEY", right_on = "KEY", how = "left")
+        self.population_2019_gdf = pd.merge(self.lsoa_gdf, self.population, left_on = "KEY", right_on = "KEY", how = "left")
+        
         self.deprivation_gdf = pd.merge(self.lsoa_gdf, self.deprivation, left_on = "KEY", right_on = "KEY", how = "left")
         
     def spatial_join(self):
