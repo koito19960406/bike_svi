@@ -12,7 +12,7 @@ import pandas as pd
 import cv2
 import numpy as np
 import albumentations as aug
-from data_preparation import ImageSegmentationDataset
+from data_preparation import ImageSegmentationDataset, parse_config
 from transformers import DetrFeatureExtractor, DetrForObjectDetection
 import glob
 import re
@@ -230,224 +230,228 @@ class ImageSegmentationSimple:
         # save as csv
         segment_pixel_ratio_df.to_csv(os.path.join(self.csv_output_folder, "segmentation_pixel_ratio_wide.csv"), index = False)
         
-# class ImageSegmenterBikeLane:
-#     """class for segmenting street view images.
-#     """
-#     def __init__(self, input_folder, model_folder):
-#         self.root_dir = input_folder
-#         self.model_folder = model_folder
-#         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#         self.label = json.load(open(os.path.join(self.root_dir,"mapillary_vistas","config_v2.0.json")))['labels']
+class ImageSegmenterBikeLane:
+    """class for segmenting street view images.
+    """
+    def __init__(self, input_folder, model_folder):
+        self.root_dir = input_folder
+        self.model_folder = model_folder
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.class_names, self.class_ids, self.class_evaluate, self.class_colors = parse_config(os.path.join(self.root_dir, "mapillary_vistas"))
     
-#     def reclassify_labels_bl_only(self):
-#         """reclassify labels into binary whether it's bine lane or not
-#         """
-#         # create a new folder
-#         self.new_binary_folder = os.path.join(self.root_dir,"mapillary_binary")
-#         os.makedirs(self.new_binary_folder, exist_ok = True)
-#         for dataset in ["training","validation"]:
-#             print("-"*10,f"working on labels in {dataset}","-"*10)
-#             # create a new folder for each dataset
-#             os.makedirs(os.path.join(self.new_binary_folder,f"{dataset}/labels"), exist_ok = True)
-#             label_file_list = glob.glob(os.path.join(self.root_dir,f"mapillary_vistas/{dataset}/v2.0/labels/*.png"))
-#             for label_file in tqdm.tqdm(label_file_list):
-#                 key = os.path.split(label_file)[1][:-4]
-#                 if not os.path.exists(os.path.join(self.new_binary_folder,f"{dataset}/labels",key+".png")):
-#                     # get the 1st of the 3rd dimention only because all the RGB layers have the same values (i.e., Class ID)
-#                     label = cv2.imread(label_file)[:,:,0]
-#                     # convert label into a binary class: whether bike lane (1) or not (0)
-#                     binary_label = label == 13
-#                     binary_label = binary_label.astype(np.int0)
-#                     # save as a png file
-#                     cv2.imwrite(os.path.join(self.new_binary_folder,f"{dataset}/labels",key+".png"), binary_label)
+    def reclassify_labels_bl_only(self):
+        """reclassify labels into binary whether it's bine lane or not
+        """
+        # create a new folder
+        self.new_binary_folder = os.path.join(self.root_dir,"mapillary_binary")
+        os.makedirs(self.new_binary_folder, exist_ok = True)
+        for dataset in ["training","validation"]:
+            print("-"*10,f"working on labels in {dataset}","-"*10)
+            # create a new folder for each dataset
+            os.makedirs(os.path.join(self.new_binary_folder,f"{dataset}/labels"), exist_ok = True)
+            label_file_list = glob.glob(os.path.join(self.root_dir,f"mapillary_vistas/{dataset}/v2.0/labels/*.png"))
+            for label_file in tqdm.tqdm(label_file_list):
+                key = os.path.split(label_file)[1][:-4]
+                if not os.path.exists(os.path.join(self.new_binary_folder,f"{dataset}/labels",key+".png")):
+                    # get the 1st of the 3rd dimention only because all the RGB layers have the same values (i.e., Class ID)
+                    label = cv2.imread(label_file)[:,:,0]
+                    # convert label into a binary class: whether bike lane (1) or not (0)
+                    binary_label = label == 13
+                    binary_label = binary_label.astype(np.int0)
+                    # save as a png file
+                    cv2.imwrite(os.path.join(self.new_binary_folder,f"{dataset}/labels",key+".png"), binary_label)
                 
-#             # move the images into the respective folders
-#             self.move_img_to_binary_folder(dataset)
+            # move the images into the respective folders
+            self.move_img_to_binary_folder(dataset)
             
-#     def move_img_to_binary_folder(self, dataset):
-#         """move input images to the new folder created in reclassify_labels_bl_only function
-#         """
-#         print("-"*10,f"working on images in {dataset}","-"*10)
-#         # make a new folder for image
-#         os.makedirs(os.path.join(self.new_binary_folder,f"{dataset}/images"), exist_ok = True)
-#         image_file_list = glob.glob(os.path.join(self.root_dir,f"mapillary_vistas/{dataset}/images/*.jpg"))
-#         for image_file in tqdm.tqdm(image_file_list):
-#             # copy into the new folder
-#             shutil.copy2(image_file,os.path.join(self.new_binary_folder,f"{dataset}/images/"))
+    def move_img_to_binary_folder(self, dataset):
+        """move input images to the new folder created in reclassify_labels_bl_only function
+        """
+        print("-"*10,f"working on images in {dataset}","-"*10)
+        # make a new folder for image
+        os.makedirs(os.path.join(self.new_binary_folder,f"{dataset}/images"), exist_ok = True)
+        image_file_list = glob.glob(os.path.join(self.root_dir,f"mapillary_vistas/{dataset}/images/*.jpg"))
+        for image_file in tqdm.tqdm(image_file_list):
+            # copy into the new folder
+            shutil.copy2(image_file,os.path.join(self.new_binary_folder,f"{dataset}/images/"))
             
-#     def _create_data_loaders(self):
-#         # data augmentation instance
-#         transform = aug.Compose([aug.Flip(p=0.5)])
-#         # ss feature extract instance
-#         feature_extractor = SegformerFeatureExtractor(align=False, reduce_zero_label=False)
+    def _create_data_loaders(self, binary = False):
+        # data augmentation instance
+        transform = aug.Compose([aug.Flip(p=0.5)])
+        # ss feature extract instance
+        feature_extractor = SegformerFeatureExtractor(align=False, reduce_zero_label=False)
 
-#         # create datasets
-#         train_dataset = ImageSegmentationDataset(root_dir=os.path.join(self.root_dir,"mapillary_binary"), feature_extractor=feature_extractor, transforms=transform)
-#         valid_dataset = ImageSegmentationDataset(root_dir=os.path.join(self.root_dir,"mapillary_binary"), feature_extractor=feature_extractor, transforms=None, train=False)
-#         print("Number of training examples:", len(train_dataset))
-#         print("Number of validation examples:", len(valid_dataset))
-#         encoded_inputs = train_dataset[0]
-#         print("pixel values: ",encoded_inputs["pixel_values"].shape,
-#               "label shape: ", encoded_inputs["labels"].shape,
-#               "label: ", encoded_inputs["labels"],
-#               "unique label: ", encoded_inputs["labels"].squeeze().unique())
-#         # create data loaders
-#         train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-#         valid_dataloader = DataLoader(valid_dataset, batch_size=32) 
-#         return train_dataloader, valid_dataloader
+        # create datasets
+        if binary:
+            train_dataset = ImageSegmentationDataset(root_dir=os.path.join(self.root_dir,"mapillary_binary"), feature_extractor=feature_extractor, transforms=transform)
+            valid_dataset = ImageSegmentationDataset(root_dir=os.path.join(self.root_dir,"mapillary_binary"), feature_extractor=feature_extractor, transforms=None, train=False)
+        else:
+            train_dataset = ImageSegmentationDataset(root_dir=os.path.join(self.root_dir,"mapillary_vistas"), feature_extractor=feature_extractor, transforms=transform)
+            valid_dataset = ImageSegmentationDataset(root_dir=os.path.join(self.root_dir,"mapillary_vistas"), feature_extractor=feature_extractor, transforms=None, train=False)
+        print("Number of training examples:", len(train_dataset))
+        print("Number of validation examples:", len(valid_dataset))
+        encoded_inputs = train_dataset[0]
+        print("pixel values: ",encoded_inputs["pixel_values"].shape,
+              "label shape: ", encoded_inputs["labels"].shape,
+              "label: ", encoded_inputs["labels"],
+              "unique label: ", encoded_inputs["labels"].squeeze().unique())
+        # create data loaders
+        train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+        valid_dataloader = DataLoader(valid_dataset, batch_size=32) 
+        return train_dataloader, valid_dataloader
     
-#     def train_segmentation_model(self, epoch_num=100):
-#         # set path to the checkpoint model file
-#         path_checkpoint = os.path.join(self.model_folder,"segmentation_checkpoint.pt")
+    def train_segmentation_model(self, epoch_num=100):
+        # set path to the checkpoint model file
+        path_checkpoint = os.path.join(self.model_folder,"segmentation_checkpoint.pt")
         
-#         # create dataloaders
-#         train_dataloader, valid_dataloader = self._create_data_loaders()
+        # create dataloaders
+        train_dataloader, valid_dataloader = self._create_data_loaders()
         
-#         # load checkpoints if there is
-#         if os.path.exists(path_checkpoint):
-#             model = torch.load(path_checkpoint)
-#             model.load_state_dict(model['model_state_dict'])
-#             optimizer.load_state_dict(model['optimizer_state_dict'])
-#             checkpoint_epoch = model['epoch']
-#             accuracies_hist_list = model['accuracies_hist_list']
-#             losses_hist_list = model['losses_hist_list']
-#             val_accuracies_hist_list = model['val_accuracies_hist_list']
-#             val_losses_hist_list = model['val_losses_hist_list']
-#         # if not, then initialize a model
-#         else:
-#             checkpoint_epoch = 1
+        # load checkpoints if there is
+        if os.path.exists(path_checkpoint):
+            model = torch.load(path_checkpoint)
+            model.load_state_dict(model['model_state_dict'])
+            optimizer.load_state_dict(model['optimizer_state_dict'])
+            checkpoint_epoch = model['epoch']
+            accuracies_hist_list = model['accuracies_hist_list']
+            losses_hist_list = model['losses_hist_list']
+            val_accuracies_hist_list = model['val_accuracies_hist_list']
+            val_losses_hist_list = model['val_losses_hist_list']
+        # if not, then initialize a model
+        else:
+            checkpoint_epoch = 1
+            # classes = self.label['name']
+            # id2label = classes.to_dict()
+            id2label = {int(id): label for (id, label) in zip(self.class_ids, self.class_names)}
+            label2id = {v: k for k, v in id2label.items()}
+            # configuration = SegformerConfig()
+            # model = SegformerForSemanticSegmentation(configuration)
+            model = SegformerForSemanticSegmentation.from_pretrained("nvidia/mit-b5", ignore_mismatched_sizes=True,
+                                                            num_labels=len(id2label), id2label=id2label, label2id=label2id,
+                                                            reshape_last_stage=True)
+            optimizer = AdamW(model.parameters(), lr=0.00006)
             
-#             classes = self.label['name']
-#             id2label = classes.to_dict()
-#             label2id = {v: k for k, v in id2label.items()}
-#             # configuration = SegformerConfig()
-#             # model = SegformerForSemanticSegmentation(configuration)
-#             model = SegformerForSemanticSegmentation.from_pretrained("nvidia/mit-b5", ignore_mismatched_sizes=True,
-#                                                             num_labels=len(id2label), id2label=id2label, label2id=label2id,
-#                                                             reshape_last_stage=True)
-#             optimizer = AdamW(model.parameters(), lr=0.00006)
-            
-#             model.to(self.device)
-#             print("Model Initialized!")
+            model.to(self.device)
+            print("Model Initialized!")
         
-#         # train through epochs
-#         for epoch in range(1, epoch_num+1):  # loop over the dataset multiple times
-#             # skip to the checkpoint_epoch
-#             if epoch < checkpoint_epoch:
-#                 continue
-#             print("Epoch:", epoch)
-#             pbar = tqdm.tqdm(train_dataloader)
-#             accuracies = []
-#             losses = []
-#             val_accuracies = []
-#             val_losses = []
-#             model.train()
-#             for idx, batch in enumerate(pbar):
-#                 # get the inputs;
-#                 pixel_values = batch["pixel_values"].to(self.device)
-#                 labels = batch["labels"].to(self.device)
+        # train through epochs
+        for epoch in range(1, epoch_num+1):  # loop over the dataset multiple times
+            # skip to the checkpoint_epoch
+            if epoch < checkpoint_epoch:
+                continue
+            print("Epoch:", epoch)
+            pbar = tqdm.tqdm(train_dataloader)
+            accuracies = []
+            losses = []
+            val_accuracies = []
+            val_losses = []
+            model.train()
+            for idx, batch in enumerate(pbar):
+                # get the inputs;
+                pixel_values = batch["pixel_values"].to(self.device)
+                labels = batch["labels"].to(self.device)
 
-#                 # zero the parameter gradients
-#                 optimizer.zero_grad()
+                # zero the parameter gradients
+                optimizer.zero_grad()
 
-#                 # forward
-#                 outputs = model(pixel_values=pixel_values, labels=labels)
+                # forward
+                outputs = model(pixel_values=pixel_values, labels=labels)
 
-#                 # evaluate
-#                 upsampled_logits = nn.functional.interpolate(outputs.logits, size=labels.shape[-2:], mode="bilinear", align_corners=False)
-#                 predicted = upsampled_logits.argmax(dim=1)
+                # evaluate
+                upsampled_logits = nn.functional.interpolate(outputs.logits, size=labels.shape[-2:], mode="bilinear", align_corners=False)
+                predicted = upsampled_logits.argmax(dim=1)
 
-#                 mask = (labels != 255) # we don't include the background class in the accuracy calculation
-#                 pred_labels = predicted[mask].detach().cpu().numpy()
-#                 true_labels = labels[mask].detach().cpu().numpy()
-#                 accuracy = accuracy_score(pred_labels, true_labels)
-#                 loss = outputs.loss
-#                 accuracies.append(accuracy)
-#                 losses.append(loss.item())
-#                 pbar.set_postfix({'Batch': idx, 'Pixel-wise accuracy': sum(accuracies)/len(accuracies), 'Loss': sum(losses)/len(losses)})
+                mask = (labels != 255) # we don't include the background class in the accuracy calculation
+                pred_labels = predicted[mask].detach().cpu().numpy()
+                true_labels = labels[mask].detach().cpu().numpy()
+                accuracy = accuracy_score(pred_labels, true_labels)
+                loss = outputs.loss
+                accuracies.append(accuracy)
+                losses.append(loss.item())
+                pbar.set_postfix({'Batch': idx, 'Pixel-wise accuracy': sum(accuracies)/len(accuracies), 'Loss': sum(losses)/len(losses)})
 
-#                 # backward + optimize
-#                 loss.backward()
-#                 optimizer.step()
-#             else:
-#                 model.eval()
-#                 with torch.no_grad():
-#                     for idx, batch in enumerate(valid_dataloader):
-#                         pixel_values = batch["pixel_values"].to(self.device)
-#                         labels = batch["labels"].to(self.device)
+                # backward + optimize
+                loss.backward()
+                optimizer.step()
+            else:
+                model.eval()
+                with torch.no_grad():
+                    for idx, batch in enumerate(valid_dataloader):
+                        pixel_values = batch["pixel_values"].to(self.device)
+                        labels = batch["labels"].to(self.device)
                         
-#                         outputs = model(pixel_values=pixel_values, labels=labels)
-#                         upsampled_logits = nn.functional.interpolate(outputs.logits, size=labels.shape[-2:], mode="bilinear", align_corners=False)
-#                         predicted = upsampled_logits.argmax(dim=1)
+                        outputs = model(pixel_values=pixel_values, labels=labels)
+                        upsampled_logits = nn.functional.interpolate(outputs.logits, size=labels.shape[-2:], mode="bilinear", align_corners=False)
+                        predicted = upsampled_logits.argmax(dim=1)
                         
-#                         mask = (labels != 255) # we don't include the background class in the accuracy calculation
-#                         pred_labels = predicted[mask].detach().cpu().numpy()
-#                         true_labels = labels[mask].detach().cpu().numpy()
-#                         accuracy = accuracy_score(pred_labels, true_labels)
-#                         val_loss = outputs.loss
-#                         val_accuracies.append(accuracy)
-#                         val_losses.append(val_loss.item())
-#             accuracy_epoch = sum(accuracies)/len(accuracies)
-#             loss_epoch = sum(losses)/len(losses)
-#             val_accuracy_epoch = sum(val_accuracies)/len(val_accuracies)
-#             val_loss_epoch = sum(val_losses)/len(val_losses)
-#             print(f"Train Pixel-wise accuracy: {accuracy_epoch}\
-#                 Train Loss: {loss_epoch}\
-#                 Val Pixel-wise accuracy: {val_accuracy_epoch}\
-#                 Val Loss: {val_loss_epoch}")
+                        mask = (labels != 255) # we don't include the background class in the accuracy calculation
+                        pred_labels = predicted[mask].detach().cpu().numpy()
+                        true_labels = labels[mask].detach().cpu().numpy()
+                        accuracy = accuracy_score(pred_labels, true_labels)
+                        val_loss = outputs.loss
+                        val_accuracies.append(accuracy)
+                        val_losses.append(val_loss.item())
+            accuracy_epoch = sum(accuracies)/len(accuracies)
+            loss_epoch = sum(losses)/len(losses)
+            val_accuracy_epoch = sum(val_accuracies)/len(val_accuracies)
+            val_loss_epoch = sum(val_losses)/len(val_losses)
+            print(f"Train Pixel-wise accuracy: {accuracy_epoch}\
+                Train Loss: {loss_epoch}\
+                Val Pixel-wise accuracy: {val_accuracy_epoch}\
+                Val Loss: {val_loss_epoch}")
             
-#             # save a checkpoint
-#             torch.save({
-#                 'epoch': epoch,
-#                 'model_state_dict': model.state_dict(),
-#                 'optimizer_state_dict': optimizer.state_dict(),
-#                 'accuracies_hist_list': accuracies_hist_list.append(accuracy_epoch),
-#                 'losses_hist_list': losses_hist_list.append(loss_epoch),
-#                 'val_accuracies_hist_list': val_accuracies_hist_list.append(val_accuracy_epoch),
-#                 'val_losses_hist_list': val_losses_hist_list.append(val_loss_epoch)
-#                 }, 
-#                        path_checkpoint)
+            # save a checkpoint
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'accuracies_hist_list': accuracies_hist_list.append(accuracy_epoch),
+                'losses_hist_list': losses_hist_list.append(loss_epoch),
+                'val_accuracies_hist_list': val_accuracies_hist_list.append(val_accuracy_epoch),
+                'val_losses_hist_list': val_losses_hist_list.append(val_loss_epoch)
+                }, 
+                       path_checkpoint)
         
-#         # save the trained model
-#         torch.save(model, os.path.join(self.model_folder,"segmentation.pt"))
+        # save the trained model
+        torch.save(model, os.path.join(self.model_folder,"segmentation.pt"))
     
-#     def infer(self):
-#         # load model
-#         model = torch.load(os.path.join(self.model_folder,"segmentation.pt"))
-#         # set up feature extractor
-#         feature_extractor_inference = SegformerFeatureExtractor(align=False, reduce_zero_label=False)
-#         # loop through images
-#         for image_file in tqdm.tqdm(glob.glob(os.path.join(self.input_folder, "gsv/image/perspective/*.png"))):
-#             # read image_file to opencv
-#             image = cv2.imread(image_file)
-#             # get pid
-#             image_file_name = os.path.split(image_file)[1]
-#             pid = re.search("(.*)(?<=_Direction)", image_file_name).groups(1)[0]
-#             pid = re.sub("_Direction", "", pid)
+    def infer(self):
+        # load model
+        model = torch.load(os.path.join(self.model_folder,"segmentation.pt"))
+        # set up feature extractor
+        feature_extractor_inference = SegformerFeatureExtractor(align=False, reduce_zero_label=False)
+        # loop through images
+        for image_file in tqdm.tqdm(glob.glob(os.path.join(self.input_folder, "gsv/image/perspective/*.png"))):
+            # read image_file to opencv
+            image = cv2.imread(image_file)
+            # get pid
+            image_file_name = os.path.split(image_file)[1]
+            pid = re.search("(.*)(?<=_Direction)", image_file_name).groups(1)[0]
+            pid = re.sub("_Direction", "", pid)
             
-#             # get pixel_values after feature extraction
-#             pixel_values = feature_extractor_inference(image, return_tensors="pt").pixel_values.to(self.device)
-#             # get output logit from the model
-#             model.eval()
-#             outputs = model(pixel_values=pixel_values) # logits are of shape (batch_size, num_labels, height/4, width/4)
-#             logits = outputs.logits.cpu()
-#             # First, rescale logits to original image size
-#             upsampled_logits = nn.functional.interpolate(logits,
-#                             size=image.shape[:-1], # (height, width)
-#                             mode='bilinear',
-#                             align_corners=False)
+            # get pixel_values after feature extraction
+            pixel_values = feature_extractor_inference(image, return_tensors="pt").pixel_values.to(self.device)
+            # get output logit from the model
+            model.eval()
+            outputs = model(pixel_values=pixel_values) # logits are of shape (batch_size, num_labels, height/4, width/4)
+            logits = outputs.logits.cpu()
+            # First, rescale logits to original image size
+            upsampled_logits = nn.functional.interpolate(logits,
+                            size=image.shape[:-1], # (height, width)
+                            mode='bilinear',
+                            align_corners=False)
 
-#             # Second, apply argmax on the class dimension
-#             seg = upsampled_logits.argmax(dim=1)[0]
-#             #TODO save the result as png file
+            # Second, apply argmax on the class dimension
+            seg = upsampled_logits.argmax(dim=1)[0]
+            #TODO save the result as png file
             
-#             color_seg = np.zeros((seg.shape[0], seg.shape[1], 3), dtype=np.uint8) # height, width, 3\
-#             for label, color in enumerate(self.label):
-#                 color_seg[seg == label, :] = color
-#                 # Convert to BGR
-#                 color_seg = color_seg[..., ::-1]
+            color_seg = np.zeros((seg.shape[0], seg.shape[1], 3), dtype=np.uint8) # height, width, 3\
+            for label, color in enumerate(self.label):
+                color_seg[seg == label, :] = color
+                # Convert to BGR
+                color_seg = color_seg[..., ::-1]
 
-#                 print(pixel_values.shape)
+                print(pixel_values.shape)
 class ImageDetector:
     """Object detect SVI (only use a pretrained model since the objective is to get vehicles and bicycles)
     """
@@ -549,21 +553,27 @@ class ImageDetector:
 #     def __init__(self, input_folder, model_folder):
 #         pass
     
-# if __name__ == '__main__':
-#     root_dir = "/Volumes/exfat/bike_svi/"
-#     input_folder = os.path.join(root_dir,"data/raw")
-#     output_folder = os.path.join(root_dir,"data/interim/cities")
-#     model_folder = os.path.join(root_dir,"models")
-#     # segmentation
-#     image_segmenter = ImageSegmentationSimple(os.path.join(input_folder,"cities/London/gsv/image/perspective"),os.path.join(output_folder,"London"))
-#     image_segmenter.segment_svi()
-#     # image_segmenter = ImageSegmenterBikeLane(input_folder, model_folder)
-#     # image_segmenter.reclassify_labels_bl_only()
-#     # # object detection
-#     # for city in os.listdir(input_folder):
-#     #     if not city.startswith("."):
-#     #         print(city)
-#     #         image_detector = ImageDetector(os.path.join(input_folder,"cities"), output_folder, city)
-#     #         image_detector.detect_object()
-#     #     else:
-#     #         pass
+if __name__ == '__main__':
+    root_dir = "/Volumes/exfat/bike_svi/"
+    if not os.path.exists(root_dir):
+        root_dir = "/Volumes/Extreme SSD/bike_svi/"
+    if not os.path.exists(root_dir):
+        root_dir = r"E:/exfat/bike_svi/"
+    input_folder = os.path.join(root_dir,"data/raw")
+    output_folder = os.path.join(root_dir,"data/interim/cities")
+    model_folder = os.path.join(root_dir,"models")
+    # segmentation
+    image_segmenter = ImageSegmenterBikeLane(input_folder, model_folder)
+    image_segmenter._create_data_loaders()
+    image_segmenter.train_segmentation_model()
+    # image_segmenter.segment_svi()
+    # image_segmenter = ImageSegmenterBikeLane(input_folder, model_folder)
+    # image_segmenter.reclassify_labels_bl_only()
+    # # object detection
+    # for city in os.listdir(input_folder):
+    #     if not city.startswith("."):
+    #         print(city)
+    #         image_detector = ImageDetector(os.path.join(input_folder,"cities"), output_folder, city)
+    #         image_detector.detect_object()
+    #     else:
+    #         pass
