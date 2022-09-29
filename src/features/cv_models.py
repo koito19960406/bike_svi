@@ -12,7 +12,6 @@ import pandas as pd
 import cv2
 import numpy as np
 import albumentations as aug
-from data_preparation import ImageSegmentationDataset, parse_config
 from transformers import DetrFeatureExtractor, DetrForObjectDetection
 import glob
 import re
@@ -32,9 +31,12 @@ import csv
 from pyarrow import feather
 import dask
 import dask.dataframe as dd
+import tensorflow as tf
+import tensorflow_datasets as tfds
 
 from datasets.simple_segmentation import SimpleSegmentationInferDataset
 from datasets.detection import DetectionInferDataset
+from datasets.mapillary_dataset import TrainingDataset, parse_config
 from color_maps import cityscapes
 
 """- objective features will be extracted through 
@@ -233,12 +235,105 @@ class ImageSegmentationSimple:
 class ImageSegmenterBikeLane:
     """class for segmenting street view images.
     """
-    def __init__(self, input_folder, model_folder):
+    def __init__(self, input_folder, model_folder, output_folder):
+        self.cpu_num = os.cpu_count()
         self.root_dir = input_folder
         self.model_folder = model_folder
+        self.output_folder = output_folder
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.class_names, self.class_ids, self.class_evaluate, self.class_colors = parse_config(os.path.join(self.root_dir, "mapillary_vistas"))
-    
+        self.ignore_id = 255
+        # set class_evaluate for those this study is not interested (change class_evaluate if they are in self.class_names)
+        class_names_interested = np.array([
+            # "Pothole",
+            # "Street Light",
+            # "Bike Lane",
+            # "Utility Pole",
+            # "Bike Rack",
+            # "Traffic Sign - Direction (Back)",
+            # "Traffic Sign - Direction (Front)",
+            # "Curb",
+            # "Curb Cut",
+            # "Building",
+            # "Vegetation",
+            "Sky"])
+        self.class_evaluate = np.in1d(self.class_names, class_names_interested)
+        # get index of classes to ignore
+        ignore_index = np.flatnonzero(self.class_evaluate==False)
+        # change class ids to ignore_id if they are ignore_index
+        self.class_ids[ignore_index] = self.ignore_id
+        # replace ids with 0,1,2,3...
+        new_id = 0
+        for index, class_id in enumerate(self.class_ids):
+            if class_id != 255:
+                self.class_ids[index]=new_id
+                new_id += 1
+        print(self.class_ids)
+    def resize_map(self):
+        def mapping(path,key):
+            # resize
+            image = tf.io.read_file(path)
+            image = tf.io.decode_jpeg(image, channels = 3)
+            image = tf.image.resize(image, [512, 512])
+            return image, key
+        
+        def mapping_label(queue,path_out):
+            # resize
+            # image = tf.io.read_file(path)
+            # image = tf.io.decode_jpeg(image, channels = 3)
+            # image = tf.image.resize(image, [512, 512])
+            # new_segmentation_map = tf.zeros((image.shape[0], image.shape[1]), dtype=np.uint8)
+            # R,C,D = tf.experimental.numpy.all(tf.experimental.numpy.where((image == self.class_colors[:,None,None,:])))
+            # new_segmentation_map[C,D] = self.class_ids[R]
+            # image = new_segmentation_map
+            # create a new mask
+            # create progress bar
+            pbar = tqdm.tqdm(total=queue.qsize())
+            while True:
+                if queue.empty():
+                    break
+                path = queue.get()
+                segmentation_map = cv2.imread(path)
+                segmentation_map = cv2.cvtColor(segmentation_map, cv2.COLOR_BGR2RGB)
+                segmentation_map = cv2.resize(segmentation_map, (512, 512))
+                new_segmentation_map = np.zeros((segmentation_map.shape[0], segmentation_map.shape[1]), dtype=np.uint8)
+                R,C,D = np.where((segmentation_map == self.class_colors[:,None,None,:]).all(3))
+                new_segmentation_map[C,D] = self.class_ids[R]
+                # new_segmentation_map = np.expand_dims(new_segmentation_map, axis=2)
+                cv2.imwrite(os.path.join(path_out, os.path.basename(path)), new_segmentation_map)
+                # mark the unit of work complete
+                queue.task_done()
+                # update pbar
+                pbar.update(1)
+            # return image, key
+        
+        for data_split in ["training", "validation"]:
+            for data_type in ["images", "v2.0/labels"]:
+                path = os.path.join(self.root_dir, "mapillary_vistas", data_split, data_type)
+                path_out = os.path.join(self.root_dir, "mapillary_vistas_resized", data_split, data_type)
+                if not os.path.exists(path_out):
+                    images = np.array([i for i in os.listdir(path) if i[:2]!= "._"], dtype = "U54")
+                    image_paths = [os.path.join(path, i) for i in images]
+                    os.makedirs(path_out, exist_ok=True)
+                    if data_type == "images":
+                        ds = tf.data.Dataset.from_tensor_slices((image_paths, images))
+                        ds = ds.map(mapping, num_parallel_calls = tf.data.AUTOTUNE)
+                        for img, path in tqdm.tqdm(tfds.as_numpy(ds)):
+                            tf.keras.utils.save_img(os.path.join(path_out, path.decode("utf-8")), img)     
+                    else:
+                        queue = Queue()
+                        [queue.put(i) for i in image_paths]
+                        threads = [Thread(target=mapping_label, args=(queue, path_out), daemon=True) for index in tqdm.tqdm(range(self.cpu_num))]
+                        for thread in threads:
+                            thread.start()
+                        # wait for threads to finish
+                        for thread in threads:
+                            thread.join()
+                        # wait for all tasks in the queue to be processed
+                        queue.join()
+                            
+                      
+        
     def reclassify_labels_bl_only(self):
         """reclassify labels into binary whether it's bine lane or not
         """
@@ -283,11 +378,11 @@ class ImageSegmenterBikeLane:
 
         # create datasets
         if binary:
-            train_dataset = ImageSegmentationDataset(root_dir=os.path.join(self.root_dir,"mapillary_binary"), feature_extractor=feature_extractor, transforms=transform)
-            valid_dataset = ImageSegmentationDataset(root_dir=os.path.join(self.root_dir,"mapillary_binary"), feature_extractor=feature_extractor, transforms=None, train=False)
+            train_dataset = TrainingDataset(root_dir=os.path.join(self.root_dir,"mapillary_binary"), feature_extractor=feature_extractor, transforms=transform)
+            valid_dataset = TrainingDataset(root_dir=os.path.join(self.root_dir,"mapillary_binary"), feature_extractor=feature_extractor, transforms=None, train=False)
         else:
-            train_dataset = ImageSegmentationDataset(root_dir=os.path.join(self.root_dir,"mapillary_vistas"), feature_extractor=feature_extractor, transforms=transform)
-            valid_dataset = ImageSegmentationDataset(root_dir=os.path.join(self.root_dir,"mapillary_vistas"), feature_extractor=feature_extractor, transforms=None, train=False)
+            train_dataset = TrainingDataset(root_dir=os.path.join(self.root_dir,"mapillary_vistas_resized"), feature_extractor=feature_extractor, transforms=transform)
+            valid_dataset = TrainingDataset(root_dir=os.path.join(self.root_dir,"mapillary_vistas_resized"), feature_extractor=feature_extractor, transforms=None, train=False)
         print("Number of training examples:", len(train_dataset))
         print("Number of validation examples:", len(valid_dataset))
         encoded_inputs = train_dataset[0]
@@ -320,12 +415,12 @@ class ImageSegmenterBikeLane:
         # if not, then initialize a model
         else:
             checkpoint_epoch = 1
-            # classes = self.label['name']
-            # id2label = classes.to_dict()
+            accuracies_hist_list = []
+            losses_hist_list = []
+            val_accuracies_hist_list = []
+            val_losses_hist_list = []
             id2label = {int(id): label for (id, label) in zip(self.class_ids, self.class_names)}
             label2id = {v: k for k, v in id2label.items()}
-            # configuration = SegformerConfig()
-            # model = SegformerForSemanticSegmentation(configuration)
             model = SegformerForSemanticSegmentation.from_pretrained("nvidia/mit-b5", ignore_mismatched_sizes=True,
                                                             num_labels=len(id2label), id2label=id2label, label2id=label2id,
                                                             reshape_last_stage=True)
@@ -416,42 +511,41 @@ class ImageSegmenterBikeLane:
         torch.save(model, os.path.join(self.model_folder,"segmentation.pt"))
     
     def infer(self):
+        # final dictionary
+        seg_dict_final = dict()
         # load model
         model = torch.load(os.path.join(self.model_folder,"segmentation.pt"))
         # set up feature extractor
         feature_extractor_inference = SegformerFeatureExtractor(align=False, reduce_zero_label=False)
-        # loop through images
-        for image_file in tqdm.tqdm(glob.glob(os.path.join(self.input_folder, "gsv/image/perspective/*.png"))):
-            # read image_file to opencv
-            image = cv2.imread(image_file)
-            # get pid
-            image_file_name = os.path.split(image_file)[1]
-            pid = re.search("(.*)(?<=_Direction)", image_file_name).groups(1)[0]
-            pid = re.sub("_Direction", "", pid)
-            
-            # get pixel_values after feature extraction
-            pixel_values = feature_extractor_inference(image, return_tensors="pt").pixel_values.to(self.device)
-            # get output logit from the model
-            model.eval()
-            outputs = model(pixel_values=pixel_values) # logits are of shape (batch_size, num_labels, height/4, width/4)
-            logits = outputs.logits.cpu()
-            # First, rescale logits to original image size
-            upsampled_logits = nn.functional.interpolate(logits,
-                            size=image.shape[:-1], # (height, width)
-                            mode='bilinear',
-                            align_corners=False)
+        gsv_invalid_file = os.path.join(self.gsv_metadata_folder,"invalid_file_name.csv")
+        
+        infer_data = SimpleSegmentationInferDataset(self.input_folder, gsv_invalid_file, feature_extractor_inference, self.img_output_folder)
+        infer_loader = torch.utils.data.DataLoader(infer_data,
+                                                batch_size=1,
+                                                shuffle=False,
+                                                num_workers=4,
+                                                pin_memory=True)
+        with torch.no_grad():
+            for inputs, file_name in tqdm.tqdm(infer_loader, total = len(infer_loader)):
+                # produce logits from the model
+                inputs = inputs.to(self.device)
+                outputs = model(pixel_values = inputs)
+                logits = outputs.logits.cpu()
+                upsampled_logits = nn.functional.interpolate(logits,
+                    size=inputs.shape[-2:], # (height, width)
+                    mode='bilinear',
+                    align_corners=False)
 
-            # Second, apply argmax on the class dimension
-            seg = upsampled_logits.argmax(dim=1)[0]
-            #TODO save the result as png file
+                # Second, apply argmax on the class dimension
+                seg = upsampled_logits.argmax(dim=1)[0].numpy()
+                total_pixel = seg.shape[0] * seg.shape[1]
+                values, counts = np.unique(seg, return_counts=True)
+                seg_dict = [{value: count/total_pixel} for (value, count) in zip(values, counts)]
+                seg_dict_final[file_name] = seg_dict
+            # save seg_dict_final as feather
+            with open(os.path.join(self.output_folder, 'segmentation_result.json'), 'w') as fp:
+                json.dump(seg_dict_final, fp)
             
-            color_seg = np.zeros((seg.shape[0], seg.shape[1], 3), dtype=np.uint8) # height, width, 3\
-            for label, color in enumerate(self.label):
-                color_seg[seg == label, :] = color
-                # Convert to BGR
-                color_seg = color_seg[..., ::-1]
-
-                print(pixel_values.shape)
 class ImageDetector:
     """Object detect SVI (only use a pretrained model since the objective is to get vehicles and bicycles)
     """
@@ -470,8 +564,8 @@ class ImageDetector:
     def detect_object(self):
         gsv_invalid_file = os.path.join(self.gsv_metadata_folder,"invalid_file_name.csv")
         # load and create a model
-        feature_extractor = DetrFeatureExtractor.from_pretrained(self.pretrained_model).to(self.device)
-        model = DetrForObjectDetection.from_pretrained(self.pretrained_model)
+        feature_extractor = DetrFeatureExtractor.from_pretrained(self.pretrained_model)
+        model = DetrForObjectDetection.from_pretrained(self.pretrained_model).to(self.device)
         
         infer_data = DetectionInferDataset(self.input_folder, gsv_invalid_file, feature_extractor, os.path.join(self.output_folder, "object_detection_raw.csv"))
         infer_loader = torch.utils.data.DataLoader(infer_data,
@@ -479,13 +573,13 @@ class ImageDetector:
                                                 shuffle=False,
                                                 num_workers=4,
                                                 pin_memory=True)
-        
+        print(len(infer_loader))
         with torch.no_grad():
             for inputs, file_name in tqdm.tqdm(infer_loader, total = len(infer_loader)):
                 try:
                     result_df = pd.read_csv(os.path.join(self.output_folder, "object_detection_raw.csv"))
                 except FileNotFoundError:
-                    result_df = pd.DataFrame(columns=["pid","label","score"])
+                    result_df = pd.DataFrame(columns=["file_name","pid","label","score"])
                 # get pid
                 pid = re.search("(.*)(?<=_Direction)", file_name).groups(1)[0]
                 pid = re.sub("_Direction", "", pid)
@@ -497,6 +591,7 @@ class ImageDetector:
                 # initialize df to save the result
                 result_list_agg = []
                 for score, label in zip(results["scores"], results["labels"]):
+                    print(label)
                     # let's only keep detections with score > 0.8
                     if score > 0.8:
                         result_list = [file_name, pid, model.config.id2label[label.item()], score.item()]
@@ -543,7 +638,7 @@ class ImageDetector:
                         )
         print(gsv_metadata)
         # save the result as csv
-        gsv_metadata.to_csv(os.path.join(self.output_folder, "/object_detection_bicycle_vehicle.csv"), index = False)
+        gsv_metadata.to_csv(os.path.join(self.output_folder, "object_detection_bicycle_vehicle.csv"), index = False)
 
 
 # class PerceptionPredictor:
@@ -554,26 +649,30 @@ class ImageDetector:
 #         pass
     
 if __name__ == '__main__':
-    root_dir = "/Volumes/exfat/bike_svi/"
+    root_dir = "/Volumes/ExFAT/bike_svi/"
     if not os.path.exists(root_dir):
-        root_dir = "/Volumes/Extreme SSD/bike_svi/"
+        root_dir = r"C:/Koichi/"
     if not os.path.exists(root_dir):
         root_dir = r"E:/exfat/bike_svi/"
     input_folder = os.path.join(root_dir,"data/raw")
     output_folder = os.path.join(root_dir,"data/interim/cities")
     model_folder = os.path.join(root_dir,"models")
-    # segmentation
-    image_segmenter = ImageSegmenterBikeLane(input_folder, model_folder)
-    image_segmenter._create_data_loaders()
-    image_segmenter.train_segmentation_model()
+    #  # segmentation
+    image_segmenter = ImageSegmenterBikeLane(input_folder, model_folder, os.path.join(output_folder, "London"))
+    image_segmenter.resize_map()
+    # image_segmenter._create_data_loaders()
+    # image_segmenter.train_segmentation_model()
     # image_segmenter.segment_svi()
     # image_segmenter = ImageSegmenterBikeLane(input_folder, model_folder)
     # image_segmenter.reclassify_labels_bl_only()
-    # # object detection
-    # for city in os.listdir(input_folder):
-    #     if not city.startswith("."):
-    #         print(city)
-    #         image_detector = ImageDetector(os.path.join(input_folder,"cities"), output_folder, city)
-    #         image_detector.detect_object()
+    # object detection
+    for city in os.listdir(os.path.join(input_folder,"cities")):
+        if not city.startswith("."):
+            print(city) 
+            gsv_metadata_folder = os.path.join(input_folder,"cities",city,"gsv/metadata")
+            image_detector = ImageDetector(os.path.join(input_folder,"cities", city, "gsv/image/perspective"), 
+                os.path.join(output_folder, city),
+                gsv_metadata_folder)
+            image_detector.detect_object()
     #     else:
     #         pass
