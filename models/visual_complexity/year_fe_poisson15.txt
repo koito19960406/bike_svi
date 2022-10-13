@@ -1,0 +1,49 @@
+
+Call:
+glm(formula = formula, family = poisson(), data = data)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-3.5795  -0.3340   0.0616   0.4128   2.4355  
+
+Coefficients:
+                   Estimate Std. Error z value Pr(>|z|)    
+(Intercept)        0.996134   0.034892  28.549  < 2e-16 ***
+visual_complexity  0.559610   0.049383  11.332  < 2e-16 ***
+year2009           0.016481   0.017356   0.950 0.342314    
+year2010           0.012470   0.083788   0.149 0.881685    
+year2011          -0.044436   0.030099  -1.476 0.139861    
+year2012          -0.074650   0.013701  -5.449 5.08e-08 ***
+year2013           0.238589   0.357537   0.667 0.504572    
+year2014          -0.039404   0.013681  -2.880 0.003974 ** 
+year2015           0.004694   0.012931   0.363 0.716638    
+year2016           0.021461   0.013557   1.583 0.113406    
+year2017           0.017257   0.013150   1.312 0.189389    
+year2018          -0.045273   0.013447  -3.367 0.000761 ***
+year2019          -0.042639   0.013522  -3.153 0.001615 ** 
+year2020           0.022224   0.014855   1.496 0.134639    
+bicycle            2.101580   0.523412   4.015 5.94e-05 ***
+building           0.355529   0.022860  15.553  < 2e-16 ***
+bus                0.502171   0.055012   9.128  < 2e-16 ***
+car                0.424605   0.095118   4.464 8.04e-06 ***
+fence              0.209324   0.082488   2.538 0.011161 *  
+motorcycle        -0.203658   1.028506  -0.198 0.843034    
+person             2.833011   0.261737  10.824  < 2e-16 ***
+pole               0.985973   0.455692   2.164 0.030489 *  
+rider              6.178095   0.912733   6.769 1.30e-11 ***
+road               1.304458   0.071917  18.138  < 2e-16 ***
+sidewalk           2.254694   0.107411  20.991  < 2e-16 ***
+sky               -1.304824   0.041012 -31.816  < 2e-16 ***
+terrain           -0.498250   0.091478  -5.447 5.13e-08 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 19129  on 20874  degrees of freedom
+Residual deviance: 13579  on 20848  degrees of freedom
+  (408 observations deleted due to missingness)
+AIC: Inf
+
+Number of Fisher Scoring iterations: 4
+

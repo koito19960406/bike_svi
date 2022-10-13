@@ -1,0 +1,24 @@
+
+Call:
+zeroinfl(formula = formula, data = data, dist = count_model, link = "logit")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-0.7335 -0.6445 -0.4571  0.1308 18.6114 
+
+Count model coefficients (negbin with log link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  7.07127    0.01612  438.61   <2e-16 ***
+vegetation  -2.67536    0.06120  -43.72   <2e-16 ***
+Log(theta)  -0.60661    0.01025  -59.19   <2e-16 ***
+
+Zero-inflation model coefficients (binomial with logit link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  -4.1038     0.1428 -28.746   <2e-16 ***
+vegetation   -1.2658     0.5784  -2.188   0.0286 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Theta = 0.5452 
+Number of iterations in BFGS optimization: 12 
+Log-likelihood: -1.525e+05 on 5 Df

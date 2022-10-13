@@ -1,0 +1,11 @@
+{
+    "timestamp": "2022-09-28T17:34:30.782290",
+    "status": null,
+    "message": "Expecting value: line 1 column 1 (char 0)",
+    "requestUrl": "https://api.ohsome.org/v1/",
+    "parameters": {
+        "bcircles": "0.03695413,51.54350347,500",
+        "time": "2008-01-01",
+        "filter": "amenity=*"
+    }
+}

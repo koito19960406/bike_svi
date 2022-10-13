@@ -245,17 +245,17 @@ class ImageSegmenterBikeLane:
         self.ignore_id = 255
         # set class_evaluate for those this study is not interested (change class_evaluate if they are in self.class_names)
         class_names_interested = np.array([
-            # "Pothole",
-            # "Street Light",
-            # "Bike Lane",
-            # "Utility Pole",
-            # "Bike Rack",
-            # "Traffic Sign - Direction (Back)",
-            # "Traffic Sign - Direction (Front)",
-            # "Curb",
-            # "Curb Cut",
-            # "Building",
-            # "Vegetation",
+            "Pothole",
+            "Street Light",
+            "Bike Lane",
+            "Utility Pole",
+            "Bike Rack",
+            "Traffic Sign - Direction (Back)",
+            "Traffic Sign - Direction (Front)",
+            "Curb",
+            "Curb Cut",
+            "Building",
+            "Vegetation",
             "Sky"])
         self.class_evaluate = np.in1d(self.class_names, class_names_interested)
         # get index of classes to ignore
@@ -401,38 +401,36 @@ class ImageSegmenterBikeLane:
         
         # create dataloaders
         train_dataloader, valid_dataloader = self._create_data_loaders()
-        
+        id2label = {int(id): label for (id, label) in zip(self.class_ids, self.class_names)}
+        label2id = {v: k for k, v in id2label.items()}
+        model = SegformerForSemanticSegmentation.from_pretrained("nvidia/mit-b5", ignore_mismatched_sizes=True,
+                                                        num_labels=len(id2label), id2label=id2label, label2id=label2id,
+                                                        reshape_last_stage=True)
+        optimizer = AdamW(model.parameters(), lr=0.00006)
         # load checkpoints if there is
         if os.path.exists(path_checkpoint):
-            model = torch.load(path_checkpoint)
-            model.load_state_dict(model['model_state_dict'])
-            optimizer.load_state_dict(model['optimizer_state_dict'])
-            checkpoint_epoch = model['epoch']
-            accuracies_hist_list = model['accuracies_hist_list']
-            losses_hist_list = model['losses_hist_list']
-            val_accuracies_hist_list = model['val_accuracies_hist_list']
-            val_losses_hist_list = model['val_losses_hist_list']
+            check_point = torch.load(path_checkpoint)
+            model.load_state_dict(check_point['model_state_dict'])
+            optimizer.load_state_dict(check_point['optimizer_state_dict'])
+            checkpoint_epoch = check_point['epoch']
+            accuracies_hist_list = check_point['accuracies_hist_list']
+            losses_hist_list = check_point['losses_hist_list']
+            val_accuracies_hist_list = check_point['val_accuracies_hist_list']
+            val_losses_hist_list = check_point['val_losses_hist_list']
         # if not, then initialize a model
         else:
-            checkpoint_epoch = 1
+            checkpoint_epoch = 0
             accuracies_hist_list = []
             losses_hist_list = []
             val_accuracies_hist_list = []
             val_losses_hist_list = []
-            id2label = {int(id): label for (id, label) in zip(self.class_ids, self.class_names)}
-            label2id = {v: k for k, v in id2label.items()}
-            model = SegformerForSemanticSegmentation.from_pretrained("nvidia/mit-b5", ignore_mismatched_sizes=True,
-                                                            num_labels=len(id2label), id2label=id2label, label2id=label2id,
-                                                            reshape_last_stage=True)
-            optimizer = AdamW(model.parameters(), lr=0.00006)
-            
             model.to(self.device)
             print("Model Initialized!")
         
         # train through epochs
         for epoch in range(1, epoch_num+1):  # loop over the dataset multiple times
             # skip to the checkpoint_epoch
-            if epoch < checkpoint_epoch:
+            if epoch <= checkpoint_epoch:
                 continue
             print("Epoch:", epoch)
             pbar = tqdm.tqdm(train_dataloader)
@@ -495,26 +493,41 @@ class ImageSegmenterBikeLane:
                 Val Pixel-wise accuracy: {val_accuracy_epoch}\
                 Val Loss: {val_loss_epoch}")
             
+            accuracies_hist_list.append(accuracy_epoch)
+            losses_hist_list.append(loss_epoch)
+            val_accuracies_hist_list.append(val_accuracy_epoch)
+            val_losses_hist_list.append(val_loss_epoch)
             # save a checkpoint
             torch.save({
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
-                'accuracies_hist_list': accuracies_hist_list.append(accuracy_epoch),
-                'losses_hist_list': losses_hist_list.append(loss_epoch),
-                'val_accuracies_hist_list': val_accuracies_hist_list.append(val_accuracy_epoch),
-                'val_losses_hist_list': val_losses_hist_list.append(val_loss_epoch)
+                'accuracies_hist_list': accuracies_hist_list,
+                'losses_hist_list': losses_hist_list,
+                'val_accuracies_hist_list': val_accuracies_hist_list,
+                'val_losses_hist_list': val_losses_hist_list
                 }, 
                        path_checkpoint)
         
         # save the trained model
         torch.save(model, os.path.join(self.model_folder,"segmentation.pt"))
     
-    def infer(self):
+    def infer(self, load_checkpoint = False):
         # final dictionary
         seg_dict_final = dict()
         # load model
-        model = torch.load(os.path.join(self.model_folder,"segmentation.pt"))
+        if load_checkpoint:
+            id2label = {int(id): label for (id, label) in zip(self.class_ids, self.class_names)}
+            label2id = {v: k for k, v in id2label.items()}
+            model = SegformerForSemanticSegmentation.from_pretrained("nvidia/mit-b5", ignore_mismatched_sizes=True,
+                                                            num_labels=len(id2label), id2label=id2label, label2id=label2id,
+                                                            reshape_last_stage=True).to(self.device)
+            check_point = torch.load(os.path.join(self.model_folder,"segmentation_checkpoint.pt"))
+            model.load_state_dict(check_point["model_state_dict"])
+            model.eval()
+        else:
+            model = torch.load(os.path.join(self.model_folder,"segmentation.pt")).to(self.device)
+            model.eval()
         # set up feature extractor
         feature_extractor_inference = SegformerFeatureExtractor(align=False, reduce_zero_label=False)
         gsv_invalid_file = os.path.join(self.gsv_metadata_folder,"invalid_file_name.csv")
@@ -545,7 +558,18 @@ class ImageSegmenterBikeLane:
             # save seg_dict_final as feather
             with open(os.path.join(self.output_folder, 'segmentation_result.json'), 'w') as fp:
                 json.dump(seg_dict_final, fp)
-            
+                
+    def json_to_df(self):
+        """function to convert json to csv
+        """
+        with open(os.path.join(self.output_folder, 'segmentation_result.json'), 'r') as file:
+            seg_dict_final = json.load(file)
+        
+        df = pd.json_normalize(seg_dict_final, max_level=0)
+        
+        # save as csv
+        df.to_csv(os.path.join(self.output_folder, 'segmentation_result.csv'))
+    
 class ImageDetector:
     """Object detect SVI (only use a pretrained model since the objective is to get vehicles and bicycles)
     """
@@ -554,8 +578,9 @@ class ImageDetector:
         self.pretrained_model = pretrained_model
         self.input_folder = input_folder
         self.output_folder = output_folder
+        self.temp_output_folder = os.path.join(self.output_folder,"detection")
         self.gsv_metadata_folder = gsv_metadata_folder
-        os.makedirs(self.output_folder, exist_ok = True)
+        os.makedirs(self.temp_output_folder, exist_ok = True)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         # filter image to remove invalid images
         filter_image(self.gsv_metadata_folder, self.input_folder)
@@ -566,81 +591,111 @@ class ImageDetector:
         # load and create a model
         feature_extractor = DetrFeatureExtractor.from_pretrained(self.pretrained_model)
         model = DetrForObjectDetection.from_pretrained(self.pretrained_model).to(self.device)
-        
-        infer_data = DetectionInferDataset(self.input_folder, gsv_invalid_file, feature_extractor, os.path.join(self.output_folder, "object_detection_raw.csv"))
+        infer_data = DetectionInferDataset(self.input_folder, gsv_invalid_file, feature_extractor, self.temp_output_folder)
         infer_loader = torch.utils.data.DataLoader(infer_data,
-                                                batch_size=1,
+                                                batch_size=1, # keep this to 1
                                                 shuffle=False,
                                                 num_workers=4,
                                                 pin_memory=True)
+        
         print(len(infer_loader))
         with torch.no_grad():
+            # batch count to bundle result into feather file
+            # save to feather every 500 count
+            batch_count = 1
+            batch_size = 500 
+            # initialize df to save the result
+            result_list_agg = []
             for inputs, file_name in tqdm.tqdm(infer_loader, total = len(infer_loader)):
-                try:
-                    result_df = pd.read_csv(os.path.join(self.output_folder, "object_detection_raw.csv"))
-                except FileNotFoundError:
-                    result_df = pd.DataFrame(columns=["file_name","pid","label","score"])
                 # get pid
-                pid = re.search("(.*)(?<=_Direction)", file_name).groups(1)[0]
+                pid = re.search("(.*)(?<=_Direction)", file_name[0]).groups(1)[0]
                 pid = re.sub("_Direction", "", pid)
                 # produce logits from the model
                 inputs = inputs.to(self.device)
                 outputs = model(pixel_values = inputs)
+                img_size = torch.tensor([inputs.size()[2], inputs.size()[3]])
+                target_sizes = torch.unsqueeze(img_size, dim=0)
                 # resize and infer
-                results = feature_extractor.post_process(outputs, target_sizes=inputs.size())[0]
-                # initialize df to save the result
-                result_list_agg = []
+                results = feature_extractor.post_process(outputs, target_sizes=target_sizes)[0]
                 for score, label in zip(results["scores"], results["labels"]):
-                    print(label)
                     # let's only keep detections with score > 0.8
                     if score > 0.8:
-                        result_list = [file_name, pid, model.config.id2label[label.item()], score.item()]
-                        print(
-                            f"Detected {model.config.id2label[label.item()]} with confidence "
-                            f"{round(score.item(), 3)}"
-                        )
+                        result_list = [file_name[0], pid, model.config.id2label[label.item()], score.item()]
+                        # print(
+                        #     f"Detected {model.config.id2label[label.item()]} with confidence "
+                        #     f"{round(score.item(), 3)}"
+                        # )
                         result_list_agg.append(result_list)
-                # if there's no result, then append only pid
-                if len(result_list_agg) == 0:
-                    result_list_agg.append([file_name, pid,None,None])
-                # convert the result_list_agg to df and save as csv
+                if batch_count % batch_size == 0:
+                    # convert the result_list_agg to df and save as csv
+                    result_list_agg_df = pd.DataFrame(result_list_agg, columns=["file_name","pid","label","score"])
+                    result_list_agg_df.to_feather(os.path.join(self.output_folder, f"object_detection_{str(batch_count)}.feather"), index = False)
+                    result_list_agg = []
+                # addd 1 to batch_count
+                batch_count += 1
+            # save the remaining data to the latest feather file
+            if len(result_list_agg) != 0:
                 result_list_agg_df = pd.DataFrame(result_list_agg, columns=["file_name","pid","label","score"])
-                result_df = pd.concat([result_df.reset_index(drop=True), result_list_agg_df.reset_index(drop=True)])
-                result_df.to_csv(os.path.join(self.output_folder, "object_detection_raw.csv"), index = False)
-                
+                if batch_count < batch_size:
+                    result_list_agg_df.to_feather(os.path.join(self.output_folder, f"object_detection_{str(batch_count)}.feather"), index = False)
+                else:
+                    latest_batch_num = (batch_count // batch_size) * batch_size
+                    latest_df = pd.read_feather(os.path.join(self.output_folder, f"object_detection_{str(latest_batch_num)}.feather"))
+                    result_list_agg_df = pd.concat([latest_df, result_list_agg_df], ignore_index = True)
+                    result_list_agg_df.to_feather(os.path.join(self.output_folder, f"object_detection_{str(latest_batch_num)}.feather"), index = False)
     
-    def count_vehicle_bicycle(self):
+    def count_objects(self):
         """calculate total number of bycicycle and vehicles (car, motorcycle, bus, truck) under COCO detection 2017 dataset
         """
-        # load the result of object detection as df
-        result_df = pd.read_csv(os.path.join(self.output_folder, "object_detection.csv"))
+        feather_list = glob.glob(os.path.join(self.output_folder, "*.feather"))
+        dfs = [dask.delayed(feather.read_feather)(f) for f in feather_list]
+        df = dd.from_delayed(dfs)
+        result_df = df.drop_duplicates().compute()
+        # filter with person and group by pid
+        result_person = (result_df.
+                        query("label == 'person'").
+                        groupby("pid").
+                        agg(["count"]).
+                        reset_index().
+                        droplevel(level=1, axis=1).
+                        iloc[:,:2].
+                        rename(columns=lambda s: s.replace("file_name", "person_count"))
+                        )
+        print(result_person)
         # filter with bicycle and group by pid
         result_bicycle = (result_df.
-                          query("label == 'bicycle'").
-                          groupby("pid").
-                          agg(["sum"]).
-                          reset_index()
-                          )
+                        query("label == 'bicycle'").
+                        groupby("pid").
+                        agg(["count"]).
+                        reset_index().
+                        droplevel(level=1, axis=1).
+                        iloc[:,:2].
+                        rename(columns=lambda s: s.replace("file_name", "bicycle_count"))
+                        )
         print(result_bicycle)
         # filter with vehicles (car, motorcycle, bus, truck) and group by pid
         result_vehicle = (result_df.
-                          query("label == 'car' | label == 'motorcycle' | label == 'bus' | label == 'truck'").
-                          groupby("pid").
-                          agg(["sum"]).
-                          reset_index()
-                          )
+                        query("label == 'car' | label == 'motorcycle' | label == 'bus' | label == 'truck'").
+                        groupby("pid").
+                        agg(["count"]).
+                        reset_index().
+                        droplevel(level=1, axis=1).
+                        iloc[:,:2].
+                        rename(columns=lambda s: s.replace("file_name", "vehicle_count"))
+                        )
         print(result_vehicle)
         # join the result back to gsv meta_data
         gsv_metadata = pd.read_csv(os.path.join(self.gsv_metadata_folder, "gsv_metadata.csv"))
         gsv_metadata = (gsv_metadata.
+                        merge(result_person, left_on = "panoid", right_on = "pid", how = "left").
                         merge(result_bicycle, left_on = "panoid", right_on = "pid", how = "left").
                         merge(result_vehicle, left_on = "panoid", right_on = "pid", how = "left")
                         )
+        gsv_metadata = gsv_metadata.loc[:,~gsv_metadata.columns.str.startswith('pid')]
         print(gsv_metadata)
         # save the result as csv
         gsv_metadata.to_csv(os.path.join(self.output_folder, "object_detection_bicycle_vehicle.csv"), index = False)
-
-
+        
 # class PerceptionPredictor:
 #     """class for predicting perception score for PlacePulse 2.0 data
 #     """
@@ -651,15 +706,13 @@ class ImageDetector:
 if __name__ == '__main__':
     root_dir = "/Volumes/ExFAT/bike_svi/"
     if not os.path.exists(root_dir):
-        root_dir = r"C:/Koichi/"
-    if not os.path.exists(root_dir):
-        root_dir = r"E:/exfat/bike_svi/"
+        root_dir = r"E:/bike_svi/"
     input_folder = os.path.join(root_dir,"data/raw")
     output_folder = os.path.join(root_dir,"data/interim/cities")
     model_folder = os.path.join(root_dir,"models")
     #  # segmentation
-    image_segmenter = ImageSegmenterBikeLane(input_folder, model_folder, os.path.join(output_folder, "London"))
-    image_segmenter.resize_map()
+    # image_segmenter = ImageSegmenterBikeLane(input_folder, model_folder, os.path.join(output_folder, "London"))
+    # image_segmenter.resize_map()
     # image_segmenter._create_data_loaders()
     # image_segmenter.train_segmentation_model()
     # image_segmenter.segment_svi()
@@ -673,6 +726,7 @@ if __name__ == '__main__':
             image_detector = ImageDetector(os.path.join(input_folder,"cities", city, "gsv/image/perspective"), 
                 os.path.join(output_folder, city),
                 gsv_metadata_folder)
-            image_detector.detect_object()
+            # image_detector.detect_object()
+            image_detector.count_objects()
     #     else:
     #         pass

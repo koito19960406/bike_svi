@@ -2,7 +2,6 @@ import os
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-import elevation
 import richdem as rd
 import geopandas as gpd
 from gis_utils import zonal_stats 
@@ -12,6 +11,7 @@ import rasterio
 import gemgis as gg
 from tqdm import tqdm
 from multiprocessing.pool import ThreadPool
+import glob 
 
 class GISVariables:
     """
@@ -96,9 +96,6 @@ class GISVariables:
             # loop through a range of years to get numbers of POI around count stations:
             # define the wrapper function
             def fetch_func(df, buffer, client):
-                print("qoq")
-                print(df)
-                return
                 for year in range(2008,2021):
                     try:
                         response = client.elements.count.post(
@@ -117,18 +114,15 @@ class GISVariables:
                     response_df = response.as_dataframe().reset_index()
                     poi_num = response_df["value"][0]
                     df[f"poi_{str(year)}"] = poi_num
-                    return df
+                return pd.DataFrame(df).transpose()
             # read csv
             try:
                 poi_df = pd.read_csv(os.path.join(output_folder, f"poi_{str(index)}.csv"))
             except FileNotFoundError:
-                poi_df = None
+                poi_df = pd.DataFrame()
             # check if poi_df exists or not
-            if poi_df is not None:
-                print("lolll")
-                print(df)
-                print(poi_df)
-                if poi_df["count_point_id"].str.contains(df["count_point_id"]).any():
+            if len(poi_df.index)>0:
+                if df["count_point_id"] in set(poi_df["count_point_id"]):
                     return
                 else:
                     df = fetch_func(df, buffer, client)
@@ -155,6 +149,13 @@ class GISVariables:
             return 
         # run the function
         parallelize_dataframe(self.count_station, parallelize_function)
+        
+        # join them
+        # list of merged files returned
+        files = glob.glob(os.path.join(self.output_folder, "poi_*.csv"))
+        # joining files with concat and read_csv
+        df = pd.concat(map(pd.read_csv, files), ignore_index=True)
+        df.to_csv(os.path.join(self.output_folder, "poi.csv"), index = False)
         
 if __name__ == "__main__":
     root_dir = "/Volumes/ExFAT/bike_svi/data"

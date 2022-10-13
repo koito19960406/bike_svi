@@ -1,0 +1,46 @@
+
+Call:
+glm(formula = formula, family = poisson(), data = data)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-3.7298  -0.3588   0.0774   0.4670   1.8966  
+
+Coefficients:
+                  Estimate Std. Error z value Pr(>|z|)    
+(Intercept)        0.80756    0.03296  24.500  < 2e-16 ***
+visual_complexity  0.71998    0.04672  15.411  < 2e-16 ***
+year2009           0.03002    0.01735   1.730   0.0836 .  
+year2010          -0.04810    0.08377  -0.574   0.5658    
+year2011          -0.05169    0.03009  -1.718   0.0858 .  
+year2012          -0.01856    0.01358  -1.367   0.1715    
+year2013           0.41280    0.35744   1.155   0.2481    
+year2014           0.02161    0.01356   1.594   0.1109    
+year2015           0.06788    0.01279   5.307 1.12e-07 ***
+year2016           0.08762    0.01341   6.536 6.32e-11 ***
+year2017           0.09013    0.01299   6.940 3.92e-12 ***
+year2018           0.01768    0.01325   1.334   0.1821    
+year2019           0.02838    0.01336   2.125   0.0336 *  
+year2020           0.10375    0.01463   7.093 1.31e-12 ***
+bicycle            3.07816    0.51096   6.024 1.70e-09 ***
+building           0.78663    0.01956  40.206  < 2e-16 ***
+bus                0.52491    0.05329   9.851  < 2e-16 ***
+car               -0.44004    0.08197  -5.369 7.94e-08 ***
+fence             -0.03201    0.07690  -0.416   0.6773    
+motorcycle        -0.51543    1.02921  -0.501   0.6165    
+person             3.13423    0.25382  12.348  < 2e-16 ***
+pole               0.25591    0.44921   0.570   0.5689    
+rider              7.17032    0.90073   7.961 1.71e-15 ***
+road               0.70934    0.06403  11.079  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 19129  on 20874  degrees of freedom
+Residual deviance: 15523  on 20851  degrees of freedom
+  (408 observations deleted due to missingness)
+AIC: Inf
+
+Number of Fisher Scoring iterations: 4
+

@@ -1,0 +1,42 @@
+
+Call:
+glm(formula = formula, family = poisson(), data = data)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-4.1719  -0.3848   0.0799   0.4726   2.1573  
+
+Coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.25557    0.01605  78.227  < 2e-16 ***
+vegetation   0.37675    0.02760  13.648  < 2e-16 ***
+year2009     0.04039    0.01735   2.329 0.019884 *  
+year2010    -0.01539    0.08376  -0.184 0.854181    
+year2011    -0.02627    0.03007  -0.873 0.382404    
+year2012     0.00843    0.01351   0.624 0.532519    
+year2013     0.42802    0.35731   1.198 0.230958    
+year2014     0.04961    0.01348   3.679 0.000234 ***
+year2015     0.10376    0.01271   8.166 3.18e-16 ***
+year2016     0.12514    0.01331   9.405  < 2e-16 ***
+year2017     0.12654    0.01288   9.822  < 2e-16 ***
+year2018     0.05013    0.01320   3.796 0.000147 ***
+year2019     0.04897    0.01331   3.679 0.000234 ***
+year2020     0.13065    0.01459   8.957  < 2e-16 ***
+bicycle      4.66130    0.48633   9.585  < 2e-16 ***
+building     0.96823    0.02382  40.643  < 2e-16 ***
+bus          0.87516    0.05002  17.497  < 2e-16 ***
+car         -0.39352    0.07315  -5.380 7.46e-08 ***
+fence        0.33449    0.07193   4.650 3.31e-06 ***
+motorcycle   1.30157    1.00431   1.296 0.194982    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 19129  on 20874  degrees of freedom
+Residual deviance: 16017  on 20855  degrees of freedom
+  (408 observations deleted due to missingness)
+AIC: Inf
+
+Number of Fisher Scoring iterations: 4
+

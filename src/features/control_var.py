@@ -45,34 +45,38 @@ class ControlVariables:
                 # from here group ages by 10 years
                 # and it'll get msessy because I'll use if conditions for each year
                 if year==2020:
-                    drop_col_list = ["OA11CD", "All Ages"]
+                    drop_col_list = ["OA11CD"]
                 elif year == 2019:
-                    drop_col_list = ["LSOA Name", "LA Code (2019 boundaries)", "LA name (2019 boundaries)", "LA Code (2020 boundaries)", "LA name (2020 boundaries)", "All Ages"]
+                    drop_col_list = ["LSOA Name", "LA Code (2019 boundaries)", "LA name (2019 boundaries)", "LA Code (2020 boundaries)", "LA name (2020 boundaries)"]
                 elif 2018 == year:
-                    drop_col_list = ["LA (2019 boundaries)","LSOA", "All Ages"]
+                    drop_col_list = ["LA (2019 boundaries)","LSOA"]
                 elif 2011 <= year <= 2017:
-                    drop_col_list = population.iloc[:,1:4]
+                    drop_col_list = population.iloc[:,1:3]
                 else: 
                     # for year 2008-2010
-                    drop_col_list = ["LAD11CD", "LAD11NM", "all_ages"]
+                    drop_col_list = ["LAD11CD", "LAD11NM"]
                     
                 population = population.drop(drop_col_list, axis =1)
+                # rename column "All Ages" to "all_ages"
+                population.columns = population.columns.map(str)
+                population.columns = population.columns.str.replace("All Ages", "all_ages")
                 age_counter = 0
                 while age_counter <= 80:
                     if year != 2011:
                         # sum up 10 columns at a time
-                        population[f"{str(age_counter)} - {str(age_counter+9)}"] = population.iloc[:,1:11].sum(axis=1)
+                        population[f"{str(age_counter)} - {str(age_counter+9)}"] = population.iloc[:,2:12].sum(axis=1) / population["all_ages"]
                         # drop columns
-                        population.drop(population.iloc[:,1:11], inplace=True, axis=1)
+                        population.drop(population.iloc[:,2:12], inplace=True, axis=1)
                     else:
-                        population[f"{str(age_counter)} - {str(age_counter+9)}"] = population.iloc[:,1:3].sum(axis=1)
+                        population[f"{str(age_counter)} - {str(age_counter+9)}"] = population.iloc[:,2:4].sum(axis=1) / population["all_ages"]
                         # drop columns
-                        population.drop(population.iloc[:,1:3], inplace=True, axis=1)
+                        population.drop(population.iloc[:,2:4], inplace=True, axis=1)
                     # update age_counter
                     age_counter+=10
                     
                     if age_counter == 90:
-                        population.rename(columns={population.columns[0]: "lsoa_code", population.columns[1]: "90+"}, inplace=True)
+                        population.rename(columns={population.columns[0]: "lsoa_code", population.columns[2]: "90+"}, inplace=True)
+                        population["90+"] = population["90+"] / population["all_ages"]
                 # add prefix
                 population.columns = [str(col) + f'_{str(year)}' if i != 0 else col for i, col in enumerate(population.columns)]
                 # save to a csv file
@@ -80,8 +84,8 @@ class ControlVariables:
         
         load_population(os.path.join(self.input_folder, "control_variables/population/sape23dt10amid2020coaunformattedsyoaestimateslondon.xlsx"), 2020)
         load_population(os.path.join(self.input_folder, "control_variables/population/SAPE22DT2-mid-2019-lsoa-syoa-estimates-unformatted.xlsx"), 2019)
-        load_population(os.path.join(self.input_folder, "control_variables/population/SAPE20DT1-mid-2017-lsoa-syoa-estimates-formatted.XLS"), 2017)
         load_population(os.path.join(self.input_folder, "control_variables/population/SAPE21DT1a-mid-2018-on-2019-LA-lsoa-syoa-estimates-formatted.xlsx"), 2018)
+        load_population(os.path.join(self.input_folder, "control_variables/population/SAPE20DT1-mid-2017-lsoa-syoa-estimates-formatted.XLS"), 2017)
         load_population(os.path.join(self.input_folder, "control_variables/population/SAPE20DT1-mid-2016-lsoa-syoa-estimates-formatted.xls"), 2016)
         load_population(os.path.join(self.input_folder, "control_variables/population/SAPE20DT1-mid-2015-lsoa-syoa-estimates-formatted.xls"), 2015)
         load_population(os.path.join(self.input_folder, "control_variables/population/SAPE20DT1-mid-2014-lsoa-syoa-estimates-formatted.xls"), 2014)
@@ -155,7 +159,7 @@ class ControlVariables:
         """
         print("-"*10, "Saving the result", "-"*10)
         # convert to pandas df
-        count_joined_df  = pd.DataFrame(self.count_joined_gdf .drop(columns="geometry"))
+        count_joined_df  = pd.DataFrame(self.count_joined_gdf.drop(columns="geometry"))
         
         # save as csv files
         count_joined_df.to_csv(os.path.join(self.output_folder,"count_control_variables.csv"), index = False)
