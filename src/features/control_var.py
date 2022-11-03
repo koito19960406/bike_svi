@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import geopandas as gpd
 import numpy as np
-
+import re
 
 class ControlVariables:
     """class to load, clean, and produce control variables
@@ -118,15 +118,42 @@ class ControlVariables:
         self.deprivation_2015 = load_deprivation(os.path.join(self.input_folder, "control_variables/deprivation/ID 2015 for London.xls"), 2015, [0,4])
         self.deprivation_2010 = load_deprivation(os.path.join(self.input_folder, "control_variables/deprivation/id-2010-for-london.xls"), 2010, [0,7])
         
+        # load housing price
+        def load_housing(file_path):
+            housing_df = pd.read_excel(file_path, sheet_name="Data", header = None).iloc[5:,:]
+            # set column 'names
+            housing_df.columns = housing_df.iloc[0,:]
+            # remove the 1st row
+            housing_df = housing_df.iloc[1:,:]
+            # wide to long format
+            housing_df = housing_df.dropna(axis=1).reset_index()
+            housing_df.columns = ["housing_price" + re.search(r'[0-9]{4}', col).group() if re.search(r'[0-9]{4}', col) is not None else col for col in housing_df.columns]
+            housing_df = pd.wide_to_long(housing_df, stubnames=["housing_price"], i="LSOA code", sep = "", j="year")
+            housing_df["housing_price"] = housing_df["housing_price"].replace(":",pd.NA)
+            housing_df = housing_df.groupby(["LSOA code", "year"])["housing_price"].agg("mean").reset_index()
+            housing_df = housing_df.rename(columns={"LSOA code": "lsoa_code"})
+            # back to wide format
+            housing_df = pd.pivot(housing_df, index="lsoa_code",columns="year",values="housing_price")
+            housing_df.columns = ["housing_price_" + re.search(r'[0-9]{4}', str(col)).group() if re.search(r'[0-9]{4}', str(col)) is not None else col for col in housing_df.columns]
+            print(housing_df)
+            return housing_df
+        
+        self.housing_df = load_housing(os.path.join(self.input_folder, "control_variables/housing/hpssadataset46medianpricepaidforresidentialpropertiesbylsoa.xls"))
+        
+        
         # load gdf 
         def load_lsoa(file_path):
-            lsoa = gpd.read_file(file_path).to_crs("EPSG:4326")
+            lsoa = gpd.read_file(file_path).to_crs("EPSG:3857")
+            # filter columns
             lsoa = lsoa.iloc[:,[0,-1]]
+            # calculate area
+            lsoa["area"] = lsoa.geometry.area
+            lsoa = lsoa.to_crs("EPSG:4326")
             lsoa.rename(columns={lsoa.columns[0]:"lsoa_code"}, inplace=True)
             return lsoa
 
         self.lsoa_gdf_2011 = load_lsoa(os.path.join(self.input_folder, "control_variables/statistical-gis-boundaries-london/ESRI/LSOA_2011_London_gen_MHW.shp"))
-        self.lsoa_gdf_2004 = load_lsoa(os.path.join(self.input_folder, "control_variables/statistical-gis-boundaries-london/ESRI/LSOA_2004_London_Low_Resolution.shp"))
+        self.lsoa_gdf_2004 = load_lsoa(os.path.join(self.input_folder, "control_variables/statistical-gis-boundaries-london/ESRI/LSOA_2004_London_Low_Resolution.shp")) 
         
     def convert_to_spatial(self):
         """convert pandas df to geopandas gdf by joining on lsoa code"""
@@ -134,12 +161,19 @@ class ControlVariables:
         def merge_gdf(variables_1, variable_2):
             print("-"*10, "converting to spatial variables", "-"*10)
             merged = pd.merge(variables_1, variable_2, on = "lsoa_code", how = "left").drop(['lsoa_code'], axis=1)
+            # calculate population density per km2
+            population_cols = [col for col in merged.columns if "all_ages" in col]
+            if len(population_cols) > 0:
+                for population_col in population_cols:
+                    year = population_col[-4:]
+                    merged[f"pop_den_{year}"] = (merged[population_col]/merged["area"])*1000000
             return merged
         self.population_gdf = merge_gdf(self.lsoa_gdf_2011, self.population)
         self.deprivation_2019_gdf = merge_gdf(self.lsoa_gdf_2011, self.deprivation_2019)
         self.deprivation_2015_gdf = merge_gdf(self.lsoa_gdf_2011, self.deprivation_2015)
         self.deprivation_2010_gdf = merge_gdf(self.lsoa_gdf_2004, self.deprivation_2010)
-        
+        self.housing_gdf = merge_gdf(self.lsoa_gdf_2011, self.housing_df)
+    
     def spatial_join(self):
         """join attributes from census data to count station by spatially left joining them
         """
@@ -153,6 +187,7 @@ class ControlVariables:
         self.count_joined_gdf = spatial_join_clen(self.count_joined_gdf, self.deprivation_2019_gdf)
         self.count_joined_gdf = spatial_join_clen(self.count_joined_gdf, self.deprivation_2015_gdf)
         self.count_joined_gdf = spatial_join_clen(self.count_joined_gdf, self.deprivation_2010_gdf)
+        self.count_joined_gdf = spatial_join_clen(self.count_joined_gdf, self.housing_gdf)
     
     def merge_save(self):
         """merge the variables and save as csv file

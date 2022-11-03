@@ -1,0 +1,22 @@
+
+Call:
+zeroinfl(formula = formula, data = data, dist = count_model, link = "logit")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-38.883  -5.877  -3.043   1.086 164.799 
+
+Count model coefficients (poisson with log link):
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) 6.299977   0.000469   13434   <2e-16 ***
+sidewalk    6.341728   0.005996    1058   <2e-16 ***
+
+Zero-inflation model coefficients (binomial with logit link):
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  -1.65994    0.05583  -29.73   <2e-16 ***
+sidewalk    -40.11164    1.54115  -26.03   <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Number of iterations in BFGS optimization: 1 
+Log-likelihood: -1.598e+07 on 4 Df

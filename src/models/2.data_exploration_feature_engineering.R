@@ -1,4 +1,4 @@
-pacman::p_load(tidyverse, Hmisc, GGally, corrplot, RColorBrewer, ggplot2, hrbrthemes)
+pacman::p_load(tidyverse, Hmisc, GGally, corrplot, RColorBrewer, ggplot2, hrbrthemes,stargazer)
 
 
 # data exploration --------------------------------------------------------
@@ -7,16 +7,21 @@ if (!(file.exists(root_dir))){
   root_dir <- "/Volumes/Extreme SSD/bike_svi"
 }
 all_var <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined.csv")) %>% 
-  select(-c(panoid, count_point_id, pid, all_ages)) %>% 
-  relocate(pedal_cycles)
-all_var_num <- all_var %>% 
-  select(-c(period))
+  select(-c(count_point_id, all_ages, person, X90, period)) %>% 
+  relocate(pedal_cycles) %>% 
+  drop_na()
+
 # summary stats
 summary_stats <- describe(all_var)
 capture.output(summary_stats, file= paste0("bike_svi/models/summary_stats.txt"))
+summary_stats_latetx <- all_var %>% 
+  mutate(year = as.numeric(year)) %>% 
+  drop_na() %>% 
+  stargazer()
+capture.output(summary_stats_latetx, file= paste0("bike_svi/models/summary_stats_latetx.txt"))
 
 # correlation matrix
-corrmatrix <- cor(all_var_num,use="complete.obs")
+corrmatrix <- cor(all_var,use="complete.obs")
 cor.mtest <- function(mat, ...) {
   mat <- as.matrix(mat)
   n <- ncol(mat)
@@ -32,7 +37,7 @@ cor.mtest <- function(mat, ...) {
   p.mat
 }
 # matrix of the p-value of the correlation
-p.mat <- cor.mtest(all_var_num)
+p.mat <- cor.mtest(all_var)
 col1 <- colorRampPalette(brewer.pal(9,"BrBG"))
 pdf("bike_svi/reports/figures/correlation_mat.pdf", height = 7, width = 7)
 corrplot(corrmatrix,method = "square",  tl.col = "black", tl.cex = 0.75, 
@@ -57,12 +62,15 @@ max_over_100 <- function(value){
 }
 all_var_scaled <- all_var %>% 
   mutate(year = as.character(year)) %>% 
+  # rename_at(vars(contains('count')), ~paste0(., "_log")) %>% 
   rename_if(max_over_100, list(~paste0(., "_log"))) %>% 
-  mutate_if(max_over_100, log) %>% 
-  mutate(across(.cols = everything(), ~ ifelse(is.infinite(.x), 0, .x)))
+  mutate_at(vars(contains("_log")), log) %>% 
+  mutate(across(.cols = everything(), ~ ifelse(is.infinite(.x), 0, .x))) %>% 
+  mutate(pedal_cycles = all_var$pedal_cycles)
+
 # save
 all_var_scaled %>% 
-  write.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined_scaled.csv"))
+  write.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined_scaled.csv"), row.names = F)
 
 # pairwise correlation for pedal_cycles and segmentation result
 pedal_seg <- all_var %>% 
@@ -100,7 +108,8 @@ create_binary <- function(data,colname){
 all_var_scaled_binary_treatment <- all_var_scaled %>% 
   create_binary(., vegetation) %>% 
   create_binary(., sidewalk) %>% 
-  create_binary(., slope)
+  create_binary(., slope) %>% 
+  drop_na()
 all_var_scaled_binary_treatment %>% 
   write.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined_scaled_binary.csv"),row.names = FALSE)
 

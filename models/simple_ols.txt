@@ -1,0 +1,28 @@
+
+Call:
+glm(formula = pedal_cycles ~ ., data = all_var_wo_year)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-4938.8   -422.1   -216.9    113.0  11232.1  
+
+Coefficients:
+                Estimate Std. Error t value Pr(>|t|)    
+(Intercept)    3.786e+02  2.719e+01  13.927  < 2e-16 ***
+vegetation    -3.351e+02  4.494e+01  -7.456 9.17e-14 ***
+IMD_score      3.725e+00  5.783e-01   6.441 1.21e-10 ***
+housing_price  1.855e-04  1.855e-05   9.999  < 2e-16 ***
+poi            5.712e+00  8.261e-02  69.139  < 2e-16 ***
+slope         -9.529e+01  6.090e+00 -15.648  < 2e-16 ***
+pop_den        3.831e-02  2.953e-03  12.975  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for gaussian family taken to be 1071075)
+
+    Null deviance: 3.6989e+10  on 25466  degrees of freedom
+Residual deviance: 2.7270e+10  on 25460  degrees of freedom
+AIC: 425869
+
+Number of Fisher Scoring iterations: 2
+

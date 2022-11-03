@@ -106,7 +106,8 @@ class CreateFeatures:
         segmentation = pd.read_csv(os.path.join(self.root_dir, "data/processed/cities", self.city, "segmentation_pixel_ratio_wide.csv"))
         detection = pd.read_csv(os.path.join(self.output_folder, "object_detection_count.csv"))
         # join gsv metadata and detection result by panoid and count station id
-        gsv_det = gsv_metadata[["panoid","year", "count_point_id"]].merge(detection, left_on = "panoid", right_on = "pid", how = "left")
+        gsv_det = gsv_metadata[["panoid","year", "count_point_id"]].merge(detection, left_on = "panoid", right_on = "pid", how = "left").\
+            fillna(0)
         # join gsv metadata and segmentation result by panoid and count station id
         gsv_seg = gsv_metadata[["panoid","year", "count_point_id"]].merge(segmentation, left_on = "panoid", right_on = "pid", how = "left")
         # compute visual complexity here
@@ -132,7 +133,7 @@ class CreateFeatures:
             control_variables[f"IMD_score_{str(year)}"] = control_variables[f"IMD_score_{str(existing_year[index])}"]
         # filter columns
         #TODO fix filtering columns
-        control_col_list = ["0 - 9", "10 - 19", "20 - 29", "30 - 39", "40 - 49", "50 - 59", "60 - 69", "70 - 79", "80 - 89", "90+", "all_ages", "IMD_score"]
+        control_col_list = ["0 - 9", "10 - 19", "20 - 29", "30 - 39", "40 - 49", "50 - 59", "60 - 69", "70 - 79", "80 - 89", "90+", "all_ages", "IMD_score", "housing_price", "pop_den"]
         control_col_list_extended = control_col_list + ["count_point_id","year"]
         control_variables_cleaned = control_variables.filter(regex='|'.join(control_col_list_extended)).dropna(how='all')
         control_variables_long = pd.wide_to_long(control_variables_cleaned,
@@ -162,6 +163,8 @@ class CreateFeatures:
             merge(poi_long, on = ["count_point_id", "year"], how = "left").
             merge(slope, on = ["count_point_id"], how = "left").
             dropna(subset=["pedal_cycles"]))
+        merged_df = merged_df.loc[:,~merged_df.columns.str.startswith('pid_')]
+        merged_df = merged_df.loc[:,~merged_df.columns.str.startswith('panoid_')]
         # create period
         def make_periods(year):
             if 2008 <= year <= 2012:

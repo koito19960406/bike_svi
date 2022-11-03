@@ -1,0 +1,886 @@
+GRF tree object 
+Number of training samples: 12733 
+Variable splits: 
+(1) split_variable: X0_9  split_value: 0.0869055 
+  (2) split_variable: poi_log  split_value: 3.17805 
+    (4) split_variable: vegetation  split_value: 0.0433292 
+      (8) split_variable: person_count  split_value: 6 
+        (16) * num_samples: 17  avg_Y: 6.58 avg_W: 0.06 
+        (17) split_variable: person_count  split_value: 15 
+          (32) * num_samples: 4  avg_Y: 6.45 avg_W: 0.08 
+          (33) * num_samples: 15  avg_Y: 7.24 avg_W: 0.06 
+      (9) split_variable: poi_log  split_value: 2.48491 
+        (18) split_variable: X20_29  split_value: 0.0723589 
+          (34) * num_samples: 3  avg_Y: 3.39 avg_W: 0.03 
+          (35) split_variable: terrain  split_value: 8.39233e-05 
+            (60) split_variable: X20_29  split_value: 0.266341 
+              (96) * num_samples: 10  avg_Y: 4.91 avg_W: 0.06 
+              (97) * num_samples: 9  avg_Y: 6.62 avg_W: 0.08 
+            (61) split_variable: X0_9  split_value: 0.0774148 
+              (98) split_variable: X60_69  split_value: 0.0510158 
+                (152) * num_samples: 17  avg_Y: 6.59 avg_W: 0.05 
+                (153) split_variable: vegetation  split_value: 0.326466 
+                  (206) * num_samples: 20  avg_Y: 4.19 avg_W: 0.06 
+                  (207) * num_samples: 36  avg_Y: 4.22 avg_W: 0.04 
+              (99) split_variable: poi_log  split_value: 1.09861 
+                (154) split_variable: X40_49  split_value: 0.141742 
+                  (208) * num_samples: 26  avg_Y: 4.14 avg_W: 0.04 
+                  (209) split_variable: road  split_value: 0.183081 
+                    (274) * num_samples: 10  avg_Y: 4.35 avg_W: 0.05 
+                    (275) * num_samples: 7  avg_Y: 4.05 avg_W: 0.04 
+                (155) split_variable: traffic.light  split_value: 0 
+                  (210) * num_samples: 19  avg_Y: 4.9 avg_W: 0.06 
+                  (211) * num_samples: 15  avg_Y: 6.02 avg_W: 0.08 
+        (19) split_variable: vehicle_count  split_value: 12 
+          (36) * num_samples: 27  avg_Y: 5.33 avg_W: 0.05 
+          (37) * num_samples: 20  avg_Y: 6.56 avg_W: 0.06 
+    (5) split_variable: poi_log  split_value: 5.67332 
+      (10) split_variable: pop_den_log  split_value: 5.37321 
+        (20) split_variable: vegetation  split_value: 0.019537 
+          (38) * num_samples: 19  avg_Y: 7.56 avg_W: 0.06 
+          (39) * num_samples: 13  avg_Y: 6.89 avg_W: 0.06 
+        (21) split_variable: vegetation  split_value: 0.341118 
+          (40) split_variable: traffic.sign  split_value: 0.00950241 
+            (62) split_variable: X10_19  split_value: 0.121872 
+              (100) split_variable: slope  split_value: 3.22654 
+                (156) split_variable: sky  split_value: 0.12324 
+                  (212) split_variable: vehicle_count  split_value: 6 
+                    (276) split_variable: person_count  split_value: 0 
+                      (346) * num_samples: 15  avg_Y: 6.9 avg_W: 0.06 
+                      (347) split_variable: road  split_value: 0.152564 
+                        (404) * num_samples: 15  avg_Y: 6.62 avg_W: 0.1 
+                        (405) split_variable: sky  split_value: 0.071703 
+                          (462) * num_samples: 8  avg_Y: 6.65 avg_W: 0.1 
+                          (463) * num_samples: 30  avg_Y: 6.86 avg_W: 0.09 
+                    (277) split_variable: X40_49  split_value: 0.153967 
+                      (348) split_variable: slope  split_value: 1.63446 
+                        (406) split_variable: building  split_value: 0.605527 
+                          (464) split_variable: vehicle_count  split_value: 21 
+                            (532) split_variable: IMD_score  split_value: 24.1158 
+                              (590) * num_samples: 20  avg_Y: 7.42 avg_W: 0.07 
+                              (591) split_variable: X80_89  split_value: 0.0108108 
+                                (656) * num_samples: 7  avg_Y: 7.97 avg_W: 0.08 
+                                (657) * num_samples: 22  avg_Y: 7.67 avg_W: 0.06 
+                            (533) * num_samples: 8  avg_Y: 7.41 avg_W: 0.06 
+                          (465) * num_samples: 7  avg_Y: 7.34 avg_W: 0.06 
+                        (407) split_variable: vegetation  split_value: 0.245411 
+                          (466) split_variable: X40_49  split_value: 0.102642 
+                            (534) split_variable: X60_69  split_value: 0.0321528 
+                              (592) * num_samples: 12  avg_Y: 7.33 avg_W: 0.09 
+                              (593) * num_samples: 10  avg_Y: 6.67 avg_W: 0.07 
+                            (535) split_variable: X0_9  split_value: 0.0574452 
+                              (594) * num_samples: 17  avg_Y: 7.59 avg_W: 0.05 
+                              (595) split_variable: X30_39  split_value: 0.260118 
+                                (658) split_variable: X40_49  split_value: 0.139981 
+                                  (720) split_variable: traffic.sign  split_value: 0.00347265 
+                                    (764) split_variable: road  split_value: 0.18464 
+                                      (802) * num_samples: 13  avg_Y: 6.87 avg_W: 0.08 
+                                      (803) * num_samples: 21  avg_Y: 7.12 avg_W: 0.08 
+                                    (765) * num_samples: 23  avg_Y: 7.22 avg_W: 0.08 
+                                  (721) * num_samples: 20  avg_Y: 6.85 avg_W: 0.09 
+                                (659) * num_samples: 14  avg_Y: 6.71 avg_W: 0.08 
+                          (467) split_variable: X40_49  split_value: 0.129412 
+                            (536) * num_samples: 9  avg_Y: 6.95 avg_W: 0.08 
+                            (537) * num_samples: 10  avg_Y: 6.77 avg_W: 0.08 
+                      (349) split_variable: person_count  split_value: 6 
+                        (408) * num_samples: 19  avg_Y: 6.51 avg_W: 0.08 
+                        (409) split_variable: sky  split_value: 0.0769482 
+                          (468) * num_samples: 11  avg_Y: 7.34 avg_W: 0.08 
+                          (469) * num_samples: 7  avg_Y: 7.16 avg_W: 0.11 
+                  (213) split_variable: year  split_value: 2018 
+                    (278) split_variable: pop_den_log  split_value: 8.94384 
+                      (350) split_variable: housing_price_log  split_value: 13.1166 
+                        (410) split_variable: X10_19  split_value: 0.0814503 
+                          (470) split_variable: pop_den_log  split_value: 8.58786 
+                            (538) * num_samples: 19  avg_Y: 7.22 avg_W: 0.08 
+                            (539) * num_samples: 11  avg_Y: 6 avg_W: 0.08 
+                          (471) * num_samples: 11  avg_Y: 6.67 avg_W: 0.06 
+                        (411) split_variable: pole  split_value: 0.00494766 
+                          (472) * num_samples: 6  avg_Y: 7.16 avg_W: 0.06 
+                          (473) split_variable: poi_log  split_value: 4.00733 
+                            (540) * num_samples: 9  avg_Y: 5.61 avg_W: 0.07 
+                            (541) split_variable: X20_29  split_value: 0.270879 
+                              (596) split_variable: road  split_value: 0.197879 
+                                (660) * num_samples: 12  avg_Y: 7.24 avg_W: 0.07 
+                                (661) * num_samples: 18  avg_Y: 7.22 avg_W: 0.08 
+                              (597) split_variable: vegetation  split_value: 0.0988719 
+                                (662) * num_samples: 20  avg_Y: 7.81 avg_W: 0.07 
+                                (663) * num_samples: 11  avg_Y: 7.92 avg_W: 0.09 
+                      (351) * num_samples: 15  avg_Y: 7.13 avg_W: 0.07 
+                    (279) split_variable: slope  split_value: 2.47069 
+                      (352) * num_samples: 20  avg_Y: 6.72 avg_W: 0.08 
+                      (353) * num_samples: 7  avg_Y: 7.19 avg_W: 0.09 
+                (157) split_variable: X60_69  split_value: 0.0573372 
+                  (214) * num_samples: 18  avg_Y: 6.96 avg_W: 0.07 
+                  (215) split_variable: X80_89  split_value: 0.0183784 
+                    (280) * num_samples: 11  avg_Y: 7.78 avg_W: 0.06 
+                    (281) * num_samples: 17  avg_Y: 6.66 avg_W: 0.06 
+              (101) split_variable: pole  split_value: 0.0226641 
+                (158) split_variable: poi_log  split_value: 5.0814 
+                  (216) split_variable: building  split_value: 0.333617 
+                    (282) * num_samples: 11  avg_Y: 6.83 avg_W: 0.07 
+                    (283) * num_samples: 14  avg_Y: 7.37 avg_W: 0.08 
+                  (217) * num_samples: 13  avg_Y: 7.23 avg_W: 0.1 
+                (159) * num_samples: 6  avg_Y: 7.58 avg_W: 0.06 
+            (63) split_variable: person_count  split_value: 3 
+              (102) * num_samples: 8  avg_Y: 6.96 avg_W: 0.09 
+              (103) split_variable: year  split_value: 2014 
+                (160) * num_samples: 13  avg_Y: 7.18 avg_W: 0.07 
+                (161) * num_samples: 23  avg_Y: 7.29 avg_W: 0.08 
+          (41) split_variable: building  split_value: 0.120453 
+            (64) split_variable: traffic.light  split_value: 7.24792e-05 
+              (104) * num_samples: 11  avg_Y: 7.18 avg_W: 0.07 
+              (105) * num_samples: 16  avg_Y: 7.39 avg_W: 0.06 
+            (65) split_variable: vegetation  split_value: 0.35918 
+              (106) * num_samples: 12  avg_Y: 7.39 avg_W: 0.07 
+              (107) * num_samples: 12  avg_Y: 6.43 avg_W: 0.09 
+      (11) split_variable: slope  split_value: 2.00154 
+        (22) * num_samples: 19  avg_Y: 7.1 avg_W: 0.08 
+        (23) split_variable: building  split_value: 0.450288 
+          (42) split_variable: X10_19  split_value: 0.0667461 
+            (66) split_variable: traffic.light  split_value: 0.000137329 
+              (108) * num_samples: 11  avg_Y: 7.78 avg_W: 0.05 
+              (109) * num_samples: 9  avg_Y: 7.1 avg_W: 0.07 
+            (67) * num_samples: 19  avg_Y: 7.58 avg_W: 0.08 
+          (43) split_variable: road  split_value: 0.1945 
+            (68) split_variable: road  split_value: 0.160548 
+              (110) split_variable: building  split_value: 0.561733 
+                (162) * num_samples: 14  avg_Y: 7.16 avg_W: 0.08 
+                (163) split_variable: X10_19  split_value: 0.0686988 
+                  (218) * num_samples: 10  avg_Y: 6.7 avg_W: 0.05 
+                  (219) * num_samples: 12  avg_Y: 7.08 avg_W: 0.1 
+              (111) * num_samples: 18  avg_Y: 7.34 avg_W: 0.09 
+            (69) split_variable: building  split_value: 0.54007 
+              (112) split_variable: pole  split_value: 0.010273 
+                (164) * num_samples: 10  avg_Y: 6.9 avg_W: 0.06 
+                (165) * num_samples: 14  avg_Y: 8.06 avg_W: 0.07 
+              (113) * num_samples: 23  avg_Y: 7.64 avg_W: 0.06 
+  (3) split_variable: person_count  split_value: 1 
+    (6) split_variable: X10_19  split_value: 0.145749 
+      (12) split_variable: traffic.light  split_value: 0.000621796 
+        (24) split_variable: traffic.sign  split_value: 0.01194 
+          (44) split_variable: X30_39  split_value: 0.271285 
+            (70) split_variable: X80_89  split_value: 0.0319149 
+              (114) split_variable: building  split_value: 0.0689418 
+                (166) split_variable: sky  split_value: 0.390569 
+                  (220) split_variable: slope  split_value: 3.43584 
+                    (284) split_variable: X60_69  split_value: 0.0976059 
+                      (354) split_variable: sky  split_value: 0.27988 
+                        (412) split_variable: terrain  split_value: 0.0835075 
+                          (474) split_variable: X10_19  split_value: 0.117445 
+                            (542) split_variable: vegetation  split_value: 0.519934 
+                              (598) split_variable: sky  split_value: 0.179067 
+                                (664) * num_samples: 19  avg_Y: 4.7 avg_W: 0.06 
+                                (665) * num_samples: 17  avg_Y: 4.49 avg_W: 0.05 
+                              (599) * num_samples: 8  avg_Y: 4.9 avg_W: 0.04 
+                            (543) split_variable: pop_den_log  split_value: 7.88748 
+                              (600) split_variable: housing_price_log  split_value: 12.9345 
+                                (666) * num_samples: 19  avg_Y: 3.97 avg_W: 0.03 
+                                (667) * num_samples: 6  avg_Y: 4.77 avg_W: 0.05 
+                              (601) * num_samples: 7  avg_Y: 5.06 avg_W: 0.05 
+                          (475) split_variable: X80_89  split_value: 0.0240569 
+                            (544) split_variable: pole  split_value: 0.00525411 
+                              (602) * num_samples: 6  avg_Y: 4.86 avg_W: 0.03 
+                              (603) split_variable: X70_79  split_value: 0.0338892 
+                                (668) * num_samples: 2  avg_Y: 3.24 avg_W: 0.03 
+                                (669) * num_samples: 25  avg_Y: 4.38 avg_W: 0.04 
+                            (545) * num_samples: 11  avg_Y: 4.96 avg_W: 0.05 
+                        (413) split_variable: X70_79  split_value: 0.0319311 
+                          (476) * num_samples: 9  avg_Y: 4.19 avg_W: 0.04 
+                          (477) split_variable: slope  split_value: 2.78068 
+                            (546) split_variable: traffic.light  split_value: 3.8147e-06 
+                              (604) split_variable: traffic.sign  split_value: 0 
+                                (670) * num_samples: 4  avg_Y: 4.47 avg_W: 0.04 
+                                (671) * num_samples: 14  avg_Y: 4.81 avg_W: 0.04 
+                              (605) * num_samples: 9  avg_Y: 5.39 avg_W: 0.05 
+                            (547) * num_samples: 14  avg_Y: 2.74 avg_W: 0.03 
+                      (355) split_variable: vegetation  split_value: 0.42516 
+                        (414) split_variable: X60_69  split_value: 0.104156 
+                          (478) * num_samples: 11  avg_Y: 2.2 avg_W: 0.02 
+                          (479) * num_samples: 9  avg_Y: 2.27 avg_W: 0.04 
+                        (415) * num_samples: 13  avg_Y: 5.1 avg_W: 0.06 
+                    (285) split_variable: pop_den_log  split_value: 7.79585 
+                      (356) * num_samples: 16  avg_Y: 2.88 avg_W: 0.04 
+                      (357) * num_samples: 8  avg_Y: 1.62 avg_W: 0.04 
+                  (221) split_variable: X80_89  split_value: 0.0171585 
+                    (286) * num_samples: 7  avg_Y: 2.72 avg_W: 0.03 
+                    (287) * num_samples: 35  avg_Y: 1.77 avg_W: 0.03 
+                (167) split_variable: pop_den_log  split_value: 6.3907 
+                  (222) split_variable: X60_69  split_value: 0.0654546 
+                    (288) * num_samples: 17  avg_Y: 4.43 avg_W: 0.05 
+                    (289) split_variable: vehicle_count  split_value: 2 
+                      (358) * num_samples: 17  avg_Y: 3.61 avg_W: 0.04 
+                      (359) * num_samples: 10  avg_Y: 3.77 avg_W: 0.05 
+                  (223) split_variable: pop_den_log  split_value: 7.02182 
+                    (290) split_variable: terrain  split_value: 0.0325839 
+                      (360) split_variable: building  split_value: 0.117923 
+                        (416) * num_samples: 5  avg_Y: 5.64 avg_W: 0.08 
+                        (417) * num_samples: 36  avg_Y: 4.95 avg_W: 0.06 
+                      (361) * num_samples: 13  avg_Y: 5.24 avg_W: 0.05 
+                    (291) split_variable: road  split_value: 0.122878 
+                      (362) split_variable: road  split_value: 0.11955 
+                        (418) split_variable: X0_9  split_value: 0.112725 
+                          (480) * num_samples: 17  avg_Y: 4.75 avg_W: 0.06 
+                          (481) split_variable: traffic.sign  split_value: 7.24792e-05 
+                            (548) * num_samples: 17  avg_Y: 3.27 avg_W: 0.04 
+                            (549) split_variable: traffic.sign  split_value: 0.00156593 
+                              (606) * num_samples: 13  avg_Y: 3.5 avg_W: 0.03 
+                              (607) * num_samples: 10  avg_Y: 4.4 avg_W: 0.03 
+                        (419) * num_samples: 8  avg_Y: 3.67 avg_W: 0.05 
+                      (363) split_variable: traffic.sign  split_value: 9.53674e-05 
+                        (420) split_variable: X0_9  split_value: 0.112962 
+                          (482) * num_samples: 13  avg_Y: 3.87 avg_W: 0.04 
+                          (483) split_variable: sky  split_value: 0.155725 
+                            (550) split_variable: poi_log  split_value: 2.77259 
+                              (608) * num_samples: 16  avg_Y: 4.2 avg_W: 0.05 
+                              (609) * num_samples: 18  avg_Y: 5.58 avg_W: 0.06 
+                            (551) split_variable: X0_9  split_value: 0.140351 
+                              (610) split_variable: sky  split_value: 0.207643 
+                                (672) * num_samples: 7  avg_Y: 4.57 avg_W: 0.06 
+                                (673) * num_samples: 14  avg_Y: 3.69 avg_W: 0.06 
+                              (611) split_variable: sky  split_value: 0.20228 
+                                (674) * num_samples: 16  avg_Y: 3.91 avg_W: 0.05 
+                                (675) * num_samples: 25  avg_Y: 4.03 avg_W: 0.04 
+                        (421) split_variable: X20_29  split_value: 0.11926 
+                          (484) split_variable: poi_log  split_value: 3.09104 
+                            (552) split_variable: X10_19  split_value: 0.128205 
+                              (612) split_variable: traffic.light  split_value: 1.14441e-05 
+                                (676) * num_samples: 14  avg_Y: 4.06 avg_W: 0.05 
+                                (677) * num_samples: 6  avg_Y: 4.76 avg_W: 0.04 
+                              (613) * num_samples: 14  avg_Y: 4.07 avg_W: 0.05 
+                            (553) * num_samples: 14  avg_Y: 4.51 avg_W: 0.05 
+                          (485) split_variable: X40_49  split_value: 0.127273 
+                            (554) split_variable: X80_89  split_value: 0.00866551 
+                              (614) * num_samples: 12  avg_Y: 5 avg_W: 0.05 
+                              (615) split_variable: vehicle_count  split_value: 6 
+                                (678) split_variable: X80_89  split_value: 0.0165453 
+                                  (722) * num_samples: 11  avg_Y: 5.7 avg_W: 0.05 
+                                  (723) split_variable: vegetation  split_value: 0.155212 
+                                    (766) * num_samples: 14  avg_Y: 5.55 avg_W: 0.05 
+                                    (767) * num_samples: 17  avg_Y: 4.72 avg_W: 0.05 
+                                (679) split_variable: X70_79  split_value: 0.0402062 
+                                  (724) * num_samples: 9  avg_Y: 5.54 avg_W: 0.06 
+                                  (725) * num_samples: 19  avg_Y: 4.97 avg_W: 0.07 
+                            (555) split_variable: poi_log  split_value: 1.79176 
+                              (616) split_variable: terrain  split_value: 0.02316 
+                                (680) split_variable: X50_59  split_value: 0.0964491 
+                                  (726) * num_samples: 13  avg_Y: 5.59 avg_W: 0.06 
+                                  (727) split_variable: X0_9  split_value: 0.150845 
+                                    (768) * num_samples: 12  avg_Y: 4.16 avg_W: 0.06 
+                                    (769) * num_samples: 9  avg_Y: 4.89 avg_W: 0.06 
+                                (681) split_variable: X80_89  split_value: 0.0154394 
+                                  (728) * num_samples: 4  avg_Y: 3.94 avg_W: 0.05 
+                                  (729) split_variable: X80_89  split_value: 0.023212 
+                                    (770) * num_samples: 9  avg_Y: 4.1 avg_W: 0.05 
+                                    (771) * num_samples: 16  avg_Y: 3.5 avg_W: 0.04 
+                              (617) split_variable: building  split_value: 0.416295 
+                                (682) split_variable: road  split_value: 0.173495 
+                                  (730) split_variable: pole  split_value: 0.00660451 
+                                    (772) * num_samples: 24  avg_Y: 4.97 avg_W: 0.04 
+                                    (773) split_variable: X30_39  split_value: 0.226762 
+                                      (804) split_variable: X20_29  split_value: 0.159636 
+                                        (830) * num_samples: 8  avg_Y: 4.89 avg_W: 0.07 
+                                        (831) * num_samples: 14  avg_Y: 5.25 avg_W: 0.07 
+                                      (805) * num_samples: 11  avg_Y: 4.71 avg_W: 0.08 
+                                  (731) split_variable: X30_39  split_value: 0.257332 
+                                    (774) split_variable: X60_69  split_value: 0.0677885 
+                                      (806) split_variable: sky  split_value: 0.119924 
+                                        (832) * num_samples: 18  avg_Y: 6.2 avg_W: 0.07 
+                                        (833) split_variable: housing_price_log  split_value: 12.4945 
+                                          (850) * num_samples: 16  avg_Y: 4.17 avg_W: 0.06 
+                                          (851) * num_samples: 25  avg_Y: 4.52 avg_W: 0.05 
+                                      (807) split_variable: X70_79  split_value: 0.0427939 
+                                        (834) split_variable: X30_39  split_value: 0.189808 
+                                          (852) * num_samples: 10  avg_Y: 3.76 avg_W: 0.05 
+                                          (853) * num_samples: 16  avg_Y: 4.61 avg_W: 0.06 
+                                        (835) split_variable: vegetation  split_value: 0.176181 
+                                          (854) * num_samples: 22  avg_Y: 4.71 avg_W: 0.05 
+                                          (855) split_variable: pole  split_value: 0.00910282 
+                                            (868) * num_samples: 14  avg_Y: 5.51 avg_W: 0.05 
+                                            (869) * num_samples: 15  avg_Y: 5.78 avg_W: 0.06 
+                                    (775) * num_samples: 7  avg_Y: 5.46 avg_W: 0.05 
+                                (683) split_variable: poi_log  split_value: 3.93183 
+                                  (732) * num_samples: 21  avg_Y: 5.02 avg_W: 0.06 
+                                  (733) * num_samples: 5  avg_Y: 5.04 avg_W: 0.05 
+              (115) split_variable: IMD_score  split_value: 28.5935 
+                (168) split_variable: vehicle_count  split_value: 6 
+                  (224) split_variable: road  split_value: 0.116348 
+                    (292) split_variable: pole  split_value: 0.00458527 
+                      (364) * num_samples: 12  avg_Y: 4.25 avg_W: 0.02 
+                      (365) * num_samples: 17  avg_Y: 3.55 avg_W: 0.03 
+                    (293) split_variable: X20_29  split_value: 0.146523 
+                      (366) split_variable: X70_79  split_value: 0.0916717 
+                        (422) split_variable: year  split_value: 2018 
+                          (486) split_variable: vegetation  split_value: 0.178281 
+                            (556) split_variable: housing_price_log  split_value: 13.2719 
+                              (618) split_variable: X60_69  split_value: 0.102302 
+                                (684) split_variable: X80_89  split_value: 0.0395928 
+                                  (734) split_variable: traffic.sign  split_value: 0.00119781 
+                                    (776) * num_samples: 7  avg_Y: 2.66 avg_W: 0.02 
+                                    (777) * num_samples: 7  avg_Y: 3.63 avg_W: 0.03 
+                                  (735) * num_samples: 12  avg_Y: 3.53 avg_W: 0.04 
+                                (685) * num_samples: 15  avg_Y: 3.65 avg_W: 0.06 
+                              (619) * num_samples: 11  avg_Y: 3.48 avg_W: 0.02 
+                            (557) split_variable: terrain  split_value: 0.00128937 
+                              (620) * num_samples: 10  avg_Y: 4.8 avg_W: 0.05 
+                              (621) split_variable: terrain  split_value: 0.185333 
+                                (686) split_variable: X70_79  split_value: 0.0834306 
+                                  (736) split_variable: X50_59  split_value: 0.12953 
+                                    (778) split_variable: X20_29  split_value: 0.0929578 
+                                      (808) * num_samples: 6  avg_Y: 3.49 avg_W: 0.03 
+                                      (809) split_variable: X20_29  split_value: 0.121279 
+                                        (836) split_variable: X40_49  split_value: 0.149083 
+                                          (856) * num_samples: 18  avg_Y: 4.49 avg_W: 0.05 
+                                          (857) * num_samples: 20  avg_Y: 4.1 avg_W: 0.04 
+                                        (837) split_variable: X30_39  split_value: 0.160465 
+                                          (858) * num_samples: 15  avg_Y: 3.79 avg_W: 0.04 
+                                          (859) * num_samples: 23  avg_Y: 4.31 avg_W: 0.05 
+                                    (779) split_variable: X50_59  split_value: 0.144823 
+                                      (810) split_variable: poi_log  split_value: 1.38629 
+                                        (838) * num_samples: 21  avg_Y: 4.22 avg_W: 0.03 
+                                        (839) * num_samples: 21  avg_Y: 4.36 avg_W: 0.05 
+                                      (811) split_variable: X50_59  split_value: 0.159329 
+                                        (840) * num_samples: 21  avg_Y: 3.97 avg_W: 0.03 
+                                        (841) * num_samples: 10  avg_Y: 3.8 avg_W: 0.04 
+                                  (737) split_variable: pole  split_value: 0.00824642 
+                                    (780) * num_samples: 19  avg_Y: 4.02 avg_W: 0.03 
+                                    (781) * num_samples: 15  avg_Y: 4.12 avg_W: 0.04 
+                                (687) * num_samples: 11  avg_Y: 3.54 avg_W: 0.01 
+                          (487) split_variable: X40_49  split_value: 0.132164 
+                            (558) * num_samples: 8  avg_Y: 3.62 avg_W: 0.03 
+                            (559) split_variable: building  split_value: 0.0587511 
+                              (622) * num_samples: 19  avg_Y: 3.8 avg_W: 0.04 
+                              (623) * num_samples: 18  avg_Y: 3.73 avg_W: 0.04 
+                        (423) split_variable: pole  split_value: 0.00462214 
+                          (488) * num_samples: 16  avg_Y: 4.03 avg_W: 0.04 
+                          (489) split_variable: X40_49  split_value: 0.115697 
+                            (560) * num_samples: 11  avg_Y: 2.83 avg_W: 0.02 
+                            (561) split_variable: X0_9  split_value: 0.0969572 
+                              (624) * num_samples: 17  avg_Y: 3.47 avg_W: 0.05 
+                              (625) split_variable: IMD_score  split_value: 10.4114 
+                                (688) split_variable: housing_price_log  split_value: 13.3271 
+                                  (738) * num_samples: 18  avg_Y: 3.76 avg_W: 0.04 
+                                  (739) * num_samples: 13  avg_Y: 3.86 avg_W: 0.05 
+                                (689) * num_samples: 23  avg_Y: 2.66 avg_W: 0.04 
+                      (367) split_variable: X20_29  split_value: 0.173106 
+                        (424) split_variable: X30_39  split_value: 0.140142 
+                          (490) * num_samples: 12  avg_Y: 3.2 avg_W: 0.04 
+                          (491) * num_samples: 38  avg_Y: 4.44 avg_W: 0.04 
+                        (425) * num_samples: 22  avg_Y: 4.41 avg_W: 0.04 
+                  (225) split_variable: sky  split_value: 0.303239 
+                    (294) split_variable: vegetation  split_value: 0.243514 
+                      (368) split_variable: slope  split_value: 2.81239 
+                        (426) split_variable: building  split_value: 0.303904 
+                          (492) split_variable: sky  split_value: 0.194195 
+                            (562) * num_samples: 6  avg_Y: 4.44 avg_W: 0.05 
+                            (563) split_variable: housing_price_log  split_value: 12.7778 
+                              (626) * num_samples: 8  avg_Y: 3.51 avg_W: 0.04 
+                              (627) * num_samples: 15  avg_Y: 4.27 avg_W: 0.04 
+                          (493) * num_samples: 19  avg_Y: 4.69 avg_W: 0.07 
+                        (427) * num_samples: 17  avg_Y: 3.75 avg_W: 0.06 
+                      (369) split_variable: sky  split_value: 0.115748 
+                        (428) * num_samples: 21  avg_Y: 5.39 avg_W: 0.05 
+                        (429) split_variable: X30_39  split_value: 0.11032 
+                          (494) * num_samples: 16  avg_Y: 4.3 avg_W: 0.04 
+                          (495) split_variable: IMD_score  split_value: 20.026 
+                            (564) split_variable: X50_59  split_value: 0.129012 
+                              (628) split_variable: traffic.sign  split_value: 0.000392914 
+                                (690) * num_samples: 15  avg_Y: 4.74 avg_W: 0.06 
+                                (691) split_variable: slope  split_value: 1.64066 
+                                  (740) * num_samples: 9  avg_Y: 4.82 avg_W: 0.04 
+                                  (741) * num_samples: 17  avg_Y: 4.21 avg_W: 0.06 
+                              (629) * num_samples: 16  avg_Y: 4.45 avg_W: 0.05 
+                            (565) * num_samples: 8  avg_Y: 4.65 avg_W: 0.04 
+                    (295) split_variable: pop_den_log  split_value: 6.82708 
+                      (370) * num_samples: 7  avg_Y: 3.39 avg_W: 0.03 
+                      (371) * num_samples: 23  avg_Y: 3.24 avg_W: 0.03 
+                (169) split_variable: pop_den_log  split_value: 8.29896 
+                  (226) split_variable: poi_log  split_value: 3.04452 
+                    (296) split_variable: road  split_value: 0.218736 
+                      (372) split_variable: X0_9  split_value: 0.147059 
+                        (430) split_variable: X20_29  split_value: 0.12725 
+                          (496) * num_samples: 13  avg_Y: 4.09 avg_W: 0.04 
+                          (497) * num_samples: 16  avg_Y: 3.16 avg_W: 0.04 
+                        (431) split_variable: X10_19  split_value: 0.119426 
+                          (498) * num_samples: 9  avg_Y: 2.94 avg_W: 0.03 
+                          (499) * num_samples: 9  avg_Y: 3.82 avg_W: 0.04 
+                      (373) split_variable: pop_den_log  split_value: 7.63206 
+                        (432) split_variable: slope  split_value: 1.29601 
+                          (500) * num_samples: 6  avg_Y: 3.46 avg_W: 0.03 
+                          (501) * num_samples: 15  avg_Y: 2.34 avg_W: 0.03 
+                        (433) * num_samples: 11  avg_Y: 4.3 avg_W: 0.04 
+                    (297) * num_samples: 13  avg_Y: 6.21 avg_W: 0.08 
+                  (227) * num_samples: 18  avg_Y: 4.88 avg_W: 0.07 
+            (71) split_variable: traffic.sign  split_value: 0.00138092 
+              (116) split_variable: traffic.light  split_value: 0 
+                (170) split_variable: pop_den_log  split_value: 7.99687 
+                  (228) * num_samples: 21  avg_Y: 5.03 avg_W: 0.07 
+                  (229) split_variable: housing_price_log  split_value: 13.0698 
+                    (298) * num_samples: 17  avg_Y: 4.16 avg_W: 0.05 
+                    (299) * num_samples: 14  avg_Y: 5.18 avg_W: 0.05 
+                (171) * num_samples: 11  avg_Y: 5.49 avg_W: 0.07 
+              (117) split_variable: traffic.sign  split_value: 0.00414085 
+                (172) split_variable: road  split_value: 0.24319 
+                  (230) split_variable: X0_9  split_value: 0.11464 
+                    (300) * num_samples: 16  avg_Y: 6.1 avg_W: 0.07 
+                    (301) * num_samples: 14  avg_Y: 4.7 avg_W: 0.07 
+                  (231) * num_samples: 13  avg_Y: 5.15 avg_W: 0.04 
+                (173) split_variable: vegetation  split_value: 0.236001 
+                  (232) * num_samples: 9  avg_Y: 3.61 avg_W: 0.05 
+                  (233) * num_samples: 11  avg_Y: 5.93 avg_W: 0.08 
+          (45) split_variable: vegetation  split_value: 0.383096 
+            (72) split_variable: X50_59  split_value: 0.10274 
+              (118) * num_samples: 27  avg_Y: 4.21 avg_W: 0.04 
+              (119) split_variable: X80_89  split_value: 0.0368098 
+                (174) split_variable: X40_49  split_value: 0.141256 
+                  (234) * num_samples: 11  avg_Y: 4.85 avg_W: 0.05 
+                  (235) * num_samples: 16  avg_Y: 5.13 avg_W: 0.05 
+                (175) * num_samples: 17  avg_Y: 3.15 avg_W: 0.04 
+            (73) * num_samples: 26  avg_Y: 3.49 avg_W: 0.04 
+        (25) split_variable: IMD_score  split_value: 43.1533 
+          (46) split_variable: slope  split_value: 3.29441 
+            (74) split_variable: X0_9  split_value: 0.16673 
+              (120) split_variable: X10_19  split_value: 0.11691 
+                (176) split_variable: pop_den_log  split_value: 7.1996 
+                  (236) split_variable: X0_9  split_value: 0.114265 
+                    (302) * num_samples: 6  avg_Y: 5.56 avg_W: 0.05 
+                    (303) * num_samples: 22  avg_Y: 4.19 avg_W: 0.06 
+                  (237) split_variable: road  split_value: 0.247573 
+                    (304) split_variable: building  split_value: 0.280205 
+                      (374) split_variable: X80_89  split_value: 0.0201072 
+                        (434) * num_samples: 26  avg_Y: 5.48 avg_W: 0.06 
+                        (435) split_variable: traffic.sign  split_value: 0.00211525 
+                          (502) * num_samples: 17  avg_Y: 5.12 avg_W: 0.07 
+                          (503) * num_samples: 13  avg_Y: 5.35 avg_W: 0.06 
+                      (375) * num_samples: 24  avg_Y: 5.78 avg_W: 0.08 
+                    (305) * num_samples: 15  avg_Y: 4.88 avg_W: 0.06 
+                (177) split_variable: X50_59  split_value: 0.115493 
+                  (238) * num_samples: 23  avg_Y: 5.36 avg_W: 0.05 
+                  (239) split_variable: X70_79  split_value: 0.0620032 
+                    (306) split_variable: X10_19  split_value: 0.133293 
+                      (376) * num_samples: 14  avg_Y: 4.2 avg_W: 0.06 
+                      (377) * num_samples: 8  avg_Y: 3.27 avg_W: 0.02 
+                    (307) * num_samples: 12  avg_Y: 4.15 avg_W: 0.05 
+              (121) * num_samples: 20  avg_Y: 4.14 avg_W: 0.06 
+            (75) split_variable: year  split_value: 2015 
+              (122) * num_samples: 29  avg_Y: 3.34 avg_W: 0.04 
+              (123) * num_samples: 15  avg_Y: 3.36 avg_W: 0.07 
+          (47) * num_samples: 34  avg_Y: 4.49 avg_W: 0.06 
+      (13) split_variable: X30_39  split_value: 0.143852 
+        (26) split_variable: pole  split_value: 0.0230039 
+          (48) split_variable: building  split_value: 0.300086 
+            (76) split_variable: X50_59  split_value: 0.116366 
+              (124) split_variable: X10_19  split_value: 0.155017 
+                (178) * num_samples: 10  avg_Y: 4.15 avg_W: 0.05 
+                (179) split_variable: traffic.light  split_value: 8.58307e-05 
+                  (240) split_variable: X50_59  split_value: 0.105923 
+                    (308) * num_samples: 7  avg_Y: 4.3 avg_W: 0.02 
+                    (309) * num_samples: 3  avg_Y: 4.86 avg_W: 0.03 
+                  (241) * num_samples: 9  avg_Y: 5.11 avg_W: 0.04 
+              (125) split_variable: housing_price_log  split_value: 13.4444 
+                (180) split_variable: X70_79  split_value: 0.0642709 
+                  (242) split_variable: X80_89  split_value: 0.0327398 
+                    (310) split_variable: X60_69  split_value: 0.07277 
+                      (378) * num_samples: 12  avg_Y: 4.25 avg_W: 0.06 
+                      (379) * num_samples: 17  avg_Y: 3.93 avg_W: 0.04 
+                    (311) * num_samples: 18  avg_Y: 3.48 avg_W: 0.04 
+                  (243) split_variable: year  split_value: 2010 
+                    (312) * num_samples: 11  avg_Y: 3.64 avg_W: 0.03 
+                    (313) * num_samples: 13  avg_Y: 4.21 avg_W: 0.04 
+                (181) * num_samples: 14  avg_Y: 2.97 avg_W: 0.03 
+            (77) * num_samples: 7  avg_Y: 2.99 avg_W: 0.05 
+          (49) * num_samples: 8  avg_Y: 3.19 avg_W: 0.06 
+        (27) split_variable: X40_49  split_value: 0.129481 
+          (50) split_variable: pole  split_value: 0.0119514 
+            (78) * num_samples: 15  avg_Y: 4.56 avg_W: 0.04 
+            (79) * num_samples: 10  avg_Y: 4.3 avg_W: 0.04 
+          (51) split_variable: X40_49  split_value: 0.138035 
+            (80) split_variable: traffic.light  split_value: 0 
+              (126) * num_samples: 13  avg_Y: 2.55 avg_W: 0.04 
+              (127) * num_samples: 7  avg_Y: 5.21 avg_W: 0.06 
+            (81) split_variable: housing_price_log  split_value: 12.7343 
+              (128) split_variable: slope  split_value: 1.51159 
+                (182) split_variable: building  split_value: 0.0902939 
+                  (244) * num_samples: 15  avg_Y: 3.61 avg_W: 0.04 
+                  (245) * num_samples: 19  avg_Y: 4.35 avg_W: 0.06 
+                (183) * num_samples: 35  avg_Y: 3.33 avg_W: 0.04 
+              (129) * num_samples: 22  avg_Y: 4.63 avg_W: 0.05 
+    (7) split_variable: person_count  split_value: 9 
+      (14) split_variable: traffic.sign  split_value: 0.000146866 
+        (28) split_variable: road  split_value: 0.128095 
+          (52) split_variable: X80_89  split_value: 0.0215643 
+            (82) * num_samples: 11  avg_Y: 5.23 avg_W: 0.07 
+            (83) * num_samples: 17  avg_Y: 4.59 avg_W: 0.04 
+          (53) split_variable: X60_69  split_value: 0.104948 
+            (84) split_variable: housing_price_log  split_value: 12.6868 
+              (130) split_variable: traffic.light  split_value: 1.14441e-05 
+                (184) split_variable: year  split_value: 2014 
+                  (246) split_variable: road  split_value: 0.185822 
+                    (314) * num_samples: 14  avg_Y: 4.66 avg_W: 0.05 
+                    (315) * num_samples: 15  avg_Y: 4.93 avg_W: 0.05 
+                  (247) * num_samples: 13  avg_Y: 5.02 avg_W: 0.04 
+                (185) split_variable: sky  split_value: 0.16492 
+                  (248) * num_samples: 6  avg_Y: 5.16 avg_W: 0.06 
+                  (249) * num_samples: 16  avg_Y: 5.44 avg_W: 0.06 
+              (131) split_variable: sky  split_value: 0.237016 
+                (186) split_variable: poi_log  split_value: 4.63473 
+                  (250) split_variable: X80_89  split_value: 0.0278069 
+                    (316) split_variable: X20_29  split_value: 0.222164 
+                      (380) split_variable: X20_29  split_value: 0.17228 
+                        (436) split_variable: pole  split_value: 0.00711568 
+                          (504) * num_samples: 16  avg_Y: 6.31 avg_W: 0.06 
+                          (505) * num_samples: 21  avg_Y: 5.67 avg_W: 0.07 
+                        (437) * num_samples: 14  avg_Y: 6.64 avg_W: 0.07 
+                      (381) split_variable: vegetation  split_value: 0.167852 
+                        (438) * num_samples: 8  avg_Y: 6.66 avg_W: 0.08 
+                        (439) * num_samples: 23  avg_Y: 6.2 avg_W: 0.06 
+                    (317) split_variable: slope  split_value: 1.89285 
+                      (382) * num_samples: 13  avg_Y: 5.38 avg_W: 0.06 
+                      (383) * num_samples: 18  avg_Y: 5.4 avg_W: 0.07 
+                  (251) * num_samples: 21  avg_Y: 6.75 avg_W: 0.08 
+                (187) * num_samples: 19  avg_Y: 4.35 avg_W: 0.07 
+            (85) split_variable: sky  split_value: 0.170415 
+              (132) * num_samples: 7  avg_Y: 6.48 avg_W: 0.08 
+              (133) * num_samples: 13  avg_Y: 4.61 avg_W: 0.06 
+        (29) split_variable: X40_49  split_value: 0.113445 
+          (54) split_variable: sky  split_value: 0.236394 
+            (86) split_variable: building  split_value: 0.361524 
+              (134) split_variable: housing_price_log  split_value: 13.2991 
+                (188) split_variable: IMD_score  split_value: 22.2133 
+                  (252) * num_samples: 16  avg_Y: 4.87 avg_W: 0.06 
+                  (253) split_variable: pole  split_value: 0.00782108 
+                    (318) * num_samples: 17  avg_Y: 6.18 avg_W: 0.04 
+                    (319) * num_samples: 45  avg_Y: 6.04 avg_W: 0.07 
+                (189) * num_samples: 7  avg_Y: 7.03 avg_W: 0.05 
+              (135) split_variable: X10_19  split_value: 0.0864542 
+                (190) * num_samples: 18  avg_Y: 6.07 avg_W: 0.06 
+                (191) split_variable: building  split_value: 0.454977 
+                  (254) * num_samples: 27  avg_Y: 6.67 avg_W: 0.08 
+                  (255) * num_samples: 16  avg_Y: 6.92 avg_W: 0.08 
+            (87) split_variable: pole  split_value: 0.0133696 
+              (136) * num_samples: 16  avg_Y: 5.36 avg_W: 0.05 
+              (137) * num_samples: 8  avg_Y: 4.97 avg_W: 0.08 
+          (55) split_variable: X60_69  split_value: 0.0393974 
+            (88) split_variable: road  split_value: 0.24575 
+              (138) split_variable: IMD_score  split_value: 36.9871 
+                (192) split_variable: traffic.sign  split_value: 0.00290298 
+                  (256) split_variable: sky  split_value: 0.148114 
+                    (320) * num_samples: 16  avg_Y: 6.26 avg_W: 0.06 
+                    (321) * num_samples: 8  avg_Y: 5.12 avg_W: 0.06 
+                  (257) split_variable: sky  split_value: 0.17442 
+                    (322) * num_samples: 11  avg_Y: 5.78 avg_W: 0.05 
+                    (323) * num_samples: 13  avg_Y: 5.33 avg_W: 0.06 
+                (193) split_variable: X80_89  split_value: 0.00588235 
+                  (258) * num_samples: 14  avg_Y: 6.55 avg_W: 0.08 
+                  (259) * num_samples: 16  avg_Y: 6.26 avg_W: 0.05 
+              (139) * num_samples: 15  avg_Y: 6.16 avg_W: 0.05 
+            (89) split_variable: X10_19  split_value: 0.140602 
+              (140) split_variable: building  split_value: 0.537394 
+                (194) split_variable: X50_59  split_value: 0.126176 
+                  (260) split_variable: road  split_value: 0.131436 
+                    (324) split_variable: sky  split_value: 0.174861 
+                      (384) split_variable: traffic.light  split_value: 0 
+                        (440) split_variable: X80_89  split_value: 0.0158128 
+                          (506) * num_samples: 12  avg_Y: 5.4 avg_W: 0.04 
+                          (507) * num_samples: 21  avg_Y: 5.41 avg_W: 0.07 
+                        (441) * num_samples: 14  avg_Y: 5.84 avg_W: 0.06 
+                      (385) * num_samples: 18  avg_Y: 5.08 avg_W: 0.06 
+                    (325) split_variable: poi_log  split_value: 2.89037 
+                      (386) split_variable: X50_59  split_value: 0.122951 
+                        (442) split_variable: X30_39  split_value: 0.191528 
+                          (508) split_variable: X60_69  split_value: 0.0748997 
+                            (566) split_variable: X50_59  split_value: 0.115656 
+                              (630) split_variable: X10_19  split_value: 0.126455 
+                                (692) split_variable: sky  split_value: 0.188557 
+                                  (742) * num_samples: 16  avg_Y: 5.7 avg_W: 0.06 
+                                  (743) split_variable: terrain  split_value: 0.0057354 
+                                    (782) * num_samples: 4  avg_Y: 4.72 avg_W: 0.04 
+                                    (783) * num_samples: 10  avg_Y: 4.63 avg_W: 0.06 
+                                (693) split_variable: X0_9  split_value: 0.169349 
+                                  (744) * num_samples: 11  avg_Y: 5.16 avg_W: 0.04 
+                                  (745) * num_samples: 10  avg_Y: 5.71 avg_W: 0.06 
+                              (631) * num_samples: 10  avg_Y: 4.89 avg_W: 0.05 
+                            (567) split_variable: X50_59  split_value: 0.101449 
+                              (632) * num_samples: 21  avg_Y: 4.99 avg_W: 0.06 
+                              (633) split_variable: vegetation  split_value: 0.346097 
+                                (694) split_variable: terrain  split_value: 0.00241089 
+                                  (746) split_variable: IMD_score  split_value: 22.255 
+                                    (784) * num_samples: 9  avg_Y: 5.3 avg_W: 0.07 
+                                    (785) * num_samples: 11  avg_Y: 5.26 avg_W: 0.06 
+                                  (747) split_variable: X50_59  split_value: 0.112637 
+                                    (786) * num_samples: 25  avg_Y: 4.73 avg_W: 0.06 
+                                    (787) split_variable: X20_29  split_value: 0.13892 
+                                      (812) * num_samples: 12  avg_Y: 4.26 avg_W: 0.05 
+                                      (813) * num_samples: 14  avg_Y: 4.96 avg_W: 0.06 
+                                (695) * num_samples: 17  avg_Y: 5.39 avg_W: 0.05 
+                          (509) split_variable: X10_19  split_value: 0.101104 
+                            (568) split_variable: IMD_score  split_value: 20.8605 
+                              (634) split_variable: pole  split_value: 0.0101986 
+                                (696) split_variable: vegetation  split_value: 0.237837 
+                                  (748) * num_samples: 10  avg_Y: 5.71 avg_W: 0.05 
+                                  (749) * num_samples: 13  avg_Y: 5.35 avg_W: 0.06 
+                                (697) split_variable: sky  split_value: 0.158364 
+                                  (750) * num_samples: 9  avg_Y: 5.48 avg_W: 0.06 
+                                  (751) * num_samples: 16  avg_Y: 4.83 avg_W: 0.05 
+                              (635) split_variable: vehicle_count  split_value: 23 
+                                (698) split_variable: building  split_value: 0.424127 
+                                  (752) split_variable: building  split_value: 0.294083 
+                                    (788) split_variable: building  split_value: 0.143976 
+                                      (814) * num_samples: 14  avg_Y: 5.02 avg_W: 0.05 
+                                      (815) * num_samples: 19  avg_Y: 6.14 avg_W: 0.08 
+                                    (789) * num_samples: 11  avg_Y: 6.47 avg_W: 0.07 
+                                  (753) * num_samples: 7  avg_Y: 5.65 avg_W: 0.09 
+                                (699) * num_samples: 14  avg_Y: 5.74 avg_W: 0.06 
+                            (569) split_variable: sky  split_value: 0.217718 
+                              (636) split_variable: IMD_score  split_value: 32.5047 
+                                (700) * num_samples: 13  avg_Y: 5.23 avg_W: 0.07 
+                                (701) * num_samples: 9  avg_Y: 5.91 avg_W: 0.06 
+                              (637) * num_samples: 20  avg_Y: 5.46 avg_W: 0.06 
+                        (443) * num_samples: 25  avg_Y: 4.83 avg_W: 0.06 
+                      (387) split_variable: building  split_value: 0.0567102 
+                        (444) split_variable: traffic.sign  split_value: 0.00271606 
+                          (510) * num_samples: 11  avg_Y: 6.34 avg_W: 0.05 
+                          (511) * num_samples: 13  avg_Y: 4.95 avg_W: 0.06 
+                        (445) split_variable: sky  split_value: 0.11708 
+                          (512) split_variable: terrain  split_value: 0.0292387 
+                            (570) split_variable: traffic.light  split_value: 0.00339317 
+                              (638) split_variable: X10_19  split_value: 0.117779 
+                                (702) split_variable: X30_39  split_value: 0.277443 
+                                  (754) split_variable: X60_69  split_value: 0.057554 
+                                    (790) split_variable: poi_log  split_value: 4.56435 
+                                      (816) * num_samples: 22  avg_Y: 6.79 avg_W: 0.07 
+                                      (817) * num_samples: 25  avg_Y: 7.4 avg_W: 0.07 
+                                    (791) split_variable: vegetation  split_value: 0.149674 
+                                      (818) split_variable: year  split_value: 2015 
+                                        (842) * num_samples: 5  avg_Y: 7.17 avg_W: 0.05 
+                                        (843) * num_samples: 15  avg_Y: 6.07 avg_W: 0.08 
+                                      (819) split_variable: year  split_value: 2016 
+                                        (844) split_variable: X30_39  split_value: 0.205663 
+                                          (860) * num_samples: 17  avg_Y: 6.76 avg_W: 0.07 
+                                          (861) split_variable: vehicle_count  split_value: 13 
+                                            (870) * num_samples: 5  avg_Y: 7.12 avg_W: 0.08 
+                                            (871) * num_samples: 10  avg_Y: 6.38 avg_W: 0.05 
+                                        (845) split_variable: X40_49  split_value: 0.140173 
+                                          (862) * num_samples: 10  avg_Y: 6.74 avg_W: 0.08 
+                                          (863) * num_samples: 19  avg_Y: 6.88 avg_W: 0.08 
+                                  (755) * num_samples: 19  avg_Y: 6.64 avg_W: 0.08 
+                                (703) * num_samples: 16  avg_Y: 6.31 avg_W: 0.07 
+                              (639) * num_samples: 14  avg_Y: 6.62 avg_W: 0.1 
+                            (571) split_variable: terrain  split_value: 0.0365782 
+                              (640) * num_samples: 7  avg_Y: 6.28 avg_W: 0.04 
+                              (641) * num_samples: 17  avg_Y: 6.22 avg_W: 0.07 
+                          (513) split_variable: pole  split_value: 0.00631618 
+                            (572) split_variable: terrain  split_value: 0.0104535 
+                              (642) split_variable: person_count  split_value: 4 
+                                (704) * num_samples: 17  avg_Y: 5.88 avg_W: 0.05 
+                                (705) * num_samples: 9  avg_Y: 6.75 avg_W: 0.04 
+                              (643) * num_samples: 20  avg_Y: 5.52 avg_W: 0.06 
+                            (573) split_variable: pole  split_value: 0.00754738 
+                              (644) split_variable: X30_39  split_value: 0.213793 
+                                (706) * num_samples: 9  avg_Y: 5.9 avg_W: 0.06 
+                                (707) * num_samples: 16  avg_Y: 6.83 avg_W: 0.08 
+                              (645) split_variable: poi_log  split_value: 3.13549 
+                                (708) split_variable: X40_49  split_value: 0.130789 
+                                  (756) * num_samples: 14  avg_Y: 6 avg_W: 0.05 
+                                  (757) split_variable: sky  split_value: 0.221562 
+                                    (792) split_variable: X70_79  split_value: 0.0397661 
+                                      (820) * num_samples: 11  avg_Y: 5.41 avg_W: 0.07 
+                                      (821) * num_samples: 17  avg_Y: 5.6 avg_W: 0.08 
+                                    (793) * num_samples: 11  avg_Y: 5.24 avg_W: 0.07 
+                                (709) split_variable: pop_den_log  split_value: 7.53392 
+                                  (758) split_variable: X10_19  split_value: 0.0935622 
+                                    (794) * num_samples: 20  avg_Y: 6.4 avg_W: 0.08 
+                                    (795) * num_samples: 10  avg_Y: 6.48 avg_W: 0.08 
+                                  (759) split_variable: pop_den_log  split_value: 7.75686 
+                                    (796) split_variable: terrain  split_value: 0.00203705 
+                                      (822) * num_samples: 4  avg_Y: 6.45 avg_W: 0.07 
+                                      (823) * num_samples: 20  avg_Y: 5.34 avg_W: 0.08 
+                                    (797) split_variable: sky  split_value: 0.130125 
+                                      (824) split_variable: X60_69  split_value: 0.0628205 
+                                        (846) * num_samples: 17  avg_Y: 6.41 avg_W: 0.08 
+                                        (847) * num_samples: 5  avg_Y: 6.19 avg_W: 0.06 
+                                      (825) split_variable: X40_49  split_value: 0.159011 
+                                        (848) split_variable: pop_den_log  split_value: 8.53912 
+                                          (864) split_variable: IMD_score  split_value: 33.2368 
+                                            (872) split_variable: sky  split_value: 0.165989 
+                                              (876) * num_samples: 19  avg_Y: 6.44 avg_W: 0.07 
+                                              (877) split_variable: vehicle_count  split_value: 24 
+                                                (880) * num_samples: 22  avg_Y: 6.13 avg_W: 0.08 
+                                                (881) * num_samples: 5  avg_Y: 5.35 avg_W: 0.04 
+                                            (873) * num_samples: 19  avg_Y: 6.45 avg_W: 0.07 
+                                          (865) split_variable: sky  split_value: 0.21078 
+                                            (874) split_variable: traffic.sign  split_value: 0.000869751 
+                                              (878) * num_samples: 7  avg_Y: 7.35 avg_W: 0.08 
+                                              (879) split_variable: X30_39  split_value: 0.197628 
+                                                (882) * num_samples: 9  avg_Y: 6.13 avg_W: 0.07 
+                                                (883) * num_samples: 26  avg_Y: 6.76 avg_W: 0.09 
+                                            (875) * num_samples: 9  avg_Y: 5.94 avg_W: 0.08 
+                                        (849) split_variable: X80_89  split_value: 0.0148005 
+                                          (866) * num_samples: 11  avg_Y: 5.65 avg_W: 0.05 
+                                          (867) * num_samples: 15  avg_Y: 6.39 avg_W: 0.09 
+                  (261) split_variable: traffic.sign  split_value: 0.00119781 
+                    (326) split_variable: X70_79  split_value: 0.0427939 
+                      (388) * num_samples: 20  avg_Y: 5.99 avg_W: 0.09 
+                      (389) split_variable: traffic.sign  split_value: 0.000912984 
+                        (446) split_variable: X0_9  split_value: 0.117775 
+                          (514) * num_samples: 19  avg_Y: 5.79 avg_W: 0.06 
+                          (515) split_variable: poi_log  split_value: 3.29584 
+                            (574) * num_samples: 21  avg_Y: 5.29 avg_W: 0.06 
+                            (575) * num_samples: 5  avg_Y: 5.79 avg_W: 0.06 
+                        (447) * num_samples: 13  avg_Y: 5.62 avg_W: 0.06 
+                    (327) split_variable: X80_89  split_value: 0.0500874 
+                      (390) split_variable: vegetation  split_value: 0.0681369 
+                        (448) * num_samples: 12  avg_Y: 5.78 avg_W: 0.07 
+                        (449) split_variable: X0_9  split_value: 0.149134 
+                          (516) split_variable: X30_39  split_value: 0.119789 
+                            (576) * num_samples: 16  avg_Y: 4.74 avg_W: 0.05 
+                            (577) split_variable: poi_log  split_value: 2.07944 
+                              (646) * num_samples: 22  avg_Y: 5.08 avg_W: 0.06 
+                              (647) split_variable: pop_den_log  split_value: 7.32261 
+                                (710) * num_samples: 21  avg_Y: 5.71 avg_W: 0.07 
+                                (711) split_variable: vegetation  split_value: 0.205816 
+                                  (760) split_variable: sky  split_value: 0.159553 
+                                    (798) split_variable: X30_39  split_value: 0.178651 
+                                      (826) * num_samples: 7  avg_Y: 6.42 avg_W: 0.09 
+                                      (827) * num_samples: 16  avg_Y: 7.3 avg_W: 0.08 
+                                    (799) * num_samples: 26  avg_Y: 6.06 avg_W: 0.06 
+                                  (761) split_variable: traffic.sign  split_value: 0.00349617 
+                                    (800) split_variable: pole  split_value: 0.0108795 
+                                      (828) * num_samples: 14  avg_Y: 5.69 avg_W: 0.06 
+                                      (829) * num_samples: 13  avg_Y: 6.61 avg_W: 0.08 
+                                    (801) * num_samples: 27  avg_Y: 6.11 avg_W: 0.07 
+                          (517) split_variable: pole  split_value: 0.013092 
+                            (578) * num_samples: 17  avg_Y: 5.3 avg_W: 0.06 
+                            (579) * num_samples: 9  avg_Y: 5.04 avg_W: 0.06 
+                      (391) * num_samples: 18  avg_Y: 4.36 avg_W: 0.06 
+                (195) split_variable: pole  split_value: 0.0106405 
+                  (262) split_variable: terrain  split_value: 2.67029e-05 
+                    (328) split_variable: poi_log  split_value: 4.00733 
+                      (392) * num_samples: 14  avg_Y: 5.82 avg_W: 0.07 
+                      (393) * num_samples: 7  avg_Y: 6.8 avg_W: 0.05 
+                    (329) * num_samples: 15  avg_Y: 6.18 avg_W: 0.06 
+                  (263) split_variable: road  split_value: 0.189111 
+                    (330) * num_samples: 17  avg_Y: 6.16 avg_W: 0.09 
+                    (331) * num_samples: 11  avg_Y: 6.84 avg_W: 0.08 
+              (141) split_variable: X30_39  split_value: 0.164912 
+                (196) split_variable: pole  split_value: 0.00914764 
+                  (264) split_variable: pop_den_log  split_value: 7.6976 
+                    (332) * num_samples: 26  avg_Y: 5.15 avg_W: 0.06 
+                    (333) * num_samples: 16  avg_Y: 5.14 avg_W: 0.08 
+                  (265) split_variable: X50_59  split_value: 0.100946 
+                    (334) * num_samples: 10  avg_Y: 5.24 avg_W: 0.06 
+                    (335) split_variable: X0_9  split_value: 0.125 
+                      (394) * num_samples: 15  avg_Y: 4.43 avg_W: 0.06 
+                      (395) split_variable: X40_49  split_value: 0.146168 
+                        (450) * num_samples: 17  avg_Y: 5.18 avg_W: 0.05 
+                        (451) * num_samples: 15  avg_Y: 5.58 avg_W: 0.07 
+                (197) split_variable: X40_49  split_value: 0.139391 
+                  (266) * num_samples: 14  avg_Y: 5.01 avg_W: 0.07 
+                  (267) * num_samples: 26  avg_Y: 5.07 avg_W: 0.07 
+      (15) split_variable: poi_log  split_value: 5.61677 
+        (30) split_variable: X70_79  split_value: 0.0376117 
+          (56) split_variable: X0_9  split_value: 0.169291 
+            (90) split_variable: sky  split_value: 0.053594 
+              (142) split_variable: vegetation  split_value: 0.202146 
+                (198) * num_samples: 4  avg_Y: 6.65 avg_W: 0.09 
+                (199) * num_samples: 11  avg_Y: 7.21 avg_W: 0.08 
+              (143) split_variable: vehicle_count  split_value: 28 
+                (200) split_variable: building  split_value: 0.154898 
+                  (268) * num_samples: 8  avg_Y: 6.31 avg_W: 0.06 
+                  (269) split_variable: building  split_value: 0.213172 
+                    (336) * num_samples: 20  avg_Y: 6.8 avg_W: 0.07 
+                    (337) split_variable: sky  split_value: 0.107175 
+                      (396) split_variable: X30_39  split_value: 0.243655 
+                        (452) split_variable: pole  split_value: 0.00841014 
+                          (518) * num_samples: 9  avg_Y: 7.3 avg_W: 0.08 
+                          (519) split_variable: building  split_value: 0.515278 
+                            (580) split_variable: X40_49  split_value: 0.142391 
+                              (648) * num_samples: 16  avg_Y: 7.15 avg_W: 0.09 
+                              (649) * num_samples: 3  avg_Y: 7.59 avg_W: 0.04 
+                            (581) * num_samples: 7  avg_Y: 6.6 avg_W: 0.09 
+                        (453) split_variable: building  split_value: 0.516512 
+                          (520) * num_samples: 14  avg_Y: 7.09 avg_W: 0.08 
+                          (521) * num_samples: 10  avg_Y: 7.49 avg_W: 0.05 
+                      (397) split_variable: X50_59  split_value: 0.0896465 
+                        (454) split_variable: slope  split_value: 1.15704 
+                          (522) * num_samples: 16  avg_Y: 6.99 avg_W: 0.07 
+                          (523) split_variable: X50_59  split_value: 0.0840909 
+                            (582) split_variable: terrain  split_value: 0.00483322 
+                              (650) split_variable: X50_59  split_value: 0.0672359 
+                                (712) * num_samples: 15  avg_Y: 6.97 avg_W: 0.08 
+                                (713) * num_samples: 30  avg_Y: 6.93 avg_W: 0.08 
+                              (651) * num_samples: 18  avg_Y: 6.51 avg_W: 0.07 
+                            (583) * num_samples: 10  avg_Y: 5.86 avg_W: 0.07 
+                        (455) split_variable: slope  split_value: 2.43088 
+                          (524) split_variable: X10_19  split_value: 0.124937 
+                            (584) split_variable: traffic.sign  split_value: 0.00353432 
+                              (652) split_variable: terrain  split_value: 0.000444412 
+                                (714) * num_samples: 19  avg_Y: 7.08 avg_W: 0.08 
+                                (715) * num_samples: 13  avg_Y: 7.58 avg_W: 0.07 
+                              (653) split_variable: traffic.light  split_value: 0.000175476 
+                                (716) * num_samples: 8  avg_Y: 6.43 avg_W: 0.08 
+                                (717) * num_samples: 10  avg_Y: 7.06 avg_W: 0.08 
+                            (585) * num_samples: 15  avg_Y: 6.56 avg_W: 0.07 
+                          (525) * num_samples: 25  avg_Y: 6.88 avg_W: 0.09 
+                (201) * num_samples: 11  avg_Y: 6.64 avg_W: 0.08 
+            (91) split_variable: IMD_score  split_value: 43.0472 
+              (144) * num_samples: 19  avg_Y: 6.34 avg_W: 0.07 
+              (145) * num_samples: 15  avg_Y: 5.34 avg_W: 0.07 
+          (57) split_variable: X60_69  split_value: 0.106825 
+            (92) split_variable: vehicle_count  split_value: 30 
+              (146) split_variable: X10_19  split_value: 0.0641153 
+                (202) split_variable: person_count  split_value: 14 
+                  (270) split_variable: pop_den_log  split_value: 8.26186 
+                    (338) * num_samples: 9  avg_Y: 6.1 avg_W: 0.07 
+                    (339) * num_samples: 15  avg_Y: 6.73 avg_W: 0.07 
+                  (271) split_variable: housing_price_log  split_value: 13.3712 
+                    (340) * num_samples: 12  avg_Y: 6.76 avg_W: 0.08 
+                    (341) * num_samples: 12  avg_Y: 7.25 avg_W: 0.07 
+                (203) split_variable: poi_log  split_value: 3.73767 
+                  (272) split_variable: X70_79  split_value: 0.0539648 
+                    (342) split_variable: terrain  split_value: 0.000507355 
+                      (398) * num_samples: 22  avg_Y: 5.56 avg_W: 0.08 
+                      (399) split_variable: IMD_score  split_value: 28.1542 
+                        (456) split_variable: traffic.sign  split_value: 0.00299263 
+                          (526) * num_samples: 10  avg_Y: 5.63 avg_W: 0.05 
+                          (527) * num_samples: 7  avg_Y: 5.76 avg_W: 0.09 
+                        (457) split_variable: X50_59  split_value: 0.0973262 
+                          (528) * num_samples: 6  avg_Y: 5.71 avg_W: 0.06 
+                          (529) * num_samples: 13  avg_Y: 5.82 avg_W: 0.08 
+                    (343) split_variable: vegetation  split_value: 0.0282841 
+                      (400) * num_samples: 7  avg_Y: 4.95 avg_W: 0.08 
+                      (401) split_variable: X30_39  split_value: 0.164295 
+                        (458) * num_samples: 13  avg_Y: 4.81 avg_W: 0.06 
+                        (459) * num_samples: 14  avg_Y: 6.06 avg_W: 0.09 
+                  (273) split_variable: slope  split_value: 1.1034 
+                    (344) * num_samples: 15  avg_Y: 6.46 avg_W: 0.08 
+                    (345) split_variable: terrain  split_value: 0.0078481 
+                      (402) split_variable: terrain  split_value: 0.00185013 
+                        (460) split_variable: X30_39  split_value: 0.197356 
+                          (530) split_variable: poi_log  split_value: 4.38203 
+                            (586) * num_samples: 20  avg_Y: 6.44 avg_W: 0.08 
+                            (587) split_variable: IMD_score  split_value: 13.1259 
+                              (654) * num_samples: 6  avg_Y: 6.96 avg_W: 0.1 
+                              (655) split_variable: X20_29  split_value: 0.17037 
+                                (718) * num_samples: 14  avg_Y: 6.58 avg_W: 0.08 
+                                (719) split_variable: X20_29  split_value: 0.239917 
+                                  (762) * num_samples: 4  avg_Y: 7.07 avg_W: 0.07 
+                                  (763) * num_samples: 12  avg_Y: 7.89 avg_W: 0.07 
+                          (531) split_variable: vehicle_count  split_value: 15 
+                            (588) * num_samples: 23  avg_Y: 6.73 avg_W: 0.08 
+                            (589) * num_samples: 14  avg_Y: 6.08 avg_W: 0.07 
+                        (461) * num_samples: 10  avg_Y: 6.81 avg_W: 0.08 
+                      (403) * num_samples: 21  avg_Y: 6.82 avg_W: 0.1 
+              (147) split_variable: pop_den_log  split_value: 8.12519 
+                (204) * num_samples: 14  avg_Y: 6.77 avg_W: 0.06 
+                (205) * num_samples: 9  avg_Y: 6.51 avg_W: 0.05 
+            (93) split_variable: terrain  split_value: 0.00398636 
+              (148) * num_samples: 20  avg_Y: 6.7 avg_W: 0.05 
+              (149) * num_samples: 4  avg_Y: 7.31 avg_W: 0.08 
+        (31) split_variable: pole  split_value: 0.0128078 
+          (58) split_variable: bicycle_count  split_value: 0 
+            (94) * num_samples: 17  avg_Y: 7.46 avg_W: 0.06 
+            (95) split_variable: building  split_value: 0.456627 
+              (150) * num_samples: 10  avg_Y: 6.97 avg_W: 0.06 
+              (151) * num_samples: 5  avg_Y: 8.01 avg_W: 0.08 
+          (59) * num_samples: 26  avg_Y: 7.81 avg_W: 0.05 

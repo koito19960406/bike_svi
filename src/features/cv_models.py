@@ -574,11 +574,12 @@ class ImageDetector:
     """Object detect SVI (only use a pretrained model since the objective is to get vehicles and bicycles)
     """
     
-    def __init__(self, input_folder, output_folder, gsv_metadata_folder, pretrained_model = "facebook/detr-resnet-50"):
+    def __init__(self, input_folder, output_folder, final_output_folder, gsv_metadata_folder, pretrained_model = "facebook/detr-resnet-50"):
         self.pretrained_model = pretrained_model
         self.input_folder = input_folder
         self.output_folder = output_folder
         self.temp_output_folder = os.path.join(self.output_folder,"detection")
+        self.final_output_folder = final_output_folder
         self.gsv_metadata_folder = gsv_metadata_folder
         os.makedirs(self.temp_output_folder, exist_ok = True)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -617,6 +618,7 @@ class ImageDetector:
                 target_sizes = torch.unsqueeze(img_size, dim=0)
                 # resize and infer
                 results = feature_extractor.post_process(outputs, target_sizes=target_sizes)[0]
+                result_list_agg_temp = []
                 for score, label in zip(results["scores"], results["labels"]):
                     # let's only keep detections with score > 0.8
                     if score > 0.8:
@@ -625,7 +627,12 @@ class ImageDetector:
                         #     f"Detected {model.config.id2label[label.item()]} with confidence "
                         #     f"{round(score.item(), 3)}"
                         # )
-                        result_list_agg.append(result_list)
+                        result_list_agg_temp.append(result_list)
+                # if there's no result, then append only pid
+                if len(result_list_agg_temp) == 0:
+                    result_list_agg_temp.append([file_name, pid,None,None])
+                # append result_list_agg_temp to result_list_agg
+                result_list_agg.append(result_list_agg_temp)
                 if batch_count % batch_size == 0:
                     # convert the result_list_agg to df and save as csv
                     result_list_agg_df = pd.DataFrame(result_list_agg, columns=["file_name","pid","label","score"])
@@ -647,7 +654,7 @@ class ImageDetector:
     def count_objects(self):
         """calculate total number of bycicycle and vehicles (car, motorcycle, bus, truck) under COCO detection 2017 dataset
         """
-        feather_list = glob.glob(os.path.join(self.output_folder, "*.feather"))
+        feather_list = glob.glob(os.path.join(self.output_folder, "detection/*.feather"))
         dfs = [dask.delayed(feather.read_feather)(f) for f in feather_list]
         df = dd.from_delayed(dfs)
         result_df = df.drop_duplicates().compute()
@@ -684,17 +691,14 @@ class ImageDetector:
                         rename(columns=lambda s: s.replace("file_name", "vehicle_count"))
                         )
         print(result_vehicle)
-        # join the result back to gsv meta_data
-        gsv_metadata = pd.read_csv(os.path.join(self.gsv_metadata_folder, "gsv_metadata.csv"))
-        gsv_metadata = (gsv_metadata.
-                        merge(result_person, left_on = "panoid", right_on = "pid", how = "left").
-                        merge(result_bicycle, left_on = "panoid", right_on = "pid", how = "left").
-                        merge(result_vehicle, left_on = "panoid", right_on = "pid", how = "left")
+        gsv_metadata = (result_person.merge(result_bicycle, on = "pid", how = "left").
+                        merge(result_vehicle, on = "pid", how = "left").
+                        fillna(0)
                         )
-        gsv_metadata = gsv_metadata.loc[:,~gsv_metadata.columns.str.startswith('pid')]
+        gsv_metadata = gsv_metadata.loc[:,~gsv_metadata.columns.str.startswith('pid_')]
         print(gsv_metadata)
         # save the result as csv
-        gsv_metadata.to_csv(os.path.join(self.output_folder, "object_detection_bicycle_vehicle.csv"), index = False)
+        gsv_metadata.to_csv(os.path.join(self.final_output_folder, "object_detection_count.csv"), index = False)
         
 # class PerceptionPredictor:
 #     """class for predicting perception score for PlacePulse 2.0 data
@@ -710,6 +714,7 @@ if __name__ == '__main__':
     input_folder = os.path.join(root_dir,"data/raw")
     output_folder = os.path.join(root_dir,"data/interim/cities")
     model_folder = os.path.join(root_dir,"models")
+    final_output_folder = os.path.join(root_dir,"data/processed/cities")
     #  # segmentation
     # image_segmenter = ImageSegmenterBikeLane(input_folder, model_folder, os.path.join(output_folder, "London"))
     # image_segmenter.resize_map()
@@ -725,6 +730,7 @@ if __name__ == '__main__':
             gsv_metadata_folder = os.path.join(input_folder,"cities",city,"gsv/metadata")
             image_detector = ImageDetector(os.path.join(input_folder,"cities", city, "gsv/image/perspective"), 
                 os.path.join(output_folder, city),
+                os.path.join(final_output_folder, city),
                 gsv_metadata_folder)
             # image_detector.detect_object()
             image_detector.count_objects()
