@@ -1,5 +1,5 @@
-pacman::p_load(tidyverse, Hmisc, GGally, corrplot, RColorBrewer, ggplot2, hrbrthemes,stargazer)
-
+pacman::p_load(tidyverse, Hmisc, GGally, corrplot, RColorBrewer, ggplot2, hrbrthemes,stargazer,plotly)
+extrafont::loadfonts()
 
 # data exploration --------------------------------------------------------
 root_dir <- "/Volumes/ExFAT/bike_svi"
@@ -7,7 +7,7 @@ if (!(file.exists(root_dir))){
   root_dir <- "/Volumes/Extreme SSD/bike_svi"
 }
 all_var <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined.csv")) %>% 
-  select(-c(count_point_id, all_ages, person, X90, period)) %>% 
+  select(-c(count_point_id, all_ages, X90, period)) %>% 
   relocate(pedal_cycles) %>% 
   drop_na()
 
@@ -38,9 +38,10 @@ cor.mtest <- function(mat, ...) {
 }
 # matrix of the p-value of the correlation
 p.mat <- cor.mtest(all_var)
-col1 <- colorRampPalette(brewer.pal(9,"BrBG"))
+# original color: purple(#7B52AE) and green (#74B652)
+col1 <- colorRampPalette(c("#62428b", "#FFFFFF", "#5d9242"))
 pdf("bike_svi/reports/figures/correlation_mat.pdf", height = 7, width = 7)
-corrplot(corrmatrix,method = "square",  tl.col = "black", tl.cex = 0.75, 
+corrplot(corrmatrix,method = "square",  tl.col = "black", tl.cex = 0.6, 
          p.mat = p.mat, sig.level = 0.05, insig = "pch", pch.cex = 1, col = col1(100),
          title = "Correlation matrix of all variables",
          mar=c(0,0,1,0))
@@ -74,22 +75,27 @@ all_var_scaled %>%
 
 # pairwise correlation for pedal_cycles and segmentation result
 pedal_seg <- all_var %>% 
-  select(c(pedal_cycles,vegetation,sidewalk, slope))
+  select(c("pedal_cycles","ss_vegetation","ss_sidewalk", "slope"))
 pedal_seg_scaled <- all_var_scaled %>% 
-  select(c(pedal_cycles_log,vegetation,sidewalk, slope))
+  select(c("pedal_cycles_log","ss_vegetation","ss_sidewalk", "slope"))
 pair_corr <- function(data,title,file_path){
-  pdf(file_path, height = 7, width = 7)
+  # pdf(file_path, height = 7, width = 7)
   scatter_plot <- function(data, mapping, ...) {
-    ggplot(data = data, mapping=mapping) +
-      stat_binhex()
+    p <- ggplot(data = data, mapping=mapping) +
+      stat_bin_2d(bins=50) +
+      scale_fill_gradient(low = "#312146",
+                          high = "#cabadf")
+    return(p)
   }
-  g <- ggpairs(data, lower=list(continuous=scatter_plot), title=title)
-  print(g)
-  dev.off()
+  g <- ggpairs(data, lower=list(continuous=scatter_plot), title=title)+
+    theme_ipsum()+
+    theme(axis.text.x = element_text(size = 6),
+          axis.text.y = element_text(size = 6))
+  ggsave(plot=g,file_path)
+  # dev.off()
 }
-pair_corr(pedal_seg, "Pair-wise correlation matrix", "bike_svi/reports/figures/pair_wise_correlation.pdf")
-pair_corr(pedal_seg_scaled, "Pair-wise correlation matrix", "bike_svi/reports/figures/pair_wise_correlation_scaled.pdf")
-
+pair_corr(pedal_seg, "Pair-wise correlation matrix", "bike_svi/reports/figures/pair_wise_correlation.png")
+pair_corr(pedal_seg_scaled, "Pair-wise correlation matrix", "bike_svi/reports/figures/pair_wise_correlation_scaled.png")
 # convert treatment into binary
 convert_to_binary <- function(array, percentile){
   tile <- ntile(array,10)
@@ -106,8 +112,8 @@ create_binary <- function(data,colname){
 }
 # apply function
 all_var_scaled_binary_treatment <- all_var_scaled %>% 
-  create_binary(., vegetation) %>% 
-  create_binary(., sidewalk) %>% 
+  create_binary(., ss_vegetation) %>% 
+  create_binary(., ss_sidewalk) %>% 
   create_binary(., slope) %>% 
   drop_na()
 all_var_scaled_binary_treatment %>% 

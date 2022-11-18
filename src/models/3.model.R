@@ -1,5 +1,5 @@
 pacman::p_load(tidyverse, stats, plm, utils,pglm,progress,MatchIt,lmtest,sandwich,
-               pscl, cobalt, grf,AER,DiagrammeR,rsvg)
+               pscl, cobalt, grf,AER,DiagrammeRsvg,rsvg,stargazer,hrbrthemes)
 
 
 # load data ---------------------------------------------------------------
@@ -10,12 +10,13 @@ if (!(file.exists(root_dir))){
 # load data
 all_var_scaled_binary_treatment <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined_scaled_binary.csv")) %>% 
   mutate(year=as.factor(year)) %>% 
+  select(-c(lu_community_service,lu_vacant,lu_undeveloped_land)) %>% 
   drop_na()
 all_var_scaled <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined_scaled.csv")) %>% 
   mutate(year=as.numeric(year)) %>% 
   drop_na()
 all_var <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined.csv")) %>% 
-  select(-c(count_point_id, person, X90, period)) %>% 
+  select(-c(count_point_id, X90, period,lu_vacant,lu_undeveloped_land)) %>% 
   mutate(year=as.factor(year)) %>% 
   # rename_at(vars(contains('count')), ~paste0(., "_log")) %>% 
   # mutate_at(vars(contains("_log")), log) %>% 
@@ -30,8 +31,9 @@ od_test <- dispersiontest(poisson_base,trafo=1)
 capture.output(od_test, file= paste0("bike_svi/models/overdispersion_test.txt"))
 
 # run simple OLS
-all_var_wo_year <- all_var %>% 
-  select(c(pedal_cycles, vegetation, IMD_score, housing_price, poi, slope, pop_den))
+all_var_wo_year <- all_var_scaled %>% 
+  select(-c("pedal_cycles_log")) %>% 
+  dplyr::select(contains(c("pedal_cycles", "vegetation", "IMD_score", "housing_price", "poi", "slope", "pop_den","lu_")))
 simple_ols <- glm(pedal_cycles ~ ., data = all_var_wo_year)
 simple_ols_summary <- summary(simple_ols)
 capture.output(simple_ols_summary, file= "bike_svi/models/simple_ols.txt")
@@ -78,7 +80,8 @@ run_zero_inflated <- function(data, dep_var_name, ind_var_name, control_var_vec,
   # create dir
   dir.create(paste0("bike_svi/models/",ind_var_name))
   # run base model
-  formula <- as.formula(paste(dep_var_name, " ~ ", ind_var_name))
+  right_side <- paste(c(ind_var_name,control_var_vec), collapse = " + ")
+  formula <- as.formula(paste(dep_var_name, " ~ ", right_side))
   print(formula)
   model_year_zero_inflated <- zeroinfl(formula, dist = count_model, link = "logit", data = data)
   model_year_zero_inflated_summary <- summary(model_year_zero_inflated)
@@ -94,11 +97,12 @@ run_zero_inflated <- function(data, dep_var_name, ind_var_name, control_var_vec,
   for (cov_name in cov_names){
     print(cov_name)
     pb$tick()
-    names_agg <- c(names_agg,cov_name)
-    right_side <- paste(names_agg, collapse = " + ")
+    right_side <- paste(c(names_agg,cov_name), collapse = " + ")
     formula <- as.formula(paste(dep_var_name, " ~ ", right_side))
+    print(formula)
     model_year_zero_inflated <- zeroinfl(formula, dist = count_model, link = "logit", data = data)
     model_year_zero_inflated_summary <- summary(model_year_zero_inflated)
+    print(model_year_zero_inflated_summary)
     # append the model result
     # add covariate's name, point estimate, and p-value
     point_est <- model_year_zero_inflated_summary[["coefficients"]][["count"]][2,1]
@@ -120,12 +124,14 @@ run_zero_inflated <- function(data, dep_var_name, ind_var_name, control_var_vec,
     as.matrix() %>% 
     write.csv(paste0("bike_svi/models/",ind_var_name,"/", "year_zero_inflated_",count_model,"_result.csv"), row.names = F)
 }
-ind_var_name_list <- c("vegetation","sidewalk","slope")
-control_var_vec <- c("year", "X0_9", "X10_19", "X20_29", "X30_39", "X40_49", "X50_59", "X60_69", "X70_79", "X80_89")
+# list of independent variables
+ind_var_name_list <- c("ss_vegetation","ss_sidewalk","slope")
+# list of baseline control variables
+control_var_vec <- names(all_var)[str_detect(names(all_var), "^X[0-9]*|year|^lu_")]
 for (ind_var_name in ind_var_name_list){
   # run_fe_poisson(all_var_scaled, "pedal_cycles_log",ind_var_name)
-  run_zero_inflated(all_var, "pedal_cycles",ind_var_name, control_var_vec, "poisson")
-  run_zero_inflated(all_var, "pedal_cycles",ind_var_name, control_var_vec, "negbin")
+  # run_zero_inflated(all_var_scaled, "pedal_cycles",ind_var_name, control_var_vec, "poisson")
+  run_zero_inflated(all_var_scaled %>% select(-c("pedal_cycles_log")), "pedal_cycles",ind_var_name, control_var_vec, "negbin")
 }
 
 # Propensity score matching -----------------------------------------------
@@ -141,12 +147,15 @@ run_psm <- function(data,dep_var_name, ind_var_name, covariates_names){
   capture.output(summary_match_model, file= paste0("bike_svi/models/",sub("_binary.*", "", ind_var_name),"/", ind_var_name, "_first_stage_model.txt"))
   models$first_stage <- match_result$model
   # plot
-  pdf(paste0("bike_svi/reports/figures/",ind_var_name,"_match_result.pdf"), height = 2, width = 6)
+  # pdf(paste0("bike_svi/reports/figures/",ind_var_name,"_match_result.pdf"), height = 2, width = 6)
   # plot(match_result, type = "density", interactive = FALSE)
-  plot <- bal.plot(match_result, var.name = "distance", which = "both") +
-    labs(title = paste0("Distributional Balance for ", strsplit(ind_var_name, "_")[[1]][1]))
-  print(plot)
-  dev.off()
+  plot <- bal.plot(match_result, var.name = "distance", which = "both",lwd=0.5) +
+    scale_fill_manual(values = alpha(c("#7B52AE", "#74B652"), 0.5))+
+    labs(title = paste0("Distributional Balance for ", strsplit(ind_var_name, "_binary")[[1]][1]))+
+    theme_ipsum()
+  ggsave(paste0("bike_svi/reports/figures/",ind_var_name,"_match_result.png"),height = 4, width = 10)
+  # print(plot)
+  # dev.off()
   # model
   match_result_df <- match.data(match_result)
   right_side <- paste0(ind_var_name," + ", covariates_names)
@@ -162,22 +171,17 @@ run_psm <- function(data,dep_var_name, ind_var_name, covariates_names){
 binary_ind_var_name_list <- names(all_var_scaled_binary_treatment)[str_detect(names(all_var_scaled_binary_treatment),"_binary")]
 pb <- progress_bar$new(total = length(binary_ind_var_name_list))
 model_list <- list()
-vegetation_covariates <- c("year", "road", "sidewalk","sky","terrain",
-  "person_count","bicycle_count","vehicle_count",
-  "X0_9", "X10_19", "X20_29", "X30_39", "X40_49",
-  "X50_59", "X60_69", "X70_79", "X80_89", "IMD_score",
-  "poi_log","slope", "housing_price_log", "pop_den_log")
-sidewalk_covariates <- c("year","building", "road", "pole", "traffic.light","traffic.sign",
-                         "vegetation", "sky","terrain", 
-                         "person_count","bicycle_count","vehicle_count",
-                         "X0_9", "X10_19", "X20_29", "X30_39", "X40_49",
-                         "X50_59", "X60_69", "X70_79", "X80_89", "IMD_score",
-                         "poi_log","slope", "housing_price_log", "pop_den_log")
-slope_covariates <- c("year","building", "road", "vegetation", "sky","terrain",
-                      "person_count","bicycle_count","vehicle_count",
-                      "X0_9", "X10_19", "X20_29", "X30_39", "X40_49",
-                      "X50_59", "X60_69", "X70_79", "X80_89", "IMD_score",
-                      "poi_log", "housing_price_log", "pop_den_log")
+vegetation_covariates <- names(all_var_scaled_binary_treatment)[str_detect(names(all_var_scaled_binary_treatment), 
+  paste("^X[0-9]*","year", "^lu_", "road","sidewalk(?!_binary)", "sky","terrain",
+        "^od_", "IMD", "poi","slope(?!_binary)","housing_price","pop_den", sep="|"))]
+sidewalk_covariates <- names(all_var_scaled_binary_treatment)[str_detect(names(all_var_scaled_binary_treatment), 
+  paste("^X[0-9]*","year", #"^lu_", 
+        "building", "road", "pole", 
+        "traffic.light","traffic.sign","vegetation(?!_binary)", "sky","terrain", 
+        "^od_", "IMD", "poi","slope(?!_binary)","housing_price","pop_den", sep="|"))]
+slope_covariates <- names(all_var_scaled_binary_treatment)[str_detect(names(all_var_scaled_binary_treatment), 
+  paste("^X[0-9]*","year", "^lu_", "building", "road", "vegetation(?!_binary)", 
+        "sky","terrain","^od_", "IMD", "poi","housing_price","pop_den", sep="|"))]
 for (ind_var_name in binary_ind_var_name_list){
   pb$tick()
   print(ind_var_name)
@@ -194,9 +198,10 @@ for (ind_var_name in binary_ind_var_name_list){
 # create stargazer 
 # need to rename models to avoid error: Error in if (is.na(s)) { : the condition has length > 1
 for (stage in c("first_stage","second_stage")){
-  vegetation <- model_list$vegetation_binary_70_percentile[[stage]]
-  sidewalk <- model_list$sidewalk_binary_70_percentile[[stage]]
+  vegetation <- model_list$ss_vegetation_binary_70_percentile[[stage]]
+  sidewalk <- model_list$ss_sidewalk_binary_70_percentile[[stage]]
   slope <- model_list$slope_binary_70_percentile[[stage]]
+  print(stage)
   stargazer(vegetation, 
             sidewalk,
             slope,
@@ -222,7 +227,7 @@ run_causal_forest <- function(data,dep_var_name, ind_var_name, covariates_names)
     select(ind_var_name)%>% 
     as.vector() %>% 
     unlist()
-  tau.forest <- causal_forest(X, Y, W)
+  tau.forest <- causal_forest(X, Y, W, seed=1234)
   
   # Estimate treatment effects for the training data using out-of-bag prediction.
   # tau.hat.oob <- predict(tau.forest)
@@ -245,7 +250,8 @@ run_causal_forest <- function(data,dep_var_name, ind_var_name, covariates_names)
   capture.output(cate, file= paste0("bike_svi/models/",ind_var_name,"/", "causal_forest_cate.txt"))
   
   # Extract the first tree from the fitted forest.
-  tree <- get_tree(tau.forest, 1)
+  tau.forest.2 <- causal_forest(X, Y, W, seed=1234, min.node.size=100)
+  tree <- get_tree(tau.forest.2, 1)
   # Print the first tree.
   print(tree)
   capture.output(tree, file= paste0("bike_svi/models/",ind_var_name,"/", "causal_tree.txt"))
@@ -259,18 +265,21 @@ pb <- progress_bar$new(total = length(ind_var_name_list))
 
 for (ind_var_name in ind_var_name_list){
   pb$tick()
-  if (str_detect(ind_var_name,"vegetation")){
-    covariates_names <- vegetation_covariates
-  } else if (str_detect(ind_var_name,"sidewalk")){
-    covariates_names <- sidewalk_covariates
-  } else if (str_detect(ind_var_name,"slope")){
-    covariates_names <- slope_covariates
-  }
+  # if (str_detect(ind_var_name,"vegetation")){
+  #   covariates_names <- vegetation_covariates
+  # } else if (str_detect(ind_var_name,"sidewalk")){
+  #   covariates_names <- sidewalk_covariates
+  # } else if (str_detect(ind_var_name,"slope")){
+  #   covariates_names <- slope_covariates
+  # }
+  covariates_names <- all_var_scaled %>% 
+    dplyr::select(-contains(c("pedal_cycles",{{ind_var_name}}))) %>% 
+    names()
   run_causal_forest(all_var_scaled, "pedal_cycles_log",ind_var_name, covariates_names)
   }
 # run a normal causal forest just to check feature importance
 X <- all_var_scaled %>%
-  dplyr::select(-c("pedal_cycles_log","X")) %>% 
+  dplyr::select(-contains("pedal_cycles")) %>% 
   as.matrix() %>% 
   unlist()
 
@@ -282,7 +291,7 @@ Y <-all_var_scaled %>%
 regression_forest <- regression_forest(X,Y)
 varimp <- variable_importance(regression_forest)
 var_name <- all_var_scaled %>%
-  dplyr::select(-c("pedal_cycles_log","X")) %>% 
+  dplyr::select(-contains("pedal_cycles")) %>% 
   names()
 df <- data.frame(var_name=var_name, variable_importance=varimp)
 df %>% 
