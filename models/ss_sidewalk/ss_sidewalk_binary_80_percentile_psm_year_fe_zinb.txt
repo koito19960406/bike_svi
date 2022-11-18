@@ -1,0 +1,94 @@
+
+Call:
+zeroinfl(formula = formula, data = match_result_df, weights = weights, dist = "negbin", link = "logit")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-1.1427 -0.7030 -0.3390  0.3526 12.1285 
+
+Count model coefficients (negbin with log link):
+                                  Estimate Std. Error z value Pr(>|z|)
+(Intercept)                       2.251826         NA      NA       NA
+ss_sidewalk_binary_80_percentile  0.212043         NA      NA       NA
+year2009                         -0.297414         NA      NA       NA
+year2010                         -0.917199         NA      NA       NA
+year2011                         -0.805744         NA      NA       NA
+year2012                         -0.753679         NA      NA       NA
+year2014                         -0.897476         NA      NA       NA
+year2015                         -0.798448         NA      NA       NA
+year2016                         -0.809446         NA      NA       NA
+year2017                         -0.842852         NA      NA       NA
+year2018                         -1.090838         NA      NA       NA
+year2019                         -1.114493         NA      NA       NA
+year2020                         -0.785475         NA      NA       NA
+ss_building                      -1.033029         NA      NA       NA
+ss_pole                          -5.462669         NA      NA       NA
+ss_road                           4.181271         NA      NA       NA
+ss_sky                           -2.379430         NA      NA       NA
+ss_terrain                       -2.923191         NA      NA       NA
+ss_traffic.light                 11.444687         NA      NA       NA
+ss_traffic.sign                   3.885281         NA      NA       NA
+ss_vegetation                    -0.721698         NA      NA       NA
+od_person_count                   0.012522         NA      NA       NA
+od_bicycle_count                  0.051683         NA      NA       NA
+od_vehicle_count                  0.005925         NA      NA       NA
+X0_9                             -8.132544         NA      NA       NA
+X10_19                           -5.945313         NA      NA       NA
+X20_29                           -1.944079         NA      NA       NA
+X30_39                           -4.434034         NA      NA       NA
+X40_49                           -1.221197         NA      NA       NA
+X50_59                           -3.927468         NA      NA       NA
+X60_69                           -2.862205         NA      NA       NA
+X70_79                           -7.821022         NA      NA       NA
+X80_89                           -7.942729         NA      NA       NA
+IMD_score                         0.015110         NA      NA       NA
+housing_price_log                 0.593720         NA      NA       NA
+pop_den_log                       0.025616         NA      NA       NA
+poi_log                           0.257246         NA      NA       NA
+slope                            -0.158189         NA      NA       NA
+Log(theta)                        0.267815         NA      NA       NA
+
+Zero-inflation model coefficients (binomial with logit link):
+                                   Estimate Std. Error z value Pr(>|z|)
+(Intercept)                      -5.343e+01         NA      NA       NA
+ss_sidewalk_binary_80_percentile -2.102e+00         NA      NA       NA
+year2009                          2.145e-01         NA      NA       NA
+year2010                         -1.906e+01         NA      NA       NA
+year2011                          3.512e+00         NA      NA       NA
+year2012                          1.339e+00         NA      NA       NA
+year2014                          8.061e-01         NA      NA       NA
+year2015                         -4.533e-01         NA      NA       NA
+year2016                         -2.819e-02         NA      NA       NA
+year2017                         -1.435e+00         NA      NA       NA
+year2018                          4.241e-01         NA      NA       NA
+year2019                         -6.919e-01         NA      NA       NA
+year2020                         -1.655e+00         NA      NA       NA
+ss_building                      -1.185e+01         NA      NA       NA
+ss_pole                          -2.001e+01         NA      NA       NA
+ss_road                           1.067e+01         NA      NA       NA
+ss_sky                           -8.849e-01         NA      NA       NA
+ss_terrain                       -2.398e+00         NA      NA       NA
+ss_traffic.light                 -1.375e+02         NA      NA       NA
+ss_traffic.sign                   6.613e-02         NA      NA       NA
+ss_vegetation                    -8.894e+00         NA      NA       NA
+od_person_count                  -9.271e-01         NA      NA       NA
+od_bicycle_count                 -1.465e+01         NA      NA       NA
+od_vehicle_count                 -6.093e-03         NA      NA       NA
+X0_9                              5.138e+01         NA      NA       NA
+X10_19                            6.450e+01         NA      NA       NA
+X20_29                            5.242e+01         NA      NA       NA
+X30_39                            6.358e+01         NA      NA       NA
+X40_49                            4.229e+01         NA      NA       NA
+X50_59                            5.909e+01         NA      NA       NA
+X60_69                            6.245e+01         NA      NA       NA
+X70_79                            3.509e+01         NA      NA       NA
+X80_89                            5.916e+01         NA      NA       NA
+IMD_score                        -2.072e-02         NA      NA       NA
+housing_price_log                 1.782e-01         NA      NA       NA
+pop_den_log                      -4.429e-01         NA      NA       NA
+poi_log                          -7.069e-01         NA      NA       NA
+slope                             3.298e-01         NA      NA       NA
+
+Theta = 1.3071 
+Number of iterations in BFGS optimization: 156 
+Log-likelihood: -6.98e+04 on 77 Df

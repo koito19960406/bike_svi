@@ -4,25 +4,38 @@ glm(formula = pedal_cycles ~ ., data = all_var_wo_year)
 
 Deviance Residuals: 
     Min       1Q   Median       3Q      Max  
--4938.8   -422.1   -216.9    113.0  11232.1  
+-2727.1   -485.1   -121.5    246.3  10835.5  
 
-Coefficients:
-                Estimate Std. Error t value Pr(>|t|)    
-(Intercept)    3.786e+02  2.719e+01  13.927  < 2e-16 ***
-vegetation    -3.351e+02  4.494e+01  -7.456 9.17e-14 ***
-IMD_score      3.725e+00  5.783e-01   6.441 1.21e-10 ***
-housing_price  1.855e-04  1.855e-05   9.999  < 2e-16 ***
-poi            5.712e+00  8.261e-02  69.139  < 2e-16 ***
-slope         -9.529e+01  6.090e+00 -15.648  < 2e-16 ***
-pop_den        3.831e-02  2.953e-03  12.975  < 2e-16 ***
+Coefficients: (1 not defined because of singularities)
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)               -6600.9987   382.1262 -17.274  < 2e-16 ***
+ss_vegetation               -68.9620    47.6918  -1.446 0.148193    
+IMD_score                    -0.1408     0.6967  -0.202 0.839865    
+housing_price_log           339.9200    17.9280  18.960  < 2e-16 ***
+poi_log                     152.0052     6.0583  25.091  < 2e-16 ***
+slope                       -46.9881     6.3224  -7.432 1.11e-13 ***
+pop_den_log                  38.7702    11.3933   3.403 0.000668 ***
+lu_community_service         24.0914     2.7928   8.626  < 2e-16 ***
+lu_defence                 -476.6770   161.0198  -2.960 0.003076 ** 
+lu_industry_commerce         38.3613     3.0901  12.414  < 2e-16 ***
+lu_minerals_landfill       -129.8001    36.6965  -3.537 0.000405 ***
+lu_residential               19.4087     3.0885   6.284 3.35e-10 ***
+lu_transport_utilities       27.5113     2.8647   9.603  < 2e-16 ***
+lu_unknown_developed_use     50.8308     3.1914  15.927  < 2e-16 ***
+lu_agriculture               21.6956     2.8482   7.617 2.69e-14 ***
+lu_forest_open_land_water    11.6466     2.9076   4.006 6.20e-05 ***
+lu_outdoor_recreation        23.4437     2.7304   8.586  < 2e-16 ***
+lu_residential_gardens        9.2589     2.7523   3.364 0.000769 ***
+lu_undeveloped_land          16.9614     3.1727   5.346 9.07e-08 ***
+lu_vacant                         NA         NA      NA       NA    
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-(Dispersion parameter for gaussian family taken to be 1071075)
+(Dispersion parameter for gaussian family taken to be 998297.9)
 
-    Null deviance: 3.6989e+10  on 25466  degrees of freedom
-Residual deviance: 2.7270e+10  on 25460  degrees of freedom
-AIC: 425869
+    Null deviance: 3.4699e+10  on 23264  degrees of freedom
+Residual deviance: 2.3206e+10  on 23246  degrees of freedom
+AIC: 387422
 
 Number of Fisher Scoring iterations: 2
 

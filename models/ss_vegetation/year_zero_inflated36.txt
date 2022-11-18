@@ -1,0 +1,64 @@
+
+Call:
+zeroinfl(formula = formula, data = data, dist = count_model, link = "logit")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-52.278  -4.621  -2.558   1.636 248.510 
+
+Count model coefficients (poisson with log link):
+                        Estimate Std. Error z value Pr(>|z|)
+(Intercept)            14.134266         NA      NA       NA
+ss_vegetation          -0.821055         NA      NA       NA
+year2009               -0.051289         NA      NA       NA
+year2010               -0.615610         NA      NA       NA
+year2011               -0.108274         NA      NA       NA
+year2012                0.115040         NA      NA       NA
+year2013                1.501128         NA      NA       NA
+year2014                0.253504         NA      NA       NA
+year2015                0.363758         NA      NA       NA
+year2016                0.444238         NA      NA       NA
+year2017                0.470755         NA      NA       NA
+year2018                0.245678         NA      NA       NA
+year2019                0.128872         NA      NA       NA
+year2020                0.212179         NA      NA       NA
+X0_9                  -18.799739         NA      NA       NA
+X10_19                 -9.895544         NA      NA       NA
+X20_29                 -4.827094         NA      NA       NA
+X30_39                 -6.974136         NA      NA       NA
+X40_49                 -4.175163         NA      NA       NA
+X50_59                 -0.583648         NA      NA       NA
+X60_69                 -5.179949         NA      NA       NA
+X70_79                -15.447332         NA      NA       NA
+X80_89                -23.846751         NA      NA       NA
+lu_outdoor_recreation   0.003983         NA      NA       NA
+
+Zero-inflation model coefficients (binomial with logit link):
+                       Estimate Std. Error z value Pr(>|z|)
+(Intercept)            -7.32438         NA      NA       NA
+ss_vegetation          -1.60858         NA      NA       NA
+year2009               -0.41121         NA      NA       NA
+year2010              -11.84890         NA      NA       NA
+year2011                1.38145         NA      NA       NA
+year2012                0.81191         NA      NA       NA
+year2013              -10.49716         NA      NA       NA
+year2014               -0.31332         NA      NA       NA
+year2015               -0.34001         NA      NA       NA
+year2016               -0.74994         NA      NA       NA
+year2017               -0.69941         NA      NA       NA
+year2018               -0.08374         NA      NA       NA
+year2019               -0.79049         NA      NA       NA
+year2020               -0.96765         NA      NA       NA
+X0_9                   15.95060         NA      NA       NA
+X10_19                 11.69926         NA      NA       NA
+X20_29                 -3.69286         NA      NA       NA
+X30_39                 -0.08778         NA      NA       NA
+X40_49                 -2.50331         NA      NA       NA
+X50_59                  4.07326         NA      NA       NA
+X60_69                 14.72138         NA      NA       NA
+X70_79                  1.29881         NA      NA       NA
+X80_89                  5.09910         NA      NA       NA
+lu_outdoor_recreation   0.01347         NA      NA       NA
+
+Number of iterations in BFGS optimization: 1 
+Log-likelihood: -8.599e+06 on 48 Df

@@ -3,20 +3,60 @@ Call:
 zeroinfl(formula = formula, data = data, dist = count_model, link = "logit")
 
 Pearson residuals:
-   Min     1Q Median     3Q    Max 
--6.799 -4.724 -3.254  1.315 82.311 
+    Min      1Q  Median      3Q     Max 
+-47.386  -4.817  -2.208   2.299 135.571 
 
 Count model coefficients (poisson with log link):
-              Estimate Std. Error z value Pr(>|z|)    
-(Intercept)  6.8741400  0.0004949 13891.1   <2e-16 ***
-slope       -0.0714732  0.0002092  -341.7   <2e-16 ***
+                            Estimate Std. Error  z value Pr(>|z|)    
+(Intercept)                8.648e+00  6.811e-02  126.983  < 2e-16 ***
+slope                     -1.092e-01  2.923e-04 -373.560  < 2e-16 ***
+X0_9                      -8.861e+00  6.791e-02 -130.474  < 2e-16 ***
+X10_19                    -2.703e+00  6.846e-02  -39.488  < 2e-16 ***
+X20_29                    -2.270e-01  6.773e-02   -3.352 0.000803 ***
+X30_39                    -8.116e-01  6.808e-02  -11.922  < 2e-16 ***
+X40_49                    -8.892e-01  6.894e-02  -12.899  < 2e-16 ***
+X50_59                     4.628e+00  6.871e-02   67.350  < 2e-16 ***
+X60_69                     1.210e-01  6.910e-02    1.751 0.079898 .  
+X70_79                    -5.374e+00  7.292e-02  -73.689  < 2e-16 ***
+X80_89                    -8.323e+00  8.957e-02  -92.918  < 2e-16 ***
+lu_community_service      -1.426e-03  6.375e-05  -22.363  < 2e-16 ***
+lu_defence                 2.307e-01  6.706e-03   34.399  < 2e-16 ***
+lu_industry_commerce      -6.726e-03  6.168e-05 -109.047  < 2e-16 ***
+lu_minerals_landfill      -2.169e-02  1.632e-03  -13.284  < 2e-16 ***
+lu_residential             1.876e-02  6.901e-05  271.861  < 2e-16 ***
+lu_transport_utilities     2.229e-03  6.438e-05   34.627  < 2e-16 ***
+lu_unknown_developed_use   1.708e-02  7.991e-05  213.800  < 2e-16 ***
+lu_agriculture            -2.029e-02  7.993e-05 -253.839  < 2e-16 ***
+lu_forest_open_land_water -5.562e-02  1.104e-04 -503.983  < 2e-16 ***
+lu_outdoor_recreation      1.133e-03  5.737e-05   19.745  < 2e-16 ***
+lu_residential_gardens    -3.640e-02  5.829e-05 -624.431  < 2e-16 ***
 
 Zero-inflation model coefficients (binomial with logit link):
-            Estimate Std. Error z value Pr(>|z|)    
-(Intercept) -4.04136    0.07437  -54.34   <2e-16 ***
-slope        0.29732    0.02545   11.68   <2e-16 ***
+                           Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               -7.443524   7.464010  -0.997 0.318641    
+slope                      0.229476   0.027891   8.228  < 2e-16 ***
+X0_9                      10.665852   7.534009   1.416 0.156865    
+X10_19                     4.323149   7.557769   0.572 0.567313    
+X20_29                    -1.382650   7.454718  -0.185 0.852858    
+X30_39                    -4.748593   7.636759  -0.622 0.534069    
+X40_49                     0.772911   7.586136   0.102 0.918848    
+X50_59                    -9.192659   7.673311  -1.198 0.230915    
+X60_69                     6.540598   7.757677   0.843 0.399165    
+X70_79                    -8.611246   7.889404  -1.091 0.275055    
+X80_89                    -1.547803  10.317367  -0.150 0.880749    
+lu_community_service       0.040144   0.010168   3.948 7.88e-05 ***
+lu_defence                -8.335180   3.684227  -2.262 0.023673 *  
+lu_industry_commerce       0.001442   0.014949   0.096 0.923165    
+lu_minerals_landfill       0.150184   0.111590   1.346 0.178349    
+lu_residential            -0.138191   0.015610  -8.853  < 2e-16 ***
+lu_transport_utilities     0.079186   0.010241   7.732 1.06e-14 ***
+lu_unknown_developed_use   0.056143   0.015460   3.632 0.000282 ***
+lu_agriculture             0.059205   0.009317   6.355 2.09e-10 ***
+lu_forest_open_land_water  0.056813   0.010688   5.315 1.06e-07 ***
+lu_outdoor_recreation      0.045969   0.009514   4.832 1.36e-06 ***
+lu_residential_gardens     0.072103   0.010125   7.121 1.07e-12 ***
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
 
 Number of iterations in BFGS optimization: 1 
-Log-likelihood: -1.679e+07 on 4 Df
+Log-likelihood: -7.04e+06 on 44 Df

@@ -4,41 +4,87 @@ zeroinfl(formula = formula, data = data, dist = count_model, link = "logit")
 
 Pearson residuals:
     Min      1Q  Median      3Q     Max 
--0.8774 -0.6740 -0.4085  0.1983 28.5343 
+-0.9982 -0.6907 -0.3410  0.2823 13.2058 
 
 Count model coefficients (negbin with log link):
-            Estimate Std. Error z value Pr(>|z|)
-(Intercept) -62.6964         NA      NA       NA
-slope        -0.1157         NA      NA       NA
-year          0.0448         NA      NA       NA
-X0_9        -30.3899         NA      NA       NA
-X10_19      -25.0193         NA      NA       NA
-X20_29      -16.2098         NA      NA       NA
-X30_39      -20.9062         NA      NA       NA
-X40_49      -15.4939         NA      NA       NA
-X50_59      -18.4786         NA      NA       NA
-X60_69      -18.2758         NA      NA       NA
-X70_79      -27.6788         NA      NA       NA
-X80_89      -38.6259         NA      NA       NA
-bicycle      29.3803         NA      NA       NA
-Log(theta)   -0.2611         NA      NA       NA
+                            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                1.332e+01  1.515e+00   8.791  < 2e-16 ***
+slope                     -8.772e-02  6.216e-03 -14.112  < 2e-16 ***
+year2009                  -6.449e-02  4.033e-02  -1.599 0.109784    
+year2010                   8.743e-02  1.988e-01   0.440 0.660082    
+year2011                  -1.184e-01  7.185e-02  -1.647 0.099458 .  
+year2012                   3.353e-02  3.076e-02   1.090 0.275743    
+year2013                   9.925e-01  1.002e+00   0.991 0.321906    
+year2014                   5.722e-02  3.109e-02   1.840 0.065695 .  
+year2015                   3.092e-01  2.851e-02  10.847  < 2e-16 ***
+year2016                   3.692e-01  3.068e-02  12.031  < 2e-16 ***
+year2017                   3.803e-01  2.982e-02  12.753  < 2e-16 ***
+year2018                   2.085e-01  3.159e-02   6.599 4.13e-11 ***
+year2019                   1.347e-01  3.242e-02   4.157 3.23e-05 ***
+year2020                   5.512e-01  3.705e-02  14.875  < 2e-16 ***
+X0_9                      -1.447e+01  1.520e+00  -9.520  < 2e-16 ***
+X10_19                    -1.026e+01  1.529e+00  -6.707 1.99e-11 ***
+X20_29                    -4.974e+00  1.505e+00  -3.305 0.000951 ***
+X30_39                    -8.329e+00  1.522e+00  -5.474 4.41e-08 ***
+X40_49                    -2.164e+00  1.568e+00  -1.381 0.167428    
+X50_59                    -5.686e+00  1.532e+00  -3.711 0.000206 ***
+X60_69                    -6.330e+00  1.543e+00  -4.103 4.07e-05 ***
+X70_79                    -1.097e+01  1.632e+00  -6.726 1.74e-11 ***
+X80_89                    -1.747e+01  2.126e+00  -8.218  < 2e-16 ***
+lu_community_service       7.342e-04  1.776e-03   0.413 0.679347    
+lu_defence                 3.344e-01  2.116e-01   1.580 0.114076    
+lu_industry_commerce      -5.330e-03  1.964e-03  -2.713 0.006662 ** 
+lu_minerals_landfill       1.528e-01  4.370e-02   3.497 0.000471 ***
+lu_residential             5.243e-02  2.239e-03  23.420  < 2e-16 ***
+lu_transport_utilities     2.769e-03  1.994e-03   1.389 0.164968    
+lu_unknown_developed_use   3.449e-02  2.609e-03  13.218  < 2e-16 ***
+lu_agriculture            -1.655e-02  1.665e-03  -9.941  < 2e-16 ***
+lu_forest_open_land_water -1.396e-02  2.162e-03  -6.457 1.07e-10 ***
+lu_outdoor_recreation      8.124e-03  1.695e-03   4.794 1.64e-06 ***
+lu_residential_gardens    -3.199e-02  1.635e-03 -19.560  < 2e-16 ***
+ss_bicycle                 1.690e+01  1.310e+00  12.901  < 2e-16 ***
+Log(theta)                -1.641e-03  8.818e-03  -0.186 0.852402    
 
 Zero-inflation model coefficients (binomial with logit link):
-              Estimate Std. Error z value Pr(>|z|)
-(Intercept)  1.470e+02         NA      NA       NA
-slope        2.682e-01         NA      NA       NA
-year        -7.663e-02         NA      NA       NA
-X0_9         1.453e+01         NA      NA       NA
-X10_19       9.463e+00         NA      NA       NA
-X20_29      -2.045e+00         NA      NA       NA
-X30_39       3.153e-01         NA      NA       NA
-X40_49      -1.563e+00         NA      NA       NA
-X50_59       3.733e-01         NA      NA       NA
-X60_69       1.143e+01         NA      NA       NA
-X70_79       1.874e-01         NA      NA       NA
-X80_89       2.756e+00         NA      NA       NA
-bicycle     -1.356e+03         NA      NA       NA
+                            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                 -1.74569    8.75553  -0.199 0.841965    
+slope                        0.24091    0.03046   7.909 2.60e-15 ***
+year2009                    -0.48088    0.32708  -1.470 0.141499    
+year2010                   -11.80158  301.53597  -0.039 0.968780    
+year2011                     1.73835    0.26523   6.554 5.60e-11 ***
+year2012                     0.92730    0.16674   5.561 2.68e-08 ***
+year2013                    -9.53653 1781.02174  -0.005 0.995728    
+year2014                    -0.21128    0.20291  -1.041 0.297765    
+year2015                    -0.08259    0.19081  -0.433 0.665119    
+year2016                    -0.52205    0.22569  -2.313 0.020718 *  
+year2017                    -0.39603    0.21173  -1.870 0.061427 .  
+year2018                     0.17591    0.19322   0.910 0.362590    
+year2019                    -0.69990    0.23495  -2.979 0.002892 ** 
+year2020                    -0.61628    0.25812  -2.388 0.016958 *  
+X0_9                         4.83695    8.75102   0.553 0.580448    
+X10_19                      -1.28593    8.90570  -0.144 0.885189    
+X20_29                     -10.21423    8.80461  -1.160 0.246008    
+X30_39                      -8.81792    8.92567  -0.988 0.323188    
+X40_49                      -9.47576    9.02332  -1.050 0.293653    
+X50_59                      -9.88430    8.96462  -1.103 0.270205    
+X60_69                      -1.40815    9.10686  -0.155 0.877117    
+X70_79                     -12.62522    9.09801  -1.388 0.165231    
+X80_89                     -14.66937   12.22010  -1.200 0.229973    
+lu_community_service         0.04625    0.01128   4.098 4.17e-05 ***
+lu_defence                  -6.61645    3.78404  -1.749 0.080375 .  
+lu_industry_commerce         0.01312    0.01647   0.796 0.425827    
+lu_minerals_landfill         0.13816    0.11721   1.179 0.238499    
+lu_residential              -0.13193    0.01791  -7.365 1.77e-13 ***
+lu_transport_utilities       0.08564    0.01137   7.530 5.07e-14 ***
+lu_unknown_developed_use     0.06602    0.01700   3.883 0.000103 ***
+lu_agriculture               0.06338    0.01034   6.131 8.71e-10 ***
+lu_forest_open_land_water    0.06041    0.01184   5.104 3.33e-07 ***
+lu_outdoor_recreation        0.05159    0.01054   4.896 9.78e-07 ***
+lu_residential_gardens       0.07200    0.01139   6.322 2.58e-10 ***
+ss_bicycle                -163.18379   46.11296  -3.539 0.000402 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
 
-Theta = 0.7702 
-Number of iterations in BFGS optimization: 111 
-Log-likelihood: -1.865e+05 on 27 Df
+Theta = 0.9984 
+Number of iterations in BFGS optimization: 89 
+Log-likelihood: -1.635e+05 on 71 Df

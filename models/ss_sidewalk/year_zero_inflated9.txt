@@ -1,0 +1,68 @@
+
+Call:
+zeroinfl(formula = formula, data = data, dist = count_model, link = "logit")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-0.9993 -0.6960 -0.3471  0.2623 13.3756 
+
+Count model coefficients (negbin with log link):
+                            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               -50.653874   1.456100 -34.787  < 2e-16 ***
+ss_sidewalk                 4.955758   0.210232  23.573  < 2e-16 ***
+year                        0.030662        NaN     NaN      NaN    
+X0_9                      -12.729110   1.463637  -8.697  < 2e-16 ***
+X10_19                     -8.157795   1.470557  -5.547 2.90e-08 ***
+X20_29                     -3.377144   1.445762  -2.336   0.0195 *  
+X30_39                     -6.638676   1.466369  -4.527 5.97e-06 ***
+X40_49                     -0.794490   1.499919  -0.530   0.5963    
+X50_59                     -3.613890   1.481721  -2.439   0.0147 *  
+X60_69                     -4.365954   1.485879  -2.938   0.0033 ** 
+X70_79                     -9.918385   1.574317  -6.300 2.97e-10 ***
+X80_89                    -15.076753   2.042334  -7.382 1.56e-13 ***
+lu_community_service        0.003705   0.001731   2.140   0.0323 *  
+lu_defence                  0.143330   0.207142   0.692   0.4890    
+lu_industry_commerce       -0.003900   0.001941  -2.009   0.0446 *  
+lu_minerals_landfill        0.186727   0.043356   4.307 1.66e-05 ***
+lu_residential              0.051526   0.002195  23.478  < 2e-16 ***
+lu_transport_utilities      0.004456   0.001960   2.273   0.0230 *  
+lu_unknown_developed_use    0.039321   0.002538  15.493  < 2e-16 ***
+lu_agriculture             -0.013327   0.001624  -8.204 2.32e-16 ***
+lu_forest_open_land_water  -0.012935   0.002128  -6.080 1.21e-09 ***
+lu_outdoor_recreation       0.010354   0.001646   6.291 3.15e-10 ***
+lu_residential_gardens     -0.029192   0.001599 -18.259  < 2e-16 ***
+ss_rider                   33.896320   2.388563  14.191  < 2e-16 ***
+Log(theta)                  0.002202   0.005344   0.412   0.6804    
+
+Zero-inflation model coefficients (binomial with logit link):
+                            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                96.811671   7.861091  12.315  < 2e-16 ***
+ss_sidewalk               -29.688326   1.814207 -16.364  < 2e-16 ***
+year                       -0.047385        NaN     NaN      NaN    
+X0_9                        3.403053   7.890406   0.431 0.666258    
+X10_19                     -3.431536   7.984044  -0.430 0.667342    
+X20_29                     -9.361065   7.823635  -1.197 0.231497    
+X30_39                     -9.328181   8.051665  -1.159 0.246643    
+X40_49                     -8.685360   7.951824  -1.092 0.274724    
+X50_59                    -10.874170   8.125863  -1.338 0.180826    
+X60_69                     -1.441644   8.217447  -0.175 0.860736    
+X70_79                    -14.731121   8.238167  -1.788 0.073751 .  
+X80_89                    -13.285523  11.040900  -1.203 0.228860    
+lu_community_service        0.036414   0.010616   3.430 0.000603 ***
+lu_defence                 -4.629527   3.378027  -1.370 0.170536    
+lu_industry_commerce        0.003003   0.015925   0.189 0.850437    
+lu_minerals_landfill        0.111365   0.118781   0.938 0.348468    
+lu_residential             -0.118644   0.016892  -7.024 2.16e-12 ***
+lu_transport_utilities      0.068180   0.010458   6.519 7.06e-11 ***
+lu_unknown_developed_use    0.049870   0.016231   3.073 0.002122 ** 
+lu_agriculture              0.048004   0.009602   4.999 5.76e-07 ***
+lu_forest_open_land_water   0.054046   0.011232   4.812 1.50e-06 ***
+lu_outdoor_recreation       0.040573   0.009787   4.146 3.39e-05 ***
+lu_residential_gardens      0.061158   0.010761   5.683 1.32e-08 ***
+ss_rider                   13.312834  15.282381   0.871 0.383687    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Theta = 1.0022 
+Number of iterations in BFGS optimization: 79 
+Log-likelihood: -1.634e+05 on 49 Df

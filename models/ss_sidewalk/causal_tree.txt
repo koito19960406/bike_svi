@@ -1,0 +1,42 @@
+GRF tree object 
+Number of training samples: 11632 
+Variable splits: 
+(1) split_variable: od_person_count  split_value: 2 
+  (2) split_variable: lu_unknown_developed_use  split_value: 9.83422 
+    (4) split_variable: X50_59  split_value: 0.103098 
+      (8) split_variable: lu_forest_open_land_water  split_value: 0.452742 
+        (16) * num_samples: 243  avg_Y: 5.47 avg_W: 0.06 
+        (17) * num_samples: 344  avg_Y: 4.12 avg_W: 0.05 
+      (9) split_variable: lu_forest_open_land_water  split_value: 12.8 
+        (18) split_variable: pop_den_log  split_value: 7.28321 
+          (26) split_variable: lu_outdoor_recreation  split_value: 16.2662 
+            (30) * num_samples: 193  avg_Y: 3.73 avg_W: 0.04 
+            (31) * num_samples: 287  avg_Y: 3.9 avg_W: 0.04 
+          (27) split_variable: lu_outdoor_recreation  split_value: 0.480627 
+            (32) * num_samples: 284  avg_Y: 4.37 avg_W: 0.05 
+            (33) split_variable: lu_community_service  split_value: 2.59775 
+              (38) * num_samples: 336  avg_Y: 4.55 avg_W: 0.05 
+              (39) * num_samples: 402  avg_Y: 4.51 avg_W: 0.05 
+        (19) * num_samples: 267  avg_Y: 3.33 avg_W: 0.04 
+    (5) split_variable: ss_pole  split_value: 0.00910441 
+      (10) * num_samples: 399  avg_Y: 5.24 avg_W: 0.05 
+      (11) split_variable: lu_transport_utilities  split_value: 23.0321 
+        (20) * num_samples: 228  avg_Y: 4.61 avg_W: 0.05 
+        (21) * num_samples: 269  avg_Y: 5.35 avg_W: 0.06 
+  (3) split_variable: od_person_count  split_value: 10 
+    (6) split_variable: lu_industry_commerce  split_value: 0.858019 
+      (12) * num_samples: 406  avg_Y: 5.72 avg_W: 0.07 
+      (13) split_variable: year  split_value: 2017 
+        (22) split_variable: lu_community_service  split_value: 3.75868 
+          (28) split_variable: ss_traffic.light  split_value: 5.91278e-05 
+            (34) * num_samples: 273  avg_Y: 6.14 avg_W: 0.07 
+            (35) * num_samples: 211  avg_Y: 6.33 avg_W: 0.07 
+          (29) split_variable: ss_fence  split_value: 0.0201206 
+            (36) * num_samples: 193  avg_Y: 6.59 avg_W: 0.07 
+            (37) * num_samples: 273  avg_Y: 6.33 avg_W: 0.07 
+        (23) * num_samples: 270  avg_Y: 6.36 avg_W: 0.07 
+    (7) split_variable: ss_person  split_value: 0.0204525 
+      (14) split_variable: year  split_value: 2016 
+        (24) * num_samples: 396  avg_Y: 6.87 avg_W: 0.07 
+        (25) * num_samples: 258  avg_Y: 7.11 avg_W: 0.07 
+      (15) * num_samples: 284  avg_Y: 7.06 avg_W: 0.07 

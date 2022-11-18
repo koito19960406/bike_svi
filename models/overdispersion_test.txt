@@ -2,9 +2,9 @@
 	Overdispersion test
 
 data:  poisson_base
-z = 37.906, p-value < 2.2e-16
+z = 43.51, p-value < 2.2e-16
 alternative hypothesis: true alpha is greater than 0
 sample estimates:
    alpha 
-712.1645 
+600.4252 
 
