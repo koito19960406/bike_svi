@@ -17,7 +17,7 @@ class ControlVariables:
         self.count_station_gdf = gpd.GeoDataFrame(self.count_station, 
                                     geometry=gpd.points_from_xy(self.count_station.longitude, self.count_station.latitude),
                                     crs=4326)
-        #TODO modify file path and worksheet
+        
         def load_population(file_path, year):
             print("-"*10, f"Loading population in {year}", "-"*10)
             # load clean data if there is
@@ -135,11 +135,39 @@ class ControlVariables:
             # back to wide format
             housing_df = pd.pivot(housing_df, index="lsoa_code",columns="year",values="housing_price")
             housing_df.columns = ["housing_price_" + re.search(r'[0-9]{4}', str(col)).group() if re.search(r'[0-9]{4}', str(col)) is not None else col for col in housing_df.columns]
-            print(housing_df)
             return housing_df
         
         self.housing_df = load_housing(os.path.join(self.input_folder, "control_variables/housing/hpssadataset46medianpricepaidforresidentialpropertiesbylsoa.xls"))
         
+        def load_land_use(file_path):
+            land_use_df = pd.read_excel(file_path, sheet_name= 0, header = [3,4,5]).iloc[4:,:].\
+            dropna(axis=1,how="all").dropna(axis=0,how="all")
+            # combine column names
+            land_use_df.columns = land_use_df.columns.map(' '.join)
+            # clean up: keep those col names with LSOA code and Total and avoid those with Grand Total
+            land_use_df = land_use_df.filter(regex='|'.join(["LSOA code","Total"]))
+            land_use_df = land_use_df.drop(land_use_df.filter(regex='Grand Total').columns, axis=1)
+            # remove uncessary strings like 1_level_1 and Unnamed: 
+            land_use_df.columns = [re.sub("[0-9]+_level_[0-9]+","", col).\
+                replace("Unnamed: ", "").replace("Total","").replace("  ", " ").\
+                replace("Developed use","").replace("Non-developed use","").\
+                replace("Non-developed","").strip() for col in land_use_df.columns]
+            land_use_df.columns = ["drop" if len(col) == 0 else col for col in land_use_df.columns]
+            # drop unnecessary columns
+            land_use_df = land_use_df.drop("drop", axis=1)
+            # replace space, "and", and "," with "_"
+            land_use_df.columns = [col.replace(" and ", "_").\
+                replace(", ","_").replace(" ","_").lower() for col in land_use_df.columns]
+            # add prefix ("lu_") to column names
+            land_use_df.columns = ["lu_" + col if col != "lsoa_code" else col for col in land_use_df.columns]
+            # replace - with 0
+            land_use_df = land_use_df.replace("-",0)
+            # rename lsoa code
+            land_use_df.rename(columns={land_use_df.columns[0]:"lsoa_code"}, inplace=True)
+            return land_use_df
+
+        self.land_use_df = load_land_use(os.path.join(self.input_folder, "control_variables/land_use/Live_Tables_-_Land_Use_Stock_2022_-_LSOA.ods"))
+        print(self.land_use_df)
         
         # load gdf 
         def load_lsoa(file_path):
@@ -167,12 +195,17 @@ class ControlVariables:
                 for population_col in population_cols:
                     year = population_col[-4:]
                     merged[f"pop_den_{year}"] = (merged[population_col]/merged["area"])*1000000
+            # drop col "area"
+            merged = merged.drop(['area'], axis=1)
+            merged = merged.drop(merged.filter(regex='Unnamed:').columns, axis=1)
             return merged
+        
         self.population_gdf = merge_gdf(self.lsoa_gdf_2011, self.population)
         self.deprivation_2019_gdf = merge_gdf(self.lsoa_gdf_2011, self.deprivation_2019)
         self.deprivation_2015_gdf = merge_gdf(self.lsoa_gdf_2011, self.deprivation_2015)
         self.deprivation_2010_gdf = merge_gdf(self.lsoa_gdf_2004, self.deprivation_2010)
         self.housing_gdf = merge_gdf(self.lsoa_gdf_2011, self.housing_df)
+        self.land_use_gdf = merge_gdf(self.lsoa_gdf_2011, self.land_use_df)
     
     def spatial_join(self):
         """join attributes from census data to count station by spatially left joining them
@@ -188,6 +221,7 @@ class ControlVariables:
         self.count_joined_gdf = spatial_join_clen(self.count_joined_gdf, self.deprivation_2015_gdf)
         self.count_joined_gdf = spatial_join_clen(self.count_joined_gdf, self.deprivation_2010_gdf)
         self.count_joined_gdf = spatial_join_clen(self.count_joined_gdf, self.housing_gdf)
+        self.count_joined_gdf = spatial_join_clen(self.count_joined_gdf, self.land_use_gdf)
     
     def merge_save(self):
         """merge the variables and save as csv file

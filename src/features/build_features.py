@@ -104,7 +104,11 @@ class CreateFeatures:
         # visual data
         gsv_metadata = pd.read_csv(os.path.join(self.root_dir, "data/raw/cities", self.city, "gsv/metadata/gsv_metadata_dist.csv"))
         segmentation = pd.read_csv(os.path.join(self.root_dir, "data/processed/cities", self.city, "segmentation_pixel_ratio_wide.csv"))
+        # add prefix
+        segmentation.columns = ["ss_" + col if col != "pid" else col for col in segmentation.columns]
         detection = pd.read_csv(os.path.join(self.output_folder, "object_detection_count.csv"))
+        # add prefix
+        detection.columns = ["od_" + col if col != "pid" else col for col in detection.columns]
         # join gsv metadata and detection result by panoid and count station id
         gsv_det = gsv_metadata[["panoid","year", "count_point_id"]].merge(detection, left_on = "panoid", right_on = "pid", how = "left").\
             fillna(0)
@@ -122,7 +126,7 @@ class CreateFeatures:
             sum_p_log_p = visual_df.apply(p_log_p).sum()
             return -1*(sum_p_log_p)/count_col_log
         tqdm.pandas()
-        gsv_seg["visual_complexity"] = gsv_seg.progress_apply(compute_complexity,axis=1)
+        gsv_seg["ss_visual_complexity"] = gsv_seg.progress_apply(compute_complexity,axis=1)
         # other covariates
         control_variables = pd.read_csv(os.path.join(self.output_folder, "count_control_variables.csv")).drop_duplicates(subset=["count_point_id"])
         # assign imd score to the nearest years
@@ -132,6 +136,7 @@ class CreateFeatures:
             index = np.argmin(diff_year) 
             control_variables[f"IMD_score_{str(year)}"] = control_variables[f"IMD_score_{str(existing_year[index])}"]
         # filter columns
+        land_use = control_variables.filter(regex="count_point_id|lu_", axis=1)
         #TODO fix filtering columns
         control_col_list = ["0 - 9", "10 - 19", "20 - 29", "30 - 39", "40 - 49", "50 - 59", "60 - 69", "70 - 79", "80 - 89", "90+", "all_ages", "IMD_score", "housing_price", "pop_den"]
         control_col_list_extended = control_col_list + ["count_point_id","year"]
@@ -160,6 +165,7 @@ class CreateFeatures:
         merged_df  = (gsv_seg.merge(count_data, on = ["count_point_id", "year"], how = "left").
             merge(gsv_det, on = ["count_point_id", "year"], how = "left").
             merge(control_variables_long, on = ["count_point_id", "year"], how = "left").
+            merge(land_use, on = ["count_point_id"], how = "left").
             merge(poi_long, on = ["count_point_id", "year"], how = "left").
             merge(slope, on = ["count_point_id"], how = "left").
             dropna(subset=["pedal_cycles"]))
