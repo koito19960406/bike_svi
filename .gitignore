@@ -81,6 +81,11 @@ target/
 /data/
 /reports/figures/
 
+# R Data and history
+.RData*
+.Rhistory
+*.Rproj
+
 # Mac OS-specific storage files
 .DS_Store
 
