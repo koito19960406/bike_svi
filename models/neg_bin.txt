@@ -1,0 +1,38 @@
+
+Call:
+zeroinfl(formula = pedal_cycles ~ ., data = all_var_wo_year, dist = "negbin", link = "logit")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-0.9152 -0.6768 -0.4098  0.1558 28.2525 
+
+Count model coefficients (negbin with log link):
+                    Estimate Std. Error z value Pr(>|z|)    
+(Intercept)       -4.0968052  0.2638496 -15.527  < 2e-16 ***
+ss_vegetation     -0.9123367  0.0488519 -18.676  < 2e-16 ***
+ss_sidewalk        3.7382399  0.2270797  16.462  < 2e-16 ***
+IMD_score          0.0142897  0.0007722  18.505  < 2e-16 ***
+housing_price_log  0.6370227  0.0192732  33.052  < 2e-16 ***
+poi_log            0.3357188  0.0051488  65.203  < 2e-16 ***
+slope             -0.1422927  0.0066900 -21.270  < 2e-16 ***
+pop_den_log        0.1396740  0.0111554  12.521  < 2e-16 ***
+lu_residential    -0.0071965  0.0015010  -4.794 1.63e-06 ***
+Log(theta)        -0.1748973  0.0087678 -19.948  < 2e-16 ***
+
+Zero-inflation model coefficients (binomial with logit link):
+                    Estimate Std. Error z value Pr(>|z|)    
+(Intercept)        -1.983631   1.689451  -1.174   0.2403    
+ss_vegetation      -3.885113   0.311251 -12.482   <2e-16 ***
+ss_sidewalk       -31.635970   2.249330 -14.065   <2e-16 ***
+IMD_score          -0.002341   0.004543  -0.515   0.6064    
+housing_price_log   0.100591   0.121816   0.826   0.4089    
+poi_log            -0.494740   0.039536 -12.514   <2e-16 ***
+slope               0.281153   0.033910   8.291   <2e-16 ***
+pop_den_log         0.177654   0.073990   2.401   0.0163 *  
+lu_residential     -0.151137   0.015522  -9.737   <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Theta = 0.8395 
+Number of iterations in BFGS optimization: 27 
+Log-likelihood: -1.657e+05 on 19 Df

@@ -4,107 +4,90 @@ zeroinfl(formula = formula, data = match_result_df, weights = weights, dist = "n
 
 Pearson residuals:
     Min      1Q  Median      3Q     Max 
--1.1153 -0.6927 -0.3082  0.3401 24.9884 
+-1.1133 -0.6941 -0.2925  0.3262 23.6217 
 
 Count model coefficients (negbin with log link):
-                             Estimate Std. Error z value Pr(>|z|)    
-(Intercept)                -2.6708760  1.5067746  -1.773 0.076299 .  
-slope_binary_40_percentile -0.2430783  0.0171793 -14.149  < 2e-16 ***
-year2009                   -0.1779576  0.0409990  -4.341 1.42e-05 ***
-year2010                    0.0577051  0.1990489   0.290 0.771890    
-year2011                   -0.5181219  0.0766378  -6.761 1.37e-11 ***
-year2012                   -0.5192110  0.0363260 -14.293  < 2e-16 ***
-year2013                   -0.3821772  0.8984709  -0.425 0.670571    
-year2014                   -0.6597287  0.0368645 -17.896  < 2e-16 ***
-year2015                   -0.5360450  0.0353985 -15.143  < 2e-16 ***
-year2016                   -0.5508851  0.0383301 -14.372  < 2e-16 ***
-year2017                   -0.5846596  0.0376521 -15.528  < 2e-16 ***
-year2018                   -0.7298598  0.0389893 -18.719  < 2e-16 ***
-year2019                   -0.7940928  0.0399614 -19.871  < 2e-16 ***
-year2020                    0.1066199  0.0536704   1.987 0.046970 *  
-ss_building                -0.7282102  0.1000729  -7.277 3.42e-13 ***
-ss_road                     2.7927008  0.1526631  18.293  < 2e-16 ***
-ss_sky                     -1.7082333  0.1624528 -10.515  < 2e-16 ***
-ss_terrain                 -1.9710054  0.1780363 -11.071  < 2e-16 ***
-ss_vegetation              -0.4887335  0.1138040  -4.295 1.75e-05 ***
-od_person_count             0.0173083  0.0010521  16.451  < 2e-16 ***
-od_bicycle_count            0.0486263  0.0057415   8.469  < 2e-16 ***
-od_vehicle_count            0.0053490  0.0007439   7.191 6.45e-13 ***
-X0_9                       -7.2600074  1.4889192  -4.876 1.08e-06 ***
-X10_19                     -4.3568961  1.4813131  -2.941 0.003269 ** 
-X20_29                     -0.5469098  1.4567146  -0.375 0.707333    
-X30_39                     -2.0936169  1.4656959  -1.428 0.153173    
-X40_49                      2.6948583  1.5059262   1.790 0.073534 .  
-X50_59                     -0.6001088  1.4805801  -0.405 0.685242    
-X60_69                     -2.1861281  1.4796528  -1.477 0.139552    
-X70_79                     -5.7859806  1.5731483  -3.678 0.000235 ***
-X80_89                     -7.6815947  2.0578996  -3.733 0.000189 ***
-IMD_score                   0.0070694  0.0008227   8.593  < 2e-16 ***
-housing_price_log           0.6506603  0.0219703  29.615  < 2e-16 ***
-pop_den_log                 0.2824560  0.0165816  17.034  < 2e-16 ***
-lu_defence                  0.0859369  0.2043248   0.421 0.674055    
-lu_industry_commerce       -0.0171186  0.0015728 -10.884  < 2e-16 ***
-lu_minerals_landfill        0.1915580  0.0411628   4.654 3.26e-06 ***
-lu_residential             -0.0042643  0.0019502  -2.187 0.028769 *  
-lu_transport_utilities      0.0011429  0.0012240   0.934 0.350463    
-lu_unknown_developed_use    0.0364381  0.0017328  21.029  < 2e-16 ***
-lu_agriculture              0.0008156  0.0011704   0.697 0.485895    
-lu_forest_open_land_water  -0.0024234  0.0012848  -1.886 0.059266 .  
-lu_outdoor_recreation       0.0078552  0.0008641   9.091  < 2e-16 ***
-lu_residential_gardens     -0.0119472  0.0009984 -11.967  < 2e-16 ***
-poi_log                     0.1758117  0.0083993  20.932  < 2e-16 ***
-Log(theta)                  0.2190742  0.0098227  22.303  < 2e-16 ***
+                            Estimate Std. Error z value Pr(>|z|)
+(Intercept)                -6.771991         NA      NA       NA
+slope_binary_40_percentile -0.552822         NA      NA       NA
+year2009                   -0.194749         NA      NA       NA
+year2010                    0.007583         NA      NA       NA
+year2011                   -0.691884         NA      NA       NA
+year2012                   -0.631624         NA      NA       NA
+year2013                    0.191862         NA      NA       NA
+year2014                   -0.836884         NA      NA       NA
+year2015                   -0.720233         NA      NA       NA
+year2016                   -0.769502         NA      NA       NA
+year2017                   -0.811079         NA      NA       NA
+year2018                   -0.971687         NA      NA       NA
+year2019                   -0.976169         NA      NA       NA
+year2020                   -0.665083         NA      NA       NA
+ss_fence                    0.396171         NA      NA       NA
+ss_pole                    -4.875221         NA      NA       NA
+ss_road                     4.182838         NA      NA       NA
+ss_sidewalk                 3.452501         NA      NA       NA
+ss_sky                     -1.790178         NA      NA       NA
+ss_terrain                 -1.130394         NA      NA       NA
+ss_traffic.light           10.171512         NA      NA       NA
+ss_traffic.sign             2.468123         NA      NA       NA
+ss_vegetation               0.248829         NA      NA       NA
+ss_wall                    -0.175100         NA      NA       NA
+ss_visual_complexity        1.212918         NA      NA       NA
+od_person_count             0.019891         NA      NA       NA
+od_bicycle_count            0.034330         NA      NA       NA
+od_vehicle_count            0.005912         NA      NA       NA
+IMD_score                   0.011289         NA      NA       NA
+housing_price_log           0.701419         NA      NA       NA
+pop_den_log                -0.008628         NA      NA       NA
+poi_log                     0.240733         NA      NA       NA
+age_0_19                   -1.051579         NA      NA       NA
+age_20_39                   3.025930         NA      NA       NA
+age_40_59                   3.649727         NA      NA       NA
+lu_residential_community   -0.347227         NA      NA       NA
+lu_commerce_developed       0.669299         NA      NA       NA
+Log(theta)                  0.216692         NA      NA       NA
 
 Zero-inflation model coefficients (binomial with logit link):
-                             Estimate Std. Error z value Pr(>|z|)    
-(Intercept)                 1.188e+01  1.008e+01   1.178  0.23864    
-slope_binary_40_percentile  9.693e-01  1.460e-01   6.641 3.12e-11 ***
-year2009                   -3.164e-01  3.366e-01  -0.940  0.34727    
-year2010                   -1.326e+01  4.564e+02  -0.029  0.97682    
-year2011                    1.936e+00  4.070e-01   4.757 1.97e-06 ***
-year2012                    9.128e-01  2.246e-01   4.063 4.84e-05 ***
-year2013                   -1.121e+01  3.042e+03  -0.004  0.99706    
-year2014                   -1.103e-01  2.672e-01  -0.413  0.67988    
-year2015                   -3.071e-01  2.671e-01  -1.150  0.25024    
-year2016                   -4.056e-01  3.156e-01  -1.285  0.19872    
-year2017                   -4.280e-01  3.131e-01  -1.367  0.17172    
-year2018                    2.508e-01  2.722e-01   0.921  0.35684    
-year2019                   -4.980e-01  3.072e-01  -1.621  0.10506    
-year2020                   -9.138e-01  3.855e-01  -2.370  0.01777 *  
-ss_building                -1.081e+01  1.214e+00  -8.904  < 2e-16 ***
-ss_road                     8.807e+00  1.160e+00   7.592 3.14e-14 ***
-ss_sky                     -5.221e+00  1.218e+00  -4.285 1.82e-05 ***
-ss_terrain                 -1.325e+00  1.076e+00  -1.232  0.21809    
-ss_vegetation              -9.772e+00  9.627e-01 -10.151  < 2e-16 ***
-od_person_count            -4.658e-01  1.014e-01  -4.592 4.39e-06 ***
-od_bicycle_count           -1.918e+00  1.109e+00  -1.729  0.08385 .  
-od_vehicle_count           -1.816e-02  8.467e-03  -2.145  0.03194 *  
-X0_9                       -8.589e+00  9.842e+00  -0.873  0.38283    
-X10_19                     -9.393e-01  9.898e+00  -0.095  0.92439    
-X20_29                     -1.853e+01  9.835e+00  -1.884  0.05959 .  
-X30_39                     -6.213e+00  9.868e+00  -0.630  0.52893    
-X40_49                     -9.532e+00  9.956e+00  -0.957  0.33835    
-X50_59                     -1.030e+01  9.896e+00  -1.041  0.29809    
-X60_69                     -9.516e+00  1.023e+01  -0.930  0.35240    
-X70_79                     -1.202e+01  1.009e+01  -1.191  0.23383    
-X80_89                     -2.591e+01  1.377e+01  -1.881  0.05991 .  
-IMD_score                  -1.227e-02  6.975e-03  -1.760  0.07847 .  
-housing_price_log          -9.932e-02  1.879e-01  -0.528  0.59716    
-pop_den_log                -2.327e-01  1.410e-01  -1.650  0.09893 .  
-lu_defence                 -5.755e+00  4.998e+00  -1.151  0.24955    
-lu_industry_commerce        4.278e-02  2.122e-02   2.017  0.04373 *  
-lu_minerals_landfill       -1.633e-01  1.712e-01  -0.954  0.33994    
-lu_residential              3.557e-03  2.901e-02   0.123  0.90241    
-lu_transport_utilities      1.754e-02  7.972e-03   2.201  0.02777 *  
-lu_unknown_developed_use    4.819e-03  1.727e-02   0.279  0.78020    
-lu_agriculture              3.254e-02  7.124e-03   4.568 4.92e-06 ***
-lu_forest_open_land_water   8.794e-03  7.427e-03   1.184  0.23643    
-lu_outdoor_recreation       2.057e-02  6.635e-03   3.101  0.00193 ** 
-lu_residential_gardens      1.676e-02  9.442e-03   1.775  0.07594 .  
-poi_log                    -2.758e-01  6.646e-02  -4.149 3.33e-05 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+                             Estimate Std. Error z value Pr(>|z|)
+(Intercept)                -3.105e+00         NA      NA       NA
+slope_binary_40_percentile -1.376e-01         NA      NA       NA
+year2009                   -1.358e-01         NA      NA       NA
+year2010                    3.081e+01         NA      NA       NA
+year2011                    2.941e+02         NA      NA       NA
+year2012                    1.121e+00         NA      NA       NA
+year2013                    5.437e+04         NA      NA       NA
+year2014                    1.141e-01         NA      NA       NA
+year2015                    4.890e-01         NA      NA       NA
+year2016                    4.203e-01         NA      NA       NA
+year2017                    8.345e-02         NA      NA       NA
+year2018                    5.674e-01         NA      NA       NA
+year2019                    3.941e-02         NA      NA       NA
+year2020                    3.781e-03         NA      NA       NA
+ss_fence                    3.313e+00         NA      NA       NA
+ss_pole                     5.608e+01         NA      NA       NA
+ss_road                     3.497e+00         NA      NA       NA
+ss_sidewalk                 2.781e+00         NA      NA       NA
+ss_sky                      2.759e+00         NA      NA       NA
+ss_terrain                  8.087e-01         NA      NA       NA
+ss_traffic.light           -3.837e+01         NA      NA       NA
+ss_traffic.sign             8.671e+00         NA      NA       NA
+ss_vegetation               1.516e+00         NA      NA       NA
+ss_wall                    -1.003e+00         NA      NA       NA
+ss_visual_complexity       -1.569e-01         NA      NA       NA
+od_person_count             1.260e+00         NA      NA       NA
+od_bicycle_count           -1.537e+00         NA      NA       NA
+od_vehicle_count           -8.499e-02         NA      NA       NA
+IMD_score                   4.003e-03         NA      NA       NA
+housing_price_log           1.281e+00         NA      NA       NA
+pop_den_log                 1.889e-02         NA      NA       NA
+poi_log                    -3.979e-01         NA      NA       NA
+age_0_19                    2.354e+00         NA      NA       NA
+age_20_39                   2.199e+00         NA      NA       NA
+age_40_59                   3.750e+00         NA      NA       NA
+lu_residential_community   -4.263e-01         NA      NA       NA
+lu_commerce_developed       9.452e-01         NA      NA       NA
+pedal_cycles               -3.637e+01         NA      NA       NA
 
-Theta = 1.2449 
-Number of iterations in BFGS optimization: 109 
-Log-likelihood: -1.306e+05 on 91 Df
+Theta = 1.242 
+Number of iterations in BFGS optimization: 57 
+Log-likelihood: -1.28e+05 on 76 Df

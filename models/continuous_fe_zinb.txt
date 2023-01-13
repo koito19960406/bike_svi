@@ -1,0 +1,63 @@
+
+Call:
+zeroinfl(formula = formula, data = all_var_scaled_binary_treatment, dist = "negbin", link = "logit")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-1.0870 -0.7060 -0.3364  0.3122 24.0474 
+
+Count model coefficients (negbin with log link):
+                          Estimate Std. Error z value Pr(>|z|)    
+(Intercept)              -7.267369   0.283328 -25.650  < 2e-16 ***
+year2009                 -0.254579   0.038152  -6.673 2.51e-11 ***
+year2010                 -0.100716   0.183220  -0.550 0.582525    
+year2011                 -0.567181   0.067699  -8.378  < 2e-16 ***
+year2012                 -0.618897   0.032818 -18.859  < 2e-16 ***
+year2013                 -0.029857   0.920708  -0.032 0.974130    
+year2014                 -0.792105   0.032682 -24.236  < 2e-16 ***
+year2015                 -0.662520   0.031063 -21.328  < 2e-16 ***
+year2016                 -0.700830   0.032907 -21.297  < 2e-16 ***
+year2017                 -0.752987   0.032437 -23.214  < 2e-16 ***
+year2018                 -0.927907   0.033723 -27.516  < 2e-16 ***
+year2019                 -0.957649   0.034547 -27.720  < 2e-16 ***
+year2020                 -0.652258   0.042412 -15.379  < 2e-16 ***
+ss_fence                  0.565068   0.156507   3.610 0.000306 ***
+ss_pole                  -5.615797   1.076632  -5.216 1.83e-07 ***
+ss_road                   4.165652   0.132357  31.473  < 2e-16 ***
+ss_sidewalk               3.503757   0.198888  17.617  < 2e-16 ***
+ss_sky                   -1.708076   0.105547 -16.183  < 2e-16 ***
+ss_terrain               -1.042957   0.160434  -6.501 7.99e-11 ***
+ss_traffic.light          8.965471   2.009743   4.461 8.16e-06 ***
+ss_traffic.sign           1.060133   1.267946   0.836 0.403097    
+ss_vegetation             0.357637   0.056221   6.361 2.00e-10 ***
+ss_wall                  -0.151054   0.167528  -0.902 0.367234    
+ss_visual_complexity      1.115508   0.094944  11.749  < 2e-16 ***
+od_person_count_log       0.194552   0.007963  24.432  < 2e-16 ***
+od_bicycle_count_log      0.156674   0.019742   7.936 2.08e-15 ***
+od_vehicle_count_log      0.037372   0.006011   6.217 5.06e-10 ***
+IMD_score_log             0.270108   0.014527  18.594  < 2e-16 ***
+housing_price_log         0.678543   0.017843  38.028  < 2e-16 ***
+pop_den_log              -0.019047   0.009839  -1.936 0.052889 .  
+poi_log                   0.224483   0.007204  31.159  < 2e-16 ***
+slope_log                -0.417995   0.013051 -32.028  < 2e-16 ***
+age_0_19                  0.039417   0.160770   0.245 0.806318    
+age_20_39                 3.351330   0.123713  27.090  < 2e-16 ***
+age_40_59                 3.342585   0.241754  13.826  < 2e-16 ***
+lu_residential_community -0.297614   0.072007  -4.133 3.58e-05 ***
+lu_commerce_developed     0.734678   0.050534  14.538  < 2e-16 ***
+Log(theta)                0.168494   0.008903  18.926  < 2e-16 ***
+
+Zero-inflation model coefficients (binomial with logit link):
+                      Estimate Std. Error z value Pr(>|z|)    
+(Intercept)            0.32437    0.21907   1.481    0.139    
+od_person_count_log   -1.31721    0.17692  -7.445 9.67e-14 ***
+od_bicycle_count_log -17.02476  436.86515  -0.039    0.969    
+od_vehicle_count_log  -0.23623    0.03882  -6.085 1.17e-09 ***
+pop_den_log           -0.29923    0.03363  -8.896  < 2e-16 ***
+poi_log               -0.40871    0.03361 -12.159  < 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Theta = 1.1835 
+Number of iterations in BFGS optimization: 46 
+Log-likelihood: -1.613e+05 on 44 Df

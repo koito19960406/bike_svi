@@ -1,0 +1,57 @@
+
+Call:
+glm(formula = formula, data = match_result_df)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-2674.3   -350.6    -79.0    184.0  10681.4  
+
+Coefficients:
+                                    Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                        -5555.367    286.542 -19.388  < 2e-16 ***
+ss_vegetation_binary_70_percentile    39.590     14.396   2.750 0.005966 ** 
+year2009                             -42.994     39.333  -1.093 0.274379    
+year2010                             -75.224    191.577  -0.393 0.694579    
+year2011                            -187.644     68.228  -2.750 0.005962 ** 
+year2012                            -200.480     32.151  -6.236 4.63e-10 ***
+year2014                            -244.661     32.256  -7.585 3.54e-14 ***
+year2015                            -233.958     31.526  -7.421 1.23e-13 ***
+year2016                            -244.646     33.663  -7.268 3.86e-13 ***
+year2017                            -306.798     32.996  -9.298  < 2e-16 ***
+year2018                            -358.254     34.418 -10.409  < 2e-16 ***
+year2019                            -365.330     34.808 -10.496  < 2e-16 ***
+year2020                            -403.518     44.169  -9.136  < 2e-16 ***
+ss_fence                            -149.915    174.268  -0.860 0.389664    
+ss_pole                            -2542.640   1282.396  -1.983 0.047418 *  
+ss_road                             2811.077    138.756  20.259  < 2e-16 ***
+ss_sidewalk                          773.513    222.950   3.469 0.000523 ***
+ss_sky                             -1465.166    124.357 -11.782  < 2e-16 ***
+ss_terrain                          -249.939    149.399  -1.673 0.094356 .  
+ss_traffic.light                    5355.732   3219.560   1.663 0.096235 .  
+ss_traffic.sign                    -5809.763   1224.193  -4.746 2.10e-06 ***
+ss_wall                             -795.788    172.059  -4.625 3.78e-06 ***
+ss_visual_complexity                 940.257    109.249   8.607  < 2e-16 ***
+od_person_count_log                  172.794      9.703  17.809  < 2e-16 ***
+od_bicycle_count_log                 472.574     30.532  15.478  < 2e-16 ***
+od_vehicle_count_log                 -24.936      5.990  -4.163 3.16e-05 ***
+IMD_score_log                        152.962     15.612   9.798  < 2e-16 ***
+housing_price_log                    358.370     17.905  20.015  < 2e-16 ***
+pop_den_log                          -84.458     11.074  -7.627 2.57e-14 ***
+poi_log                               77.970      7.530  10.354  < 2e-16 ***
+slope_log                           -207.324     13.134 -15.785  < 2e-16 ***
+age_0_19                           -1008.079    177.751  -5.671 1.45e-08 ***
+age_20_39                           1301.821    136.405   9.544  < 2e-16 ***
+age_40_59                           1634.289    262.833   6.218 5.18e-10 ***
+lu_residential_community            -229.615     81.060  -2.833 0.004623 ** 
+lu_commerce_developed                750.385     57.833  12.975  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for gaussian family taken to be 612998.1)
+
+    Null deviance: 1.3651e+10  on 13955  degrees of freedom
+Residual deviance: 8.5329e+09  on 13920  degrees of freedom
+AIC: 225623
+
+Number of Fisher Scoring iterations: 2
+

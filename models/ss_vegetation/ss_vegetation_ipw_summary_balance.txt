@@ -1,0 +1,56 @@
+Call
+ weightit(formula = formula, data = data, method = "ps", estimand = "ATT")
+
+Balance Measures
+                            Type Corr.Un Corr.Adj        R.Threshold Diff.Adj
+year_2008                 Binary  0.0393   0.0349     Balanced, <0.1   0.0109
+year_2009                 Binary  0.0068  -0.0015     Balanced, <0.1   0.0136
+year_2010                 Binary  0.0035   0.0005     Balanced, <0.1  -0.0013
+year_2011                 Binary  0.0095   0.0007     Balanced, <0.1   0.0060
+year_2012                 Binary  0.0211   0.0125     Balanced, <0.1   0.0276
+year_2013                 Binary  0.0009   0.0009     Balanced, <0.1   0.0014
+year_2014                 Binary  0.0199   0.0122     Balanced, <0.1   0.0008
+year_2015                 Binary -0.0490  -0.0256     Balanced, <0.1  -0.0177
+year_2016                 Binary -0.0162  -0.0170     Balanced, <0.1  -0.0085
+year_2017                 Binary -0.0254  -0.0237     Balanced, <0.1  -0.0261
+year_2018                 Binary -0.0189  -0.0104     Balanced, <0.1  -0.0029
+year_2019                 Binary  0.0306   0.0186     Balanced, <0.1   0.0112
+year_2020                 Binary  0.0093   0.0130     Balanced, <0.1   0.0023
+ss_building              Contin. -0.7006  -0.4452 Not Balanced, >0.1  -0.0434
+ss_fence                 Contin. -0.0093   0.0127     Balanced, <0.1  -0.0618
+ss_pole                  Contin. -0.2282  -0.1138 Not Balanced, >0.1  -0.0281
+ss_road                  Contin. -0.0506   0.0104     Balanced, <0.1   0.0091
+ss_sidewalk              Contin. -0.1625  -0.0854     Balanced, <0.1   0.0064
+ss_sky                   Contin. -0.2063  -0.0573     Balanced, <0.1  -0.0264
+ss_terrain               Contin.  0.3547   0.2125 Not Balanced, >0.1   0.0328
+ss_traffic.light         Contin. -0.1162  -0.0772     Balanced, <0.1  -0.0055
+ss_traffic.sign          Contin. -0.0391  -0.0412     Balanced, <0.1   0.0000
+ss_wall                  Contin.  0.0297   0.0044     Balanced, <0.1  -0.0560
+ss_visual_complexity     Contin. -0.1567   0.0001     Balanced, <0.1  -0.2242
+od_person_count_log      Contin. -0.3975  -0.2575 Not Balanced, >0.1  -0.0317
+od_bicycle_count_log     Contin. -0.1390  -0.1073 Not Balanced, >0.1  -0.0230
+od_vehicle_count_log     Contin. -0.2798  -0.1637 Not Balanced, >0.1  -0.0201
+IMD_score_log            Contin. -0.2146  -0.1096 Not Balanced, >0.1  -0.0244
+housing_price_log        Contin. -0.0535  -0.0554     Balanced, <0.1  -0.0517
+pop_den_log              Contin. -0.2395  -0.1256 Not Balanced, >0.1  -0.0345
+poi_log                  Contin. -0.3219  -0.2099 Not Balanced, >0.1  -0.0680
+slope_log                Contin.  0.0678  -0.0062     Balanced, <0.1  -0.0077
+age_0_19                 Contin.  0.1505   0.1233 Not Balanced, >0.1   0.0424
+age_20_39                Contin. -0.3065  -0.1904 Not Balanced, >0.1  -0.0558
+age_40_59                Contin.  0.1449   0.0949     Balanced, <0.1   0.0290
+lu_residential_community Contin. -0.1621  -0.0920     Balanced, <0.1  -0.0348
+lu_commerce_developed    Contin. -0.4144  -0.2593 Not Balanced, >0.1  -0.0547
+
+Balance tally for treatment correlations
+                   count
+Balanced, <0.1        25
+Not Balanced, >0.1    12
+
+Variable with the greatest treatment correlation
+    Variable Corr.Adj        R.Threshold
+ ss_building  -0.4452 Not Balanced, >0.1
+
+Effective sample sizes
+              Total
+Unadjusted 23265.  
+Adjusted   13479.45

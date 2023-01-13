@@ -1,0 +1,34 @@
+
+Call:  glm(formula = formula, data = match_result_df)
+
+Coefficients:
+                     (Intercept)  ss_sidewalk_binary_30_percentile                          year2009  
+                        -4667.95                             46.19                           -146.37  
+                        year2010                          year2011                          year2012  
+                         -127.95                           -407.96                           -348.79  
+                        year2013                          year2014                          year2015  
+                          651.19                           -321.05                           -355.23  
+                        year2016                          year2017                          year2018  
+                         -291.24                           -340.32                           -477.76  
+                        year2019                          year2020                          ss_fence  
+                         -507.36                           -587.01                            -77.89  
+                         ss_pole                           ss_road                            ss_sky  
+                        -2709.35                           3157.17                           -953.88  
+                      ss_terrain                  ss_traffic.light                   ss_traffic.sign  
+                           61.74                           6660.60                          -5364.40  
+                   ss_vegetation                           ss_wall              ss_visual_complexity  
+                          269.09                           -156.55                            984.47  
+             od_person_count_log              od_bicycle_count_log              od_vehicle_count_log  
+                          193.82                            422.26                            -23.39  
+                   IMD_score_log                 housing_price_log                       pop_den_log  
+                           89.99                            278.99                           -130.61  
+                         poi_log                         slope_log                          age_0_19  
+                          155.08                           -259.42                           -949.35  
+                       age_20_39                         age_40_59          lu_residential_community  
+                         1848.63                           2319.04                           -518.99  
+           lu_commerce_developed  
+                          899.01  
+
+Degrees of Freedom: 13961 Total (i.e. Null);  13925 Residual
+Null Deviance:	    2.484e+10 
+Residual Deviance: 1.492e+10 	AIC: 233500
