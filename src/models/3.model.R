@@ -1,6 +1,9 @@
+devtools::install_github("gaborcsardi/notifier")
+
 pacman::p_load(tidyverse, stats, plm, utils,pglm,progress,MatchIt,lmtest,sandwich,
                pscl, cobalt, grf,AER,DiagrammeRsvg,rsvg,stargazer,hrbrthemes,Hmisc,
-               WeightIt,gbm,CBPS,caret,car)
+               WeightIt,gbm,CBPS,caret,car,notifier,corrplot,randomForest,pdp,doMC,
+               doParallel)
 
 # load data ---------------------------------------------------------------
 root_dir <- "/Volumes/ExFAT/bike_svi"
@@ -22,7 +25,7 @@ all_var_scaled <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_va
   dplyr::select(-c(age_60_90,lu_others)) %>% 
   drop_na()
 all_var <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined.csv")) %>% 
-  select(-c(count_point_id, X90, period,lu_vacant,lu_undeveloped_land)) %>% 
+  dplyr::select(-c(count_point_id, X90, period,lu_vacant,lu_undeveloped_land)) %>% 
   mutate(year=as.factor(year)) %>% 
   # rename_at(vars(contains('count')), ~paste0(., "_log")) %>% 
   # mutate_at(vars(contains("_log")), log) %>% 
@@ -55,6 +58,12 @@ run_psm <- function(data,dep_var_name, ind_var_name, covariates){
   # dev.off()
   # model
   match_result_df <- match.data(match_result)
+  # estimate ps and save data
+  ps <- glm(formula, family = binomial(), data = data)
+  ps_df <- data.frame(pr_score = predict(ps, type = "response"),
+                      count_point_id = data$count_point_id,
+                      treatment=data[[ind_var_name]])
+  write.csv(ps_df, file = paste0("models/",sub("_binary.*", "", ind_var_name),"/", ind_var_name, "_propensity_score.csv"))
   match_result_df_cor <- match_result_df %>% 
     dplyr::select({unlist(strsplit(covariates_names," \\+ "))}) %>% 
     dplyr::select(-c(year))
@@ -117,15 +126,15 @@ run_ipw <- function(data,dep_var_name, ind_var_name, covariates){
 run_causal_forest <- function(data,dep_var_name, ind_var_name, covariates_names, treatment){
   print(ind_var_name)
   X <- data %>% 
-    select(covariates_names) %>% 
+    dplyr::select(covariates_names) %>% 
     as.matrix() %>% 
     unlist()
   Y <- data %>% 
-    select(dep_var_name)%>% 
+    dplyr::select(dep_var_name)%>% 
     as.vector() %>% 
     unlist()
   W <- data %>% 
-    select(ind_var_name)%>% 
+    dplyr::select(ind_var_name)%>% 
     as.vector() %>% 
     unlist()
   tau.forest <- causal_forest(X, Y, W, seed=1234)
@@ -142,40 +151,47 @@ run_causal_forest <- function(data,dep_var_name, ind_var_name, covariates_names,
   df <- data.frame(var_name=covariates_names, variable_importance=forest.Y.varimp)
   # save the result
   df %>%
-    write.csv(paste0("models/",ind_var_name,"/", treatment, "_", "causal_forest_var_imp.csv"), row.names = F)
+    write.csv(paste0("models/",sub("_binary.*", "", ind_var_name),"/", treatment, "_", "causal_forest_var_imp.csv"), row.names = F)
   
   # conditional average treatment effect
-  cate <- average_treatment_effect(tau.forest, target.sample = "all")
+  cate <- average_treatment_effect(tau.forest, target.sample = "treated")
   t_score <- cate["estimate"] / cate["std.err"]
   cate["p_value"] <- 2*pt(q=abs(t_score), df=length(Y)-1, lower.tail=FALSE)
-  capture.output(cate, file= paste0("models/",ind_var_name,"/", treatment, "_", "causal_forest_cate.txt"))
+  capture.output(cate, file= paste0("models/",sub("_binary.*", "", ind_var_name),"/", treatment, "_", "causal_forest_cate.txt"))
   
   # Extract the first tree from the fitted forest.
   tau.forest.2 <- causal_forest(X, Y, W, seed=1234, min.node.size=100)
   tree <- get_tree(tau.forest.2, 1)
   # Print the first tree.
   print(tree)
-  capture.output(tree, file= paste0("models/",ind_var_name,"/", treatment, "_", "causal_tree.txt"))
+  capture.output(tree, file= paste0("models/",sub("_binary.*", "", ind_var_name),"/", treatment, "_", "causal_tree.txt"))
   # Plot the first tree.
   tree_plot <- plot(tree)
   tree_plot <- DiagrammeRsvg::export_svg(tree_plot)
   tree_plot <- charToRaw(tree_plot) # flatten
-  rsvg::rsvg_pdf(tree_plot, paste0("reports/figures/", treatment, "_", ind_var_name,"_causal_tree.pdf")) # saved graph as png
-}
+  rsvg::rsvg_pdf(tree_plot, paste0("reports/figures/", treatment, "_", sub("_binary.*", "", ind_var_name),"_causal_tree.pdf")) # saved graph as png
+  
+  # plot HTE by ranking
+  cf_preds <- predict(tau.forest, estimate.variance = TRUE)
+  
+  # save as csv
+  cf_preds %>% as.tibble(cf_preds) %>% 
+    write.csv(paste0("models/",sub("_binary.*", "", ind_var_name),"/", treatment, "_predictions.csv"), row.names = F)
+  }
 
 # compute rate
 compute_rate <- function(data,dep_var_name, ind_var_name, covariates_names, treatment){
   print(ind_var_name)
   X <- data %>% 
-    select(covariates_names) %>% 
+    dplyr::select(covariates_names) %>% 
     as.matrix() %>% 
     unlist()
   Y <- data %>% 
-    select(dep_var_name)%>% 
+    dplyr::select(dep_var_name)%>% 
     as.vector() %>% 
     unlist()
   W <- data %>% 
-    select(ind_var_name)%>% 
+    dplyr::select(ind_var_name)%>% 
     as.vector() %>% 
     unlist()
   # plot rate
@@ -184,11 +200,11 @@ compute_rate <- function(data,dep_var_name, ind_var_name, covariates_names, trea
   eval.forest <- causal_forest(X[-train, ], Y[-train], W[-train])
   rate <- rank_average_treatment_effect(eval.forest,
                                         predict(train.forest, X[-train, ])$predictions)
-  pdf(paste0("reports/figures/",treatment, "_", ind_var_name,"_rate.pdf"), height = 7, width = 7)
+  pdf(paste0("reports/figures/",treatment, "_", sub("_binary.*", "", ind_var_name),"_rate.pdf"), height = 7, width = 7)
   plot(rate)
   dev.off()
   autoc <- paste("AUTOC:", round(rate$estimate, 2), "+/", round(1.96 * rate$std.err, 2))
-  capture.output(autoc, file= paste0("models/",str_remove(ind_var_name,"_binary_70_percentile"),"/",treatment, "_", "autoc.txt"))
+  capture.output(autoc, file= paste0("models/",sub("_binary.*", "", ind_var_name),"/",treatment, "_", "autoc.txt"))
 }
 
 # compute cate ranking
@@ -284,47 +300,51 @@ compute_cate_ranking<-function(data,dep_var_name, ind_var_name, covariates_names
 
 # compute hte by covariate
 compute_hte_subgroups<-function(data,dep_var_name, ind_var_name, covariates_names){
-  # run causal forest
-  X <- data %>%
-    dplyr::select(covariates_names) %>%
-    as.matrix() %>%
-    unlist()
-  Y <- data %>%
-    dplyr::select(dep_var_name)%>%
-    as.vector() %>%
-    unlist()
-  W <- data %>%
-    dplyr::select(ind_var_name)%>%
-    as.vector() %>%
-    unlist()
-  tau.forest <- causal_forest(X, Y, W, seed=1234)
-  fmla <- formula(paste0("~ 0 + ", paste0(covariates_names, collapse="+")))
+  # define a function for a simple cf model
+  cf_simple <- function(data,dep_var_name, ind_var_name, covariates_names) {
+    # run causal forest
+    X <- data %>%
+      dplyr::select(covariates_names) %>%
+      as.matrix() %>%
+      unlist()
+    Y <- data %>%
+      dplyr::select(dep_var_name)%>%
+      as.vector() %>%
+      unlist()
+    W <- data %>%
+      dplyr::select(ind_var_name)%>%
+      as.vector() %>%
+      unlist()
+    tau.forest <- causal_forest(X, Y, W, seed=1234)
+    
+    # get CATE and SE
+    cate <- average_treatment_effect(tau.forest, target.sample = "treated")
+    return(cate)
+  }
   # create a dataframe to store the results
   hte_df <- data.frame(matrix(ncol = 4, nrow = 0))
-  col_names <- c("covariate", "percentile", "tau_hat","tau_hat_se")
+  col_names <- c("covariate", "category", "estimate","std.err")
   colnames(hte_df) <- col_names
   for (selected_covariate in covariates_names){
     print(selected_covariate)
-    # calculate 25th and 75th percentiles
-    percentiles <- c(.1,.25,.5,.75,.9)
-    grid.size <- length(percentiles)
-    covariate.grid <- quantile(data[,selected_covariate], probs=percentiles)
-    # calculate medians for other covariates
-    other_covariates <- covariates_names[-which(covariates_names %in% selected_covariate)]
-    medians <- apply(data[, other_covariates, F], 2, median)
-    # Construct a dataset
-    data.grid <- data.frame(sapply(medians, function(x) rep(x, grid.size)), covariate.grid)
-    colnames(data.grid) <- c(other_covariates, selected_covariate)
-    X.grid <- model.matrix(fmla, data.grid)
-    # Point predictions of the CATE and standard errors 
-    forest.pred <- predict(tau.forest, newdata = X.grid, estimate.variance=TRUE)
-    tau.hat <- forest.pred$predictions
-    tau.hat.se <- sqrt(forest.pred$variance.estimates)
-    selected_covariate_vec <- rep(selected_covariate,grid.size)
-    df_temp <- cbind(selected_covariate_vec,percentiles,tau.hat,tau.hat.se)
-    colnames(df_temp) <- col_names
-    # concatenate with hte_df
-    hte_df <- rbind(hte_df,df_temp)
+    # Split data into two groups at the median of the selected_covariate variable
+    data_group1 <- data[data[[selected_covariate]] <= median(data[[selected_covariate]]),]
+    data_group2 <- data[data[[selected_covariate]] > median(data[[selected_covariate]]),]
+    
+    # get CATE and SE for group 1 and group 2
+    cate_group1 <- cf_simple(data_group1,dep_var_name, ind_var_name, covariates_names)
+    cate_group2 <- cf_simple(data_group2,dep_var_name, ind_var_name, covariates_names)
+    
+    # complete the vector 
+    cate_group1["covariate"] <- selected_covariate
+    cate_group2["covariate"] <- selected_covariate
+    cate_group1["category"] <- "low"
+    cate_group2["category"] <- "high"
+    
+    # rbind to hte_df
+    df = 
+    hte_df <- rbind(hte_df,data.frame(as.list(cate_group1)))
+    hte_df <- rbind(hte_df,data.frame(as.list(cate_group2)))
   }
   return(hte_df)
 }
@@ -333,7 +353,7 @@ compute_hte_subgroups<-function(data,dep_var_name, ind_var_name, covariates_name
 compute_overall_var_imp <- function(treatment){
   # run a normal causal forest just to check feature importance
   X <- all_var_scaled_binary_treatment %>%
-    dplyr::select(-contains("pedal_cycles","binary")) %>% 
+    dplyr::select(-contains(c("pedal_cycles","binary"))) %>% 
     as.matrix() %>% 
     unlist()
   
@@ -352,20 +372,48 @@ compute_overall_var_imp <- function(treatment){
     write.csv(paste0("models/", treatment, "_", "causal_forest_var_imp.csv"), row.names = F)
 }
 
+#TODO
+run_random_forest <- function(data, dep_var_name, ind_var_name, covariates_names){
+  data <- data %>% 
+    dplyr::select(all_of(c(dep_var_name, ind_var_name, covariates_names)))
+  covariates_pasted <- paste(c(ind_var_name, covariates_names), collapse = " + ")
+  formula <- as.formula(paste(dep_var_name, " ~ ", covariates_pasted))
+  # # Set up a parallel backend with 4 cores
+  # cl <- makeCluster(4)
+  # registerDoParallel(cl)
+  # model <- foreach(ntree=500, .packages='randomForest') %dopar% {
+  #                 randomForest(formula, data = data, ntree=ntree)
+  #               }
+  # # Stop the parallel backend
+  # stopCluster(cl)
+  model <- randomForest(formula, data = data, ntree = 500)
+  # plot
+  partial_df <- pdp::partial(model, pred.var = ind_var_name, train = data) 
+  partial_df %>% 
+    autoplot(rug = TRUE, train = data) + 
+    geom_line(color = "#7B52AE") +
+    # geom_point(color = "red", size = 2) +
+    labs(x = ind_var_name, y = "Predicted cyclists' counts") +
+    theme_ipsum()
+  # save 
+  ggsave(paste0("reports/figures/", str_remove(ind_var_name,"_binary_70_percentile"),"_pdp.png"), width = 10, height = 10)
+  partial_df %>% write.csv(paste0("models/", str_remove(ind_var_name,"_binary_70_percentile"), "/pdp.csv"))
+}
+
 # background check --------------------------------------------------------
 # check overdispersion
-for (treatment in c("continuous","binary")){
+for (treatment in c("binary")){
   # set covariates
   if (treatment == "continuous"){
     covariates <- names(all_var_scaled_binary_treatment)[!str_detect(names(all_var_scaled_binary_treatment), 
-                                                                     paste("pedal_cycles", "ss_bus","ss_bicycle","motorcycle","ss_person","ss_rider",
+                                                                     paste("pedal_cycles","count_point_id","ss_bus","ss_bicycle","motorcycle","ss_person","ss_rider",
                                                                            "ss_train", "ss_truck", "ss_car", "ss_building",
                                                                            "binary","year",
                                                                            sep="|"))]
   }
   else{
     covariates <- names(all_var_scaled_binary_treatment)[!str_detect(names(all_var_scaled_binary_treatment), 
-                                                                     paste("pedal_cycles", "ss_bus","ss_bicycle","motorcycle","ss_person","ss_rider",
+                                                                     paste("pedal_cycles", "count_point_id","ss_bus","ss_bicycle","motorcycle","ss_person","ss_rider",
                                                                            "ss_train", "ss_truck", "ss_car", "ss_building",
                                                                            "^.*binary((?!70_percentile).)*$","year","slope_log$","vegetation$","sidewalk$",
                                                                            sep="|"))]
@@ -401,7 +449,9 @@ for (treatment in c("continuous","binary")){
   
   # psm
   if (treatment == "binary"){
-    binary_ind_var_name_list <- names(all_var_scaled_binary_treatment)[str_detect(names(all_var_scaled_binary_treatment),"_binary")]
+    # binary_ind_var_name_list <- names(all_var_scaled_binary_treatment)[str_detect(names(all_var_scaled_binary_treatment),"_binary")]
+    # hard code the binary independent variables
+    binary_ind_var_name_list <- c("ss_vegetation_binary_70_percentile","ss_sidewalk","slope_log_binary_70_percentile")
     model_list <- list()
     vegetation_covariates <- names(all_var_scaled_binary_treatment)[str_detect(names(all_var_scaled_binary_treatment), 
                                                                                paste("^age_","year", "^lu_", "road","sidewalk(?!_binary)", "sky","terrain",
@@ -417,7 +467,7 @@ for (treatment in c("continuous","binary")){
                                                                           paste("^age_","year", "^lu_","building", "road", "vegetation(?!_binary)", 
                                                                                 "sky","terrain","^od_", "IMD", "poi","housing_price","pop_den", sep="|"))]
     covariates <- names(all_var_scaled_binary_treatment)[!str_detect(names(all_var_scaled_binary_treatment), 
-                                                                     paste("pedal_cycles","binary","pedal_cycles_log","bus","ss_bicycle","motorcycle","ss_person","ss_rider",
+                                                                     paste("pedal_cycles","count_point_id", "binary","pedal_cycles_log","bus","ss_bicycle","motorcycle","ss_person","ss_rider",
                                                                            "ss_train", "ss_truck", "ss_car", "ss_building", sep="|"))]
     pb <- progress_bar$new(total = length(binary_ind_var_name_list))
     for (ind_var_name in binary_ind_var_name_list){
@@ -439,15 +489,15 @@ for (treatment in c("continuous","binary")){
       models <- run_psm(all_var_scaled_binary_treatment, "pedal_cycles",ind_var_name, covariates_names)
       model_list[[ind_var_name]] <- models
     }
-    # create model objects to pass to stargazer later
-    vegetation_ps <- model_list$ss_vegetation_binary_70_percentile[["second_stage"]]
-    sidewalk_ps <- model_list$ss_sidewalk_binary_70_percentile[["second_stage"]]
-    slope_ps <- model_list$slope_log_binary_70_percentile[["second_stage"]]
-    cluster=c("subclass")
-    vegetation_se <- as.vector(summary(vegetation,cluster = cluster)$coefficients$count[,"Std. Error"])
-    sidewalk_se <- as.vector(summary(sidewalk,cluster = cluster)$coefficients$count[,"Std. Error"])
-    slope_se <- as.vector(summary(slope,cluster = cluster)$coefficients$count[,"Std. Error"])
-    se_list <- list(NA, NA, NA, vegetation_se,sidewalk_se,slope_se)
+    # # create model objects to pass to stargazer later
+    # vegetation_ps <- model_list$ss_vegetation_binary_70_percentile[["second_stage"]]
+    # sidewalk_ps <- model_list$ss_sidewalk_binary_70_percentile[["second_stage"]]
+    # slope_ps <- model_list$slope_log_binary_70_percentile[["second_stage"]]
+    # cluster=c("subclass")
+    # vegetation_se <- as.vector(summary(vegetation,cluster = cluster)$coefficients$count[,"Std. Error"])
+    # sidewalk_se <- as.vector(summary(sidewalk,cluster = cluster)$coefficients$count[,"Std. Error"])
+    # slope_se <- as.vector(summary(slope,cluster = cluster)$coefficients$count[,"Std. Error"])
+    # se_list <- list(vegetation_se,sidewalk_se,slope_se)
   }
   
   # ipw
@@ -493,39 +543,63 @@ for (treatment in c("continuous","binary")){
   }
   
   
+  # create stargazer
+  # need to rename models to avoid error: Error in if (is.na(s)) { : the condition has length > 1
+  for (stage in c("first_stage","second_stage")){
+    vegetation <- model_list$ss_vegetation_binary_70_percentile[[stage]]
+    sidewalk <- model_list$ss_sidewalk_binary_70_percentile[[stage]]
+    slope <- model_list$slope_log_binary_70_percentile[[stage]]
+    if (stage=="second_stage"){
+      cluster=c("subclass")
+      vegetation_se <- as.vector(summary(vegetation,cluster = cluster)$coefficients$count[,"Std. Error"])
+      # sidewalk_se <- as.vector(summary(sidewalk,cluster = cluster)$coefficients$count[,"Std. Error"])
+      slope_se <- as.vector(summary(slope,cluster = cluster)$coefficients$count[,"Std. Error"])
+    } else{
+      cluster=c()
+      vegetation_se <- as.vector(summary(vegetation,cluster = cluster)$coefficients[,"Std. Error"])
+      # sidewalk_se <- as.vector(summary(sidewalk,cluster = cluster)$coefficients[,"Std. Error"])
+      slope_se <- as.vector(summary(slope,cluster = cluster)$coefficients[,"Std. Error"])
+    }
+    print(stage)
+    stargazer(vegetation,
+              # sidewalk,
+              slope,
+              se=list(vegetation_se,sidewalk_se,slope_se),
+              single.row = TRUE,
+              column.sep.width = "1pt",
+              no.space = TRUE,
+              font.size = "small",
+              type = "latex", 
+              out = paste0("models/psm_", stage,".tex")
+    )
+  }
   
   
-  
-  # summarize results in stargazer
-  stargazer(simple_ols,
-            pooled_zinb,
-            fe_zinb,
-            vegetation_ps,
-            sidewalk_ps,
-            slope_ps,
-            keep = covariates[str_detect(covariates,
-                                         paste("vegetation","sidewalk","slope",sep="|"))],
-            se = se_list,
-            single.row = TRUE,
-            column.sep.width = "1pt",
-            no.space = TRUE,
-            font.size = "small"
-  )
+  # # summarize results in stargazer
+  # model_result <- stargazer(vegetation_ps,
+  #           sidewalk_ps,
+  #           slope_ps,
+  #           keep = covariates[str_detect(covariates,
+  #                                        paste("vegetation","sidewalk","slope",sep="|"))],
+  #           se = se_list,
+  #           single.row = TRUE,
+  #           column.sep.width = "1pt",
+  #           no.space = TRUE,
+  #           font.size = "small")
+  # # save in txt file
+  # capture.output(model_result, file= paste0("models/psm_all_treatment.txt"))
 }
-
-
-
-
-
-
-
 
 
 # fe poisson by step ------------------------------------------------------
 # define functions
 run_fe_poisson <- function(data, dep_var_name, ind_var_name){
   # create dir
-  dir.create(paste0("models/",ind_var_name))
+  if (!dir.exists(paste0("models/",ind_var_name))){
+    dir.create(paste0("models/",ind_var_name))
+  } else {
+    print("Dir already exists!")
+  }
   # run base model
   formula <- as.formula(paste(dep_var_name, " ~ ", ind_var_name))
   print(formula)
@@ -555,7 +629,12 @@ run_zero_inflated <- function(data, dep_var_name, ind_var_name, control_var_vec,
   estimate_list <- list()
   p_val_list <- list()
   # create dir
-  dir.create(paste0("models/",ind_var_name))
+  # create dir
+  if (!dir.exists(paste0("models/",ind_var_name))){
+    dir.create(paste0("models/",ind_var_name))
+  } else {
+    print("Dir already exists!")
+  }
   # run base model
   right_side <- paste(c(ind_var_name,control_var_vec), collapse = " + ")
   formula <- as.formula(paste(dep_var_name, " ~ ", right_side))
@@ -565,8 +644,8 @@ run_zero_inflated <- function(data, dep_var_name, ind_var_name, control_var_vec,
   capture.output(model_year_zero_inflated_summary, file= paste0("models/",ind_var_name,"/", "year_zero_inflated_",count_model,"_base.txt"))
   # add other covariates one by one
   data_covar <- data %>%
-    select(-c(ind_var_name,dep_var_name, control_var_vec)) %>%
-    select(1:ncol(.))
+    dplyr::select(-c(ind_var_name,dep_var_name, control_var_vec)) %>%
+    dplyr::select(1:ncol(.))
   cov_names <- names(data_covar)
   names_agg <- c(ind_var_name, control_var_vec)
   pb <- progress_bar$new(total = length(cov_names))
@@ -602,13 +681,13 @@ run_zero_inflated <- function(data, dep_var_name, ind_var_name, control_var_vec,
     write.csv(paste0("models/",ind_var_name,"/", "year_zero_inflated_",count_model,"_result.csv"), row.names = F)
 }
 # list of independent variables
-ind_var_name_list <- c("ss_vegetation","ss_sidewalk","slope")
+ind_var_name_list <- c("ss_vegetation","ss_sidewalk","slope_log")
 # list of baseline control variables
-control_var_vec <- names(all_var)[str_detect(names(all_var), "^age_|year|^lu_")]
+control_var_vec <- names(all_var_scaled)[str_detect(names(all_var_scaled), "^age_|year|^lu_")]
 for (ind_var_name in ind_var_name_list){
   # run_fe_poisson(all_var_scaled, "pedal_cycles_log",ind_var_name)
   # run_zero_inflated(all_var_scaled, "pedal_cycles",ind_var_name, control_var_vec, "poisson")
-  run_zero_inflated(all_var_scaled %>% select(-c("pedal_cycles_log")), "pedal_cycles",ind_var_name, control_var_vec, "negbin")
+  run_zero_inflated(all_var_scaled %>% dplyr::select(-c("pedal_cycles_log")), "pedal_cycles",ind_var_name, control_var_vec, "negbin")
 }
 
 # Propensity score matching -----------------------------------------------
@@ -663,25 +742,58 @@ for (ind_var_name in ind_var_name_list){
 
 # causal forest -----------------------------------------------------------
 all_var_scaled_binary_treatment <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined_scaled_binary.csv")) %>% 
-  select(-c(lu_defence,lu_vacant,lu_undeveloped_land,lu_minerals_landfill,
-            lu_forest_open_land_water,lu_outdoor_recreation,lu_transport_utilities,
-            lu_agriculture, lu_community_service,lu_residential_gardens, lu_industry_commerce,lu_unknown_developed_use)) %>% 
-  mutate(year=as.numeric(year)) %>% 
+  mutate(year=as.numeric(year),
+         ss_sidewalk=as.numeric(ss_sidewalk)) %>% 
+  dplyr::select(-c(age_60_90,lu_others)) %>% 
   drop_na()
 all_var_scaled <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined_scaled.csv")) %>% 
   mutate(year=as.numeric(year)) %>% 
-  select(-c(age_60_90,lu_others)) %>% 
+  dplyr::select(-c(age_60_90,lu_others)) %>% 
   drop_na()
-
-
-
-
-
-
 
 covariates <- names(all_var_scaled_binary_treatment)[!str_detect(names(all_var_scaled_binary_treatment), 
                                                                  paste("binary","pedal_cycles","bus","ss_bicycle","motorcycle","ss_person","ss_rider",
-                                                                       "ss_train", "ss_truck", "ss_car", "ss_building", sep="|"))]
+                                                                       "ss_train", "ss_truck", "ss_car", "ss_building",
+                                                                       sep="|"))]
+binary_ind_var_name_list <- c("ss_vegetation_binary_70_percentile","ss_sidewalk","slope_log_binary_70_percentile")
+
+pb <- progress_bar$new(total = length(binary_ind_var_name_list))
+for (ind_var_name in binary_ind_var_name_list){
+  pb$tick()
+  if (str_detect(ind_var_name,"vegetation")){
+    # covariates_names <- vegetation_covariates
+    covariates_names <- covariates[str_detect(covariates,
+                                              "^((?!.*vegetation*).)*$")]
+  } else if (str_detect(ind_var_name,"sidewalk")){
+    # covariates_names <- sidewalk_covariates
+    covariates_names <- covariates[str_detect(covariates,
+                                              "^((?!.*sidewalk*).)*$")]
+  } else if (str_detect(ind_var_name,"slope")){
+    # covariates_names <- slope_covariates
+    covariates_names <- covariates[str_detect(covariates,
+                                              "^((?!.*slope*).)*$")]
+  }
+  print(covariates_names)
+  run_causal_forest(all_var_scaled_binary_treatment, "pedal_cycles_log",ind_var_name, covariates_names, "binary")
+  # compute_rate(all_var_scaled_binary_treatment, "pedal_cycles_log",ind_var_name, covariates_names, "binary")
+  # df_list <- compute_cate_ranking(all_var_scaled_binary_treatment, "pedal_cycles_log", ind_var_name, covariates_names)
+  # df_list$forest.ate %>%
+  #   write.csv(paste0("models/", str_remove(ind_var_name,"_binary_70_percentile"),"/rank_cate.csv"), row.names = F)
+  # df_list$df %>%
+  # #   write.csv(paste0("models/", str_remove(ind_var_name,"_binary_70_percentile"),"/rank_cate_covariates.csv"), row.names = F)
+  hte_df <- compute_hte_subgroups(all_var_scaled_binary_treatment, "pedal_cycles_log",ind_var_name, covariates_names[ !covariates_names == 'ss_sidewalk'])
+  # write.csv(hte_df,paste0("models/", str_remove(ind_var_name,"_binary_70_percentile"),"/hte_by_covariate.csv"), row.names = F)
+  # compute_overall_var_imp("binary")
+}
+
+
+# random forest -----------------------------------------------------------
+covariates <- names(all_var_scaled_binary_treatment)[!str_detect(names(all_var_scaled_binary_treatment), 
+                                                                 paste("binary","pedal_cycles","bus","ss_bicycle","motorcycle","ss_person","ss_rider",
+                                                                       "ss_train", "ss_truck", "ss_car", "ss_building",
+                                                                       sep="|"))]
+ind_var_name_list <- c("ss_vegetation","slope_log")
+
 pb <- progress_bar$new(total = length(ind_var_name_list))
 for (ind_var_name in ind_var_name_list){
   pb$tick()
@@ -698,15 +810,8 @@ for (ind_var_name in ind_var_name_list){
     covariates_names <- covariates[str_detect(covariates,
                                               "^((?!.*slope*).)*$")]
   }
-  # run_causal_forest(all_var_scaled, "pedal_cycles_log",ind_var_name, covariates_names)
-  # compute_rate(all_var_scaled_binary_treatment, "pedal_cycles_log",paste0(ind_var_name,"_binary_70_percentile"), covariates_names)
-  # df_list <- compute_cate_ranking(all_var_scaled_binary_treatment, "pedal_cycles_log",paste0(ind_var_name,"_binary_70_percentile"), covariates_names)
-  # df_list$forest.ate %>%
-  #   write.csv(paste0("models/", str_remove(ind_var_name,"_binary_70_percentile"),"/rank_cate.csv"), row.names = F)
-  # df_list$df %>%
-  #   write.csv(paste0("models/", str_remove(ind_var_name,"_binary_70_percentile"),"/rank_cate_covariates.csv"), row.names = F)
-  hte_df <- compute_hte_subgroups(all_var_scaled, "pedal_cycles_log",ind_var_name, covariates_names)
-  write.csv(hte_df,paste0("models/", str_remove(ind_var_name,"_binary_70_percentile"),"/hte_by_covariate.csv"), row.names = F)
+  print(covariates_names)
+  run_random_forest(all_var_scaled_binary_treatment, "pedal_cycles_log",ind_var_name, covariates_names)
 }
 
   

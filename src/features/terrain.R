@@ -6,8 +6,8 @@ pacman::p_load(tidyverse,sf,raster,exactextractr)
 root_dir <- "/Volumes/ExFAT/bike_svi"
 dem <- raster(paste0(root_dir, "/data/external/cities/London/gis_variables/slope/LIDAR_10m_DTM_Composite_2019/LIDAR_10m_DTM_Composite.tif"))
 count_station <- read_csv(paste0(root_dir, "/data/external/cities/London/count_station.csv")) %>% 
-  st_as_sf(coords=c("longitude","latitude"), crs=4326) %>% 
-  st_transform(3857) %>% 
+  st_as_sf(coords=c("longitude","latitude"), crs=4326) %>%
+  st_transform(3857) %>%
   st_buffer(500)
 
 # compute slope -----------------------------------------------------------
@@ -22,9 +22,3 @@ count_station <- count_station %>%
 count_station %>% 
   st_drop_geometry() %>% 
   write.csv(paste0(root_dir, "/data/processed/cities/London/slope.csv"))
-
-
-
-
-
-

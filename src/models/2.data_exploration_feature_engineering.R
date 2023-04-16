@@ -1,5 +1,6 @@
 pacman::p_load(tidyverse, Hmisc, GGally, corrplot, RColorBrewer, ggplot2, 
-               hrbrthemes,stargazer,plotly, sf, basemaps, magrittr,cowplot,dotenv)
+               hrbrthemes,stargazer,plotly, sf, basemaps, magrittr,cowplot,dotenv,
+               basemapR)
 extrafont::loadfonts()
 
 # data exploration --------------------------------------------------------
@@ -9,7 +10,7 @@ root_dir <- "/Volumes/ExFAT/bike_svi"
 if (!(file.exists(root_dir))){
   root_dir <- "/Volumes/Extreme SSD/bike_svi"
 }
-all_var <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined.csv")) %>% 
+all_var_with_id <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined.csv")) %>% 
   relocate(pedal_cycles) %>% 
   mutate(ss_visual_complexity = ifelse(ss_visual_complexity>1,1,ss_visual_complexity),
          age_0_19 = X0_9 + X10_19,
@@ -19,9 +20,11 @@ all_var <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joine
          lu_residential_community = (lu_community_service + lu_residential)/100,
          lu_commerce_developed = (lu_industry_commerce + lu_transport_utilities + lu_unknown_developed_use)/100,
          lu_others = (lu_agriculture + lu_forest_open_land_water + lu_outdoor_recreation 
-          + lu_residential_gardens + lu_defence + lu_minerals_landfill + lu_undeveloped_land + lu_vacant)/100
+          + lu_residential_gardens + lu_defence + lu_minerals_landfill + lu_undeveloped_land + lu_vacant)/100,
+         ss_sidewalk = ifelse(ss_sidewalk>0.05,1,0),
+         count_point_id = as.character(count_point_id)
          ) %>% 
-  select(-c(count_point_id, all_ages, period, X0_9, X10_19,
+  dplyr::select(-c(all_ages, period, X0_9, X10_19,
             X20_29, X30_39, X40_49, X50_59,
             X60_69, X70_79, X80_89, X90,
             lu_community_service, lu_residential, lu_residential_gardens,
@@ -31,13 +34,16 @@ all_var <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joine
             )) %>% 
   drop_na()
 
+all_var <- all_var_with_id %>% 
+  dplyr::select(-c(count_point_id))
+
 # summary stats
 summary_stats <- describe(all_var)
 capture.output(summary_stats, file= paste0("models/summary_stats.txt"))
 summary_stats_latetx <- all_var %>% 
   mutate(year = as.numeric(year)) %>% 
   drop_na() %>% 
-  stargazer()
+  stargazer(type = "latex", out = "models/summary_stats_latetx.tex")
 capture.output(summary_stats_latetx, file= paste0("models/summary_stats_latetx.txt"))
 
 # correlation matrix
@@ -88,11 +94,11 @@ max_over_x <- function(value){
     return(FALSE)
   }
 }
-all_var_scaled <- all_var %>% 
+all_var_scaled <- all_var_with_id %>% 
   mutate(year = as.character(year)) %>% 
   # rename_at(vars(contains('count')), ~paste0(., "_log")) %>% 
   rename_if(max_over_x, list(~paste0(., "_log"))) %>% 
-  mutate_at(vars(contains("_log")), log) %>% 
+  mutate_at(vars(contains("_log")), function(x) log(x+1)) %>% 
   mutate(across(.cols = everything(), ~ ifelse(is.infinite(.x), 0, .x))) %>% 
   mutate(pedal_cycles = all_var$pedal_cycles)
 
@@ -102,9 +108,9 @@ all_var_scaled %>%
 
 # pairwise correlation for pedal_cycles and segmentation result
 pedal_seg <- all_var %>% 
-  select(c("pedal_cycles","ss_vegetation","ss_sidewalk", "slope"))
+  dplyr::select(c("pedal_cycles","ss_vegetation","slope"))
 pedal_seg_scaled <- all_var_scaled %>% 
-  select(c("pedal_cycles_log","ss_vegetation","ss_sidewalk", "slope_log"))
+  dplyr::select(c("pedal_cycles_log","ss_vegetation","slope_log"))
 pair_corr <- function(data,title,file_path){
   # pdf(file_path, height = 7, width = 7)
   scatter_plot <- function(data, mapping, ...) {
@@ -376,3 +382,146 @@ map_bivariate(hex_grid_joined,
 
 
 
+
+
+
+# map changes in cyclists' count ------------------------------------------
+count_station <- read_csv(paste0(root_dir,"/data/external/cities/London/count_station.csv")) %>% 
+  st_as_sf(.,coords=c("longitude","latitude"),crs=4326) 
+
+all_var_map <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined.csv")) %>% 
+  left_join(.,count_station,by="count_point_id") %>% 
+  st_as_sf()
+
+hex_grid <- count_station %>% 
+  st_transform(3857) %>% 
+  st_make_grid(cellsize=1000,square=F) %>% 
+  st_as_sf() %>% 
+  st_transform(4326) %>% 
+  mutate(grid_id = row_number()) 
+
+hex_grid_summarized <- hex_grid %>% 
+  st_join(.,all_var_map) %>% 
+  st_drop_geometry() %>% 
+  mutate(year_group = cut(year, breaks = c(2007, 2010, 2017, 2020), 
+                          labels = c("2008-2010", "2011-2017", "2018-2020"))) %>% 
+  relocate(year_group, .after = year) %>% 
+  group_by(grid_id, year_group) %>% 
+  dplyr::summarize(across(everything(), .f = list(mean), na.rm = TRUE)) %>% 
+  rename_with(.fn=function(x){str_remove(x,"_1$")}) %>% 
+  filter(year_group %in%  c("2008-2010", "2018-2020")) %>% 
+  dplyr::select(grid_id, year_group, pedal_cycles) %>% 
+  pivot_wider(names_from = year_group, values_from = pedal_cycles) %>% 
+  mutate(change = `2018-2020` - `2008-2010`)
+
+hex_grid_joined <- hex_grid %>% 
+  left_join(.,hex_grid_summarized,by="grid_id") %>% 
+  drop_na(change) %>% 
+  rename(geometry=x) %>% 
+  st_transform(4326)
+
+
+# reference: https://timogrossenbacher.ch/2019/04/bivariate-maps-with-ggplot2-and-sf/#define-a-map-theme
+theme_map <- function(...,
+                      default_font_color = "#4e4d47",
+                      default_background_color = "#f5f5f2",
+                      default_font_family = "Ubuntu Regular"
+) {
+  theme_ipsum() +
+    theme(
+      text = element_text(family = default_font_family,
+                          color = default_font_color),
+      # remove all axes
+      axis.line = element_blank(),
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      # add a subtle grid
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      # background colors
+      # plot.background = element_rect(fill = default_background_color,
+      #                                color = NA),
+      # panel.background = element_rect(fill = default_background_color,
+      #                                 color = NA),
+      # legend.background = element_rect(fill = default_background_color,
+      #                                  color = NA),
+      # borders and margins
+      plot.margin = unit(c(.5, .5, .2, .5), "cm"),
+      panel.border = element_blank(),
+      panel.spacing = unit(c(-.1, 0.2, .2, 0.2), "cm"),
+      # titles
+      legend.title = element_text(size = 11),
+      legend.text = element_text(size = 9, hjust = 0,
+                                 color = default_font_color),
+      plot.title = element_text(size = 15, hjust = 0.5,
+                                color = default_font_color),
+      plot.subtitle = element_text(size = 10, hjust = 0.5,
+                                   color = default_font_color,
+                                   margin = margin(b = -0.1,
+                                                   t = -0.1,
+                                                   l = 2,
+                                                   unit = "cm"),
+                                   debug = F),
+      # captions
+      plot.caption = element_text(size = 7,
+                                  hjust = .5,
+                                  margin = margin(t = 0.2,
+                                                  b = 0,
+                                                  unit = "cm"),
+                                  color = "#939184"),
+      ...
+    )
+}
+
+# set up color and breaks
+my_palette <- colorRampPalette(c("#62428b", "#FFFFFF", "#5d9242"))
+# Calculate quantiles for the value column
+quantiles <- quantile(hex_grid_joined$change, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1))
+# here I define custom labels (the default ones would be ugly)
+labels <- c()
+
+for(idx in 1:length(quantiles)){
+  labels <- c(labels, paste0(round(quantiles[idx], 2),
+                             " — ",
+                             round(quantiles[idx + 1], 2)))
+}
+# I need to remove the last label 
+# because that would be something like "66.62 - NA"
+labels <- labels[1:length(labels)-1]
+
+# Create the color scale
+color_scale <- setNames(my_palette(length(quantiles)-1), labels)
+
+# here I actually create a new 
+# variable on the dataset with the quantiles
+hex_grid_joined$change_quantile <- cut(hex_grid_joined$change, 
+                                     breaks = quantiles, 
+                                     labels = labels,
+                                     include.lowest = T)
+
+map <- ggplot() +
+  base_map(st_bbox(hex_grid_joined), increase_zoom = 2, 
+           basemap = 'positron', nolabels = T) +
+  geom_sf(
+    data=hex_grid_joined,
+    mapping = aes(fill = change_quantile),
+    color = "black",
+    size = 0.05) +
+  scale_fill_manual(values = color_scale) +
+  # add titles
+  labs(x = NULL,
+       y = NULL,
+       fill = "Change in count",
+       title = "Change in the average cyclists' count over time",
+       subtitle = "between 2008-2010 and 2018-2020",
+       caption = "Basemap: carto \n Data source: Transport for London") +
+  guides(fill = guide_legend(reverse = TRUE)) +
+  # add the theme
+  theme_map()
+
+ggsave(plot = map, 
+       filename = "reports/figures/map_grid_cycle_count_change.png",
+       width = 7,
+       height = 7,
+       units = c("in"))
