@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "bike_svi"
+version = "0.1.0"
+description = "Causal inference projects for active transport"
+authors = ["koito19960406 <61777450+koito19960406@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "bike_svi"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pandas = "^2.0.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
