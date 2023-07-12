@@ -6,6 +6,9 @@ from dotenv import find_dotenv, load_dotenv
 from zensvi.download import GSVDownloader
 from zensvi.cv import Segmenter
 import os
+import numpy as np
+import osmnx as ox
+import geopandas as gpd
 
 from clean_data import MontrealDataCleaner, LondonDataCleaner
 
@@ -28,36 +31,59 @@ def main(gsv_api_key, log_path, dir_input, dir_temp, dir_output, city_name):
     # clean data
     data_cleaner.clean_all()
     
-    # initialize StreetViewDownloader
-    downloader = GSVDownloader(gsv_api_key=gsv_api_key, log_path=log_path, 
-                                    distance=10, grid_size=10)
+    if not Path(dir_temp / "pixel_ratios.csv").exists() or not Path(dir_temp / "label_counts.csv").exists():
+        # initialize StreetViewDownloader
+        downloader = GSVDownloader(gsv_api_key=gsv_api_key, log_path=log_path, 
+                                        distance=10, grid_size=10)
+        
+        # download gsv
+        downloader.download_svi(dir_temp, input_csv_file = str(dir_input / "count_station_clean.csv"),
+                                id_columns = ["count_point_id"],
+                                buffer = 100,
+                                augment_metadata=True)
     
-    # download gsv
-    downloader.download_svi(dir_temp, input_csv_file = str(dir_input / "count_station.csv"),
-                            id_columns = ["count_point_id"],
-                            buffer = 100,
-                            augment_metadata=True)
-    
-    # segment gsv
-    segmenter = Segmenter(dataset="mapillary", task = "panoptic")
-    segmenter.segment(dir_temp / "gsv_panorama", 
-                    dir_segmentation_summary_output = dir_temp,
-                    pixel_ratio_save_format=["csv"],
-                    csv_format="wide",
-                    max_workers=4)
+        # segment gsv
+        segmenter = Segmenter(dataset="mapillary", task = "panoptic")
+        segmenter.segment(dir_temp / "gsv_panorama", 
+                        dir_segmentation_summary_output = dir_temp,
+                        pixel_ratio_save_format=["csv"],
+                        csv_format="wide",
+                        max_workers=4)
     
     # left join pids.csv with pixel_ratios.csv
-    pids = pd.read_csv(dir_temp / "gsv_pids.csv")[["pid", "count_point_id", "year"]]
+    count_station = pd.read_csv(dir_input / "count_station_clean.csv")
+    # convert count_station to geopandas geodataframe from longitude and latitude
+    count_station = gpd.GeoDataFrame(count_station, geometry=gpd.points_from_xy(count_station.longitude, count_station.latitude), crs="EPSG:4326")
+    # change to utm projection with osmnx 
+    count_station["geometry"] = ox.projection.project_gdf(count_station).buffer(100).to_crs(epsg=4326)
+    # read in pixel_ratios.csv
+    pids = pd.read_csv(dir_temp / "gsv_pids.csv")[["panoid", "year", "lat", "lon"]]
     pixel_ratios = pd.read_csv(dir_temp / "pixel_ratios.csv")
-    pids_pixel_ratios = pd.merge(pids, pixel_ratios, on="pid", how="left").drop(columns=["pid"])
+    # calculate visual complexity (i.e. entropy): ∑𝑖=1𝑘𝑃𝑖×ln(𝑃𝑖)ln(𝑘)
+    pixel_ratios["visual_complexity"] = -1 * pixel_ratios.iloc[:, 1:].apply(lambda row: np.sum([val * np.log(val) if val > 0 else 0 for val in row]), axis=1) / np.log(len(pixel_ratios.columns[1:]))
+    pids_pixel_ratios = pd.merge(pids, pixel_ratios, left_on="panoid", right_on="filename_key", how="left").drop(columns=["panoid", "filename_key"])
+    # convert pids_pixel_ratios to geopandas geodataframe from longitude and latitude
+    pids_pixel_ratios = gpd.GeoDataFrame(pids_pixel_ratios, geometry=gpd.points_from_xy(pids_pixel_ratios.lon, pids_pixel_ratios.lat), crs = "EPSG:4326")
+    # spatial join pids_pixel_ratios with count_station
+    pids_pixel_ratios = gpd.sjoin(pids_pixel_ratios, count_station, how="left", op="within")
     # aggregate all the columns except for count_point_id and year
     pids_pixel_ratios = pids_pixel_ratios.groupby(["count_point_id", "year"]).agg("mean").reset_index()
-
+    # add prefix to column names
+    pids_pixel_ratios.columns = ["count_point_id", "year"] + ["ss_" + col.lower().\
+        replace(" - ", "_").replace(" ", "_").replace("(", "").replace(")", "") for col in pids_pixel_ratios.columns[2:]]
+    
     # left join pids.csv with label_counts.csv
     label_counts = pd.read_csv(dir_temp / "label_counts.csv")
-    pids_label_counts = pd.merge(pids, label_counts, on="pid", how="left").drop(columns=["pid"])
+    pids_label_counts = pd.merge(pids, label_counts, left_on="panoid", right_on="filename_key", how="left").drop(columns=["panoid", "filename_key"])
+    # convert pids_pixel_ratios to geopandas geodataframe from longitude and latitude
+    pids_label_counts = gpd.GeoDataFrame(pids_label_counts, geometry=gpd.points_from_xy(pids_label_counts.lon, pids_label_counts.lat), crs = "EPSG:4326")
+    # spatial join pids_pixel_ratios with count_station
+    pids_label_counts = gpd.sjoin(pids_label_counts, count_station, how="left", op="within")
     # aggregate all the columns except for count_point_id and year
     pids_label_counts = pids_label_counts.groupby(["count_point_id", "year"]).agg("mean").reset_index()
+    # add prefix to column names
+    pids_label_counts.columns = ["count_point_id", "year"] + ["od_" + col.lower().\
+        replace(" - ", "_").replace(" ", "_").replace("(", "").replace(")", "") for col in pids_label_counts.columns[2:]]
     
     # save pids_pixel_ratios and pids_label_counts
     pids_pixel_ratios.to_csv(dir_output / "count_pixel_ratios.csv", index=False)
