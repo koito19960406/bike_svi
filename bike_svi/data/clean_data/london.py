@@ -11,8 +11,8 @@ from rasterstats import zonal_stats
 import rasterio
 import numpy as np
 
-from base import BaseDataCleaner
-from terrain import dem_to_slope
+from .base import BaseDataCleaner
+from .terrain import dem_to_slope
 
 class LondonDataCleaner(BaseDataCleaner):
     def __init__(self, dir_input, dir_output):
@@ -75,21 +75,31 @@ class LondonDataCleaner(BaseDataCleaner):
                 age.columns = age.columns.map(str)
                 age.columns = age.columns.str.replace("All Ages", "all_ages")
                 age_counter = 0
-                while age_counter <= 80:
+                while age_counter <= 60:
                     if year != 2011:
-                        # sum up 10 columns at a time
-                        age[f"{str(age_counter)} - {str(age_counter+9)}"] = age.iloc[:,2:12].sum(axis=1) / age["all_ages"]
-                        # drop columns
-                        age.drop(age.iloc[:,2:12], inplace=True, axis=1)
+                        if age_counter < 60:
+                            # sum up 20 columns at a time
+                            age[f"age_{str(age_counter)}_{str(age_counter+19)}"] = age.iloc[:,2:22].sum(axis=1) / age["all_ages"] * 100
+                            # drop columns
+                            age.drop(age.iloc[:,2:22], inplace=True, axis=1)
+                        else:
+                            # sum from 60 to 90+ (31 columns)
+                            age[f"age_{str(age_counter)}_{str(age_counter+30)}"] = age.iloc[:,2:33].sum(axis=1) / age["all_ages"] * 100
+                            # drop columns
+                            age.drop(age.iloc[:,2:33], inplace=True, axis=1)
                     else:
-                        age[f"{str(age_counter)} - {str(age_counter+9)}"] = age.iloc[:,2:4].sum(axis=1) / age["all_ages"]
-                        # drop columns
-                        age.drop(age.iloc[:,2:4], inplace=True, axis=1)
+                        if age_counter < 60:
+                            # sum up 4 columns at a time
+                            age[f"age_{str(age_counter)}_{str(age_counter+19)}"] = age.iloc[:,2:6].sum(axis=1) / age["all_ages"] * 100
+                            # drop columns
+                            age.drop(age.iloc[:,2:6], inplace=True, axis=1)
+                        else:
+                            # sum from 60 to 90+ (7 columns)
+                            age[f"age_{str(age_counter)}_{str(age_counter+30)}"] = age.iloc[:,2:9].sum(axis=1) / age["all_ages"] * 100
+                            # drop columns
+                            age.drop(age.iloc[:,2:9], inplace=True, axis=1)
                     # update age_counter
-                    age_counter+=10
-                    if age_counter == 90:
-                        age.rename(columns={age.columns[2]: "90+"}, inplace=True)
-                        age["90+"] = age["90+"] / age["all_ages"]
+                    age_counter+=20
                 # add year column
                 age["year"] = year
                 # rename "all_ages" to "total"
@@ -228,6 +238,16 @@ class LondonDataCleaner(BaseDataCleaner):
             land_use_df = land_use_df.replace("-",0)
             # rename lsoa code
             land_use_df.rename(columns={land_use_df.columns[0]:"census_id"}, inplace=True)
+            # create new land use columns by aggregating the existing ones
+            land_use_df["lu_residential_community"] = land_use_df["lu_community_service"] + land_use_df["lu_residential"] / 100
+            land_use_df["lu_commerce_developed"] = land_use_df["lu_industry_commerce"] + land_use_df["lu_transport_utilities"] + land_use_df["lu_unknown_developed_use"] / 100
+            land_use_df["lu_others"] = land_use_df["lu_agriculture"] + land_use_df["lu_forest_open_land_water"] +\
+                land_use_df["lu_outdoor_recreation"] + land_use_df["lu_residential_gardens"] + land_use_df["lu_defence"] +\
+                land_use_df["lu_minerals_landfill"] + land_use_df["lu_undeveloped_land"] + land_use_df["lu_vacant"] / 100
+            # drop the original columns
+            land_use_df = land_use_df.drop(["lu_community_service", "lu_residential", "lu_industry_commerce", "lu_transport_utilities",\
+                "lu_unknown_developed_use", "lu_agriculture", "lu_forest_open_land_water", "lu_outdoor_recreation", "lu_residential_gardens",\
+                "lu_defence", "lu_minerals_landfill", "lu_undeveloped_land", "lu_vacant"], axis=1)
             return land_use_df
 
         land_use = _preclean_land_use_data(os.path.join(self.dir_input, "control_variables/land_use/Live_Tables_-_Land_Use_Stock_2022_-_LSOA.ods"))
@@ -402,6 +422,9 @@ class LondonDataCleaner(BaseDataCleaner):
             # rename "year_count" to "year"
             count_census = count_census.rename(columns={"year_count": "year"})
             count_census = count_census.drop(columns=["index", "year_census"])
+
+            # drop duplicated rows
+            count_census = count_census.drop_duplicates(subset=["count_point_id", "year"])
             
         return count_census
 
@@ -497,6 +520,8 @@ class LondonDataCleaner(BaseDataCleaner):
         # join count_station_year with count_station
         self.count_land_use = self.join_count_station_with_census("land_use")
         
+        # drop "index" column
+        self.count_land_use = self.count_land_use.drop(columns=["index"])
         # save to csv
         self.count_land_use.to_csv(Path(self.dir_output) / "count_land_use.csv", index=False)
         pass

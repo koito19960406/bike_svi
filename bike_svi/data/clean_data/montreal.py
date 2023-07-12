@@ -15,9 +15,10 @@ from tenacity import retry, stop_after_attempt
 from rasterstats import zonal_stats
 import geopandas as gpd
 import rasterio
+import numpy as np
 
-from base import BaseDataCleaner
-from terrain import dem_to_slope
+from .base import BaseDataCleaner
+from .terrain import dem_to_slope
 
 class MontrealDataCleaner(BaseDataCleaner):
     def __init__(self, dir_input, dir_output):
@@ -369,7 +370,7 @@ class MontrealDataCleaner(BaseDataCleaner):
     def load_data(self):
         # load count data
         # get a list of files in the directory that doesn't end with "count_station.csv"
-        list_files = [file for file in Path(self.dir_input).iterdir() if file.suffix == ".csv" and not file.stem.endswith("count_station_clean") and not file.name.startswith('.')]
+        list_files = [file for file in Path(self.dir_input).iterdir() if file.suffix == ".csv" and not file.stem.startswith("count_station") and not file.name.startswith('.')]
         # load csv files into a list of dataframes
         list_df = [pd.read_csv(file) for file in list_files]
         # concatenate the list of dataframes into a single dataframe
@@ -536,7 +537,8 @@ class MontrealDataCleaner(BaseDataCleaner):
     def clean_count_station_data(self):
         # check if the csv file exists
         if os.path.exists(str(Path(self.dir_input) / "count_station_clean.csv")) and \
-            os.path.exists(str(Path(self.dir_output) / "count_station_year.csv")):
+            os.path.exists(str(Path(self.dir_output) / "count_station_year.csv")) and \
+            os.path.exists(str(Path(self.dir_input) / "count_station_old_new.csv")):
             self.count_station = pd.read_csv(str(Path(self.dir_input) / "count_station_clean.csv"))
             self.count_station_year = pd.read_csv(str(Path(self.dir_output) / "count_station_year.csv"))
             # join count_station_year with count_station
@@ -550,7 +552,7 @@ class MontrealDataCleaner(BaseDataCleaner):
         # filter "Description_Code_Banque" to only keep "Pietons"
         self.count_df = self.count_df[self.count_df["Description_Code_Banque"] == "Pietons"]
         # rename columns
-        self.count_df = self.count_df.rename(columns={"Id_Reference": "count_point_id",
+        self.count_df = self.count_df.rename(columns={"Id_Reference": "count_point_id_old",
                                                         "Latitude": "latitude",
                                                         "Longitude": "longitude"})
         # get year from "Date"
@@ -558,18 +560,29 @@ class MontrealDataCleaner(BaseDataCleaner):
         self.count_df["year"] = self.count_df["Date"].dt.year
         
         # aggregate counts (Approche_Nord, Approche_Sud, Approche_Est, Approche_Ouest) by count_point_id and year
-        self.count_station_year = self.count_df.groupby(["count_point_id", "year"], as_index=False).\
+        self.count_station_year = self.count_df.groupby(["count_point_id_old", "year"], as_index=False).\
             agg({"Approche_Nord": "mean", "Approche_Sud": "mean", "Approche_Est": "mean", "Approche_Ouest": "mean"})
         # sum columns: Approche_Nord, Approche_Sud, Approche_Est, Approche_Ouest
         self.count_station_year["count"] = self.count_station_year[["Approche_Nord", "Approche_Sud", "Approche_Est", "Approche_Ouest"]].sum(axis=1)
         
         # save df.count_station: count_point_id, latitude, longitude
-        self.count_station = self.count_df.drop_duplicates(subset=["count_point_id"])[["count_point_id", "latitude", "longitude"]]
-        self.count_station.to_csv(Path(self.dir_input) / "count_station_clean.csv", index=False)
-        # save df.count_station_year: count_point_id, year, count
+        self.count_station = self.count_df.drop_duplicates(subset=["count_point_id_old"])[["count_point_id_old", "latitude", "longitude"]]
+        # get unique pairs of latitude and longitude
+        count_station_new = self.count_station.drop_duplicates(subset=["latitude", "longitude"])
+        # create a new id column
+        count_station_new["count_point_id"] = np.arange(len(count_station_new))
+        # save to csv
+        count_station_new[["count_point_id", "latitude", "longitude"]].to_csv(Path(self.dir_input) / "count_station_clean.csv", index=False)
+        # merge the two dataframes
+        self.count_station = count_station_new[["count_point_id", "latitude", "longitude"]].merge(self.count_station, on=["latitude", "longitude"], how="left")
+        # merge with count_station_year
+        self.count_station_year = self.count_station_year.merge(self.count_station[["count_point_id_old", "count_point_id", "latitude", "longitude"]], 
+                                                                on = "count_point_id_old", how="left")
+        # group by count_point_id and year
+        self.count_station_year = self.count_station_year.groupby(["count_point_id", "year"], as_index=False).agg({"count": "sum"})
         self.count_station_year[["count_point_id", "year", "count"]].to_csv(Path(self.dir_output) / "count_station_year.csv", index=False)
         # join count_station_year with count_station
-        self.count_station_year = self.count_station_year.merge(self.count_station[["count_point_id", "latitude", "longitude"]], on="count_point_id", how="left")
+        self.count_station_year = self.count_station_year.merge(count_station_new[["count_point_id", "latitude", "longitude"]], on="count_point_id", how="left")
         # convert count_station_year to geodataframe
         self.count_station_year = gpd.GeoDataFrame(self.count_station_year, geometry=gpd.points_from_xy(self.count_station_year.longitude, self.count_station_year.latitude)).\
             set_crs(epsg=4326)
@@ -613,6 +626,11 @@ class MontrealDataCleaner(BaseDataCleaner):
 
         # join count_station_year with count_station
         self.count_age = self.join_count_station_with_census("age")
+        # divide "age_" columns by "total" and multiply by 100
+        for col in self.count_age.columns:
+            if "age_" in col:
+                self.count_age[col] = self.count_age[col] / self.count_age["total"] * 100
+                
         # drop "total" column
         self.count_age = self.count_age.drop(columns=["total"])
         
@@ -698,9 +716,9 @@ class MontrealDataCleaner(BaseDataCleaner):
         # fill NaN with 0
         self.count_land_use = self.count_land_use.fillna(0)
         
-        # calculate total area and divide land use area by total area
+        # calculate total area and divide land use area by total area and multiply by 100
         self.count_land_use["total_area"] = self.count_land_use.iloc[:, 2:].sum(axis=1)
-        self.count_land_use.iloc[:, 2:] = self.count_land_use.iloc[:, 2:].div(self.count_land_use["total_area"], axis=0)
+        self.count_land_use.iloc[:, 2:] = self.count_land_use.iloc[:, 2:].div(self.count_land_use["total_area"], axis=0) * 100
         self.count_land_use = self.count_land_use.drop(columns="total_area") 
 
         # save to csv
