@@ -6,180 +6,14 @@ extrafont::loadfonts()
 # data exploration --------------------------------------------------------
 load_dot_env()
 root_dir <- Sys.getenv("ROOT_DIR")
-root_dir <- "/Volumes/ExFAT/bike_svi"
-if (!(file.exists(root_dir))){
-  root_dir <- "/Volumes/Extreme SSD/bike_svi"
-}
-all_var_with_id <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined.csv")) %>% 
-  relocate(pedal_cycles) %>% 
-  mutate(ss_visual_complexity = ifelse(ss_visual_complexity>1,1,ss_visual_complexity),
-         age_0_19 = X0_9 + X10_19,
-         age_20_39 = X20_29 + X30_39,
-         age_40_59 = X40_49 + X50_59,
-         age_60_90 = X60_69 + X70_79 + X80_89 + X90,
-         lu_residential_community = (lu_community_service + lu_residential)/100,
-         lu_commerce_developed = (lu_industry_commerce + lu_transport_utilities + lu_unknown_developed_use)/100,
-         lu_others = (lu_agriculture + lu_forest_open_land_water + lu_outdoor_recreation 
-          + lu_residential_gardens + lu_defence + lu_minerals_landfill + lu_undeveloped_land + lu_vacant)/100,
-         ss_sidewalk = ifelse(ss_sidewalk>0.05,1,0),
-         count_point_id = as.character(count_point_id)
-         ) %>% 
-  dplyr::select(-c(all_ages, period, X0_9, X10_19,
-            X20_29, X30_39, X40_49, X50_59,
-            X60_69, X70_79, X80_89, X90,
-            lu_community_service, lu_residential, lu_residential_gardens,
-            lu_industry_commerce, lu_transport_utilities, lu_unknown_developed_use,
-            lu_agriculture, lu_forest_open_land_water, lu_outdoor_recreation,
-            lu_defence, lu_minerals_landfill, lu_undeveloped_land, lu_vacant
-            )) %>% 
-  drop_na()
 
-all_var <- all_var_with_id %>% 
-  dplyr::select(-c(count_point_id))
+# load external/city_list.txt to get the list of cities
+city_list <- read.csv(paste0(root_dir,"/data/external/city_list.txt"), header = FALSE, sep = "\t") %>% 
+  rename(city = V1) %>% 
+  mutate(city = str_replace_all(city, " ", "_")) %>% 
+  as.vector() %>% 
+  unlist()
 
-# summary stats
-summary_stats <- describe(all_var)
-capture.output(summary_stats, file= paste0("models/summary_stats.txt"))
-summary_stats_latetx <- all_var %>% 
-  mutate(year = as.numeric(year)) %>% 
-  drop_na() %>% 
-  stargazer(type = "latex", out = "models/summary_stats_latetx.tex")
-capture.output(summary_stats_latetx, file= paste0("models/summary_stats_latetx.txt"))
-
-# correlation matrix
-corrmatrix <- cor(all_var,use="complete.obs")
-cor.mtest <- function(mat, ...) {
-  mat <- as.matrix(mat)
-  n <- ncol(mat)
-  p.mat<- matrix(NA, n, n)
-  diag(p.mat) <- 0
-  for (i in 1:(n - 1)) {
-    for (j in (i + 1):n) {
-      tmp <- cor.test(mat[, i], mat[, j], ...)
-      p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
-    }
-  }
-  colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
-  p.mat
-}
-# matrix of the p-value of the correlation
-p.mat <- cor.mtest(all_var)
-# original color: purple(#7B52AE) and green (#74B652)
-col1 <- colorRampPalette(c("#62428b", "#FFFFFF", "#5d9242"))
-pdf("reports/figures/correlation_mat.pdf", height = 7, width = 7)
-corrplot(corrmatrix,method = "square",  tl.col = "black", tl.cex = 0.6, 
-         p.mat = p.mat, sig.level = 0.05, insig = "pch", pch.cex = 1, col = col1(100),
-         title = "Correlation matrix of all variables",
-         mar=c(0,0,1,0))
-dev.off()
-
-# create df to remove variables over 0.6 correlation
-corrdf <- corrmatrix %>%
-  as.data.frame() %>%
-  tibble::rownames_to_column("Var1") %>%
-  gather("Var2", "value", -Var1) 
-  
-corrdf %>% filter(value>=0.6|value<=-0.6)
-# data normalizatioon -----------------------------------------------------
-max_over_x <- function(value){
-  if (is.numeric(value)){
-    if (max(value,na.rm = T)>1){
-      return(TRUE)
-    }
-    else{
-      return(FALSE)
-    }
-  }
-  else{
-    return(FALSE)
-  }
-}
-all_var_scaled <- all_var_with_id %>% 
-  mutate(year = as.character(year)) %>% 
-  # rename_at(vars(contains('count')), ~paste0(., "_log")) %>% 
-  rename_if(max_over_x, list(~paste0(., "_log"))) %>% 
-  mutate_at(vars(contains("_log")), function(x) log(x+1)) %>% 
-  mutate(across(.cols = everything(), ~ ifelse(is.infinite(.x), 0, .x))) %>% 
-  mutate(pedal_cycles = all_var$pedal_cycles)
-
-# save
-all_var_scaled %>% 
-  write.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined_scaled.csv"), row.names = F)
-
-# pairwise correlation for pedal_cycles and segmentation result
-pedal_seg <- all_var %>% 
-  dplyr::select(c("pedal_cycles","ss_vegetation","slope"))
-pedal_seg_scaled <- all_var_scaled %>% 
-  dplyr::select(c("pedal_cycles_log","ss_vegetation","slope_log"))
-pair_corr <- function(data,title,file_path){
-  # pdf(file_path, height = 7, width = 7)
-  scatter_plot <- function(data, mapping, ...) {
-    p <- ggplot(data = data, mapping=mapping) +
-      stat_bin_2d(bins=50) +
-      scale_fill_gradient(low = "#312146",
-                          high = "#cabadf")
-    return(p)
-  }
-  g <- ggpairs(data, lower=list(continuous=scatter_plot), title=title)+
-    theme_ipsum()+
-    theme(axis.text.x = element_text(size = 6),
-          axis.text.y = element_text(size = 6))
-  ggsave(plot=g,file_path)
-  # dev.off()
-}
-pair_corr(pedal_seg, "Pair-wise correlation matrix", "reports/figures/pair_wise_correlation.png")
-pair_corr(pedal_seg_scaled, "Pair-wise correlation matrix", "reports/figures/pair_wise_correlation_scaled.png")
-# convert treatment into binary
-convert_to_binary <- function(array, percentile){
-  tile <- ntile(array,10)
-  # return TRUE to those above threshold
-  return(ifelse(tile>percentile,1,0))
-}
-# function to create multiple binary columns with different thresholds
-create_binary <- function(data,colname){
-  for (i in seq(1,9)){
-    data <- data %>% 
-      mutate("{{colname}}_binary_{i*10}_percentile" := convert_to_binary({{colname}},i))
-  }
-  return(data)
-}
-# apply function
-all_var_scaled_binary_treatment <- all_var_scaled %>% 
-  create_binary(., ss_vegetation) %>% 
-  create_binary(., ss_sidewalk) %>% 
-  create_binary(., slope_log) %>% 
-  drop_na()
-all_var_scaled_binary_treatment %>% 
-  write.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined_scaled_binary.csv"),row.names = FALSE)
-
-
-# map greenery and cycling ------------------------------------------------
-count_station <- read_csv(paste0(root_dir,"/data/external/cities/London/count_station.csv")) %>% 
-  st_as_sf(.,coords=c("longitude","latitude"),crs=4326) 
-
-all_var_map <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined.csv")) %>% 
-  left_join(.,count_station,by="count_point_id") %>% 
-  st_as_sf()
-
-hex_grid <- count_station %>% 
-  st_transform(3857) %>% 
-  st_make_grid(cellsize=1000,square=F) %>% 
-  st_as_sf() %>% 
-  st_transform(4326) %>% 
-  mutate(grid_id = row_number()) 
-
-hex_grid_summarized <- hex_grid %>% 
-  st_join(.,all_var_map) %>% 
-  st_drop_geometry() %>% 
-  st_drop_geometry() %>% 
-  group_by(grid_id) %>% 
-  dplyr::summarize(across(everything(), .f = list(mean), na.rm = TRUE)) %>% 
-  rename_with(.fn=function(x){str_remove(x,"_1")})
-  
-hex_grid_joined <- hex_grid %>% 
-  left_join(.,hex_grid_summarized,by="grid_id") %>% 
-  drop_na(pedal_cycles,ss_vegetation) %>% 
-  rename(geometry=x)
 
 # reference: https://timogrossenbacher.ch/2019/04/bivariate-maps-with-ggplot2-and-sf/#define-a-map-theme
 theme_map <- function(...,
@@ -322,6 +156,7 @@ map_bivariate <- function(sf,
                           title="",
                           subtitle="",
                           caption=""){
+  flush_cache()
   clean_sf <- prep_data(sf, col1, col2, bivariate_color_scale)
   legend_custom <- create_legend(bivariate_color_scale, col1, col2, axis1=axis1,axis2=axis2)
   map <- basemap_ggplot(st_bbox(clean_sf), map_service="carto", 
@@ -350,10 +185,10 @@ map_bivariate <- function(sf,
     draw_plot(map, 0, 0, 1, 1) +
     draw_plot(legend_custom, 0.75, 0.15, 0.18, 0.18)
   ggsave(plot = final_plot, 
-         filename = "reports/figures/map_grid.png",
-         width = 7,
-         height = 7,
-         units = c("in"))
+         filename = paste0(figure_dir, "/map_grid.png"),
+                           width = 7,
+                           height = 7,
+                           units = c("in"))
 }
 
 bivariate_color_scale <- tibble(
@@ -368,160 +203,297 @@ bivariate_color_scale <- tibble(
   "1 - 1" = "#d3d3d3" # low-low
 ) 
 
-map_bivariate(hex_grid_joined,
-              "ss_vegetation", 
-              "pedal_cycles",
-              bivariate_color_scale,
-              map_token = Sys.getenv("MAP_TOKEN"),
-              axis1="More greenery →", 
-              axis2="More cyclists →",
-              title="Greenery and cyclists count in London",
-              subtitle="between 2008-2020 (1km grid)",
-              caption="")
+# loop through the cities
+for (city in city_list){
+  # create folders for each city
+  model_dir <- paste0(root_dir,"/models/", city)
+  if (!dir.exists(model_dir)){
+    dir.create(model_dir)
+  }
+  figure_dir <- paste0("reports/figures/", city)
+  if (!dir.exists(figure_dir)){
+    dir.create(figure_dir)
+  }
+  external_dir <- paste0(root_dir,"/data/external/cities/", city)
+  processed_dir <- paste0(root_dir,"/data/processed/cities/", city)
+  
+  # read in the data
+  # binarize some variables: ss_sidewalk, ss_pedestrian_area, ss_bike_lane, ss_bike_rack, ss_parking
+  #TODO: only keep some columns from object detection (i.e., columns that start with "od_" + vehicles + people):
+  # od_person_count: od_person
+  # od_bicycle: od_bicyclist, od_bicycle
+  # od_vehicle_count: od_vehicle, od_bus, od_car, od_caravan, od_motorcycle, od_truck, od_other_vehicle, od_trailer, od_train, od_wheeled_slow, od_ego_vehicle
+  # od_animal_count: od_bird, od_ground_animal
+  all_var_with_id <- read.csv(paste0(processed_dir, "/all_var_joined.csv")) %>%
+    select(-contains("binary")) 
+    # relocate(count) %>% 
+    # mutate(ss_visual_complexity = ifelse(ss_visual_complexity>1,1,ss_visual_complexity),
+    #       ss_sidewalk = ifelse(ss_sidewalk>0.05,1,0),
+    #       ss_pedestrian_area = ifelse(ss_pedestrian_area>0.05,1,0),
+    #       ss_bike_lane = ifelse(ss_bike_lane>0.05,1,0),
+    #       ss_bike_rack = ifelse(ss_bike_rack>0.05,1,0),
+    #       ss_parking = ifelse(ss_parking>0.05,1,0),
+    #       ss_construction = ss_fence + ss_barrier + ss_wall + ss_bridge + ss_building + ss_tunnel,
+    #       ss_road_flat = ss_crosswalk_plain + ss_rail_track + ss_road + ss_service_lane,
+    #       ss_marking = ss_lane_marking_crosswalk + ss_lane_marking_general,
+    #       ss_nature = ss_mountain + ss_sand + ss_snow + ss_terrain + ss_water,
+    #       ss_street_object = ss_banner + ss_billboard + ss_catch_basin + ss_cctv_camera + ss_fire_hydrant + ss_junction_box + ss_mailbox + ss_manhole + ss_phone_booth + ss_pole
+    #         + ss_traffic_sign_frame + ss_utility_pole + ss_traffic_light + ss_traffic_sign_back + ss_traffic_sign_front + ss_trash_can,
+    #       od_person_count = od_person,
+    #       od_bicycle_count = od_bicyclist + od_bicycle,
+    #       od_vehicle_count = od_vehicle + od_bus + od_car + od_caravan + od_motorcycle + od_truck + od_other_vehicle + od_trailer + od_train + od_wheeled_slow + od_ego_vehicle,
+    #       od_animal_count = od_bird + od_ground_animal,
+    #       count_point_id = as.character(count_point_id)
+    #       ) %>%
+    # drop_na()
+
+  all_var <- all_var_with_id %>% 
+    dplyr::select(-c(count_point_id))
+
+  # # summary stats
+  # summary_stats <- describe(all_var, na.rm = T)
+  # print(summary_stats)
+  # capture.output(summary_stats, file= paste0(model_dir, "/summary_stats.txt"))
+  summary_stats_latetx <- all_var %>% 
+    mutate(year = as.numeric(year)) %>% 
+    drop_na() %>% 
+    stargazer(type = "latex", out = paste0(model_dir, "/summary_stats_latetx.tex"))
+  capture.output(summary_stats_latetx, file= paste0(model_dir, "/summary_stats_latetx.txt"))
+
+  # correlation matrix
+  corrmatrix <- cor(all_var,use="complete.obs")
+  cor.mtest <- function(mat, ...) {
+    mat <- as.matrix(mat)
+    n <- ncol(mat)
+    p.mat<- matrix(NA, n, n)
+    diag(p.mat) <- 0
+    for (i in 1:(n - 1)) {
+      for (j in (i + 1):n) {
+        tmp <- cor.test(mat[, i], mat[, j], ...)
+        p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+      }
+    }
+    colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
+    p.mat
+  }
+  # matrix of the p-value of the correlation
+  p.mat <- cor.mtest(all_var)
+  # original color: purple(#7B52AE) and green (#74B652)
+  col1 <- colorRampPalette(c("#62428b", "#FFFFFF", "#5d9242"))
+  pdf(paste0(figure_dir, "/correlation_mat.pdf"), height = 7, width = 7)
+  corrplot(corrmatrix,method = "square",  tl.col = "black", tl.cex = 0.6, 
+          p.mat = p.mat, sig.level = 0.05, insig = "pch", pch.cex = 1, col = col1(100),
+          title = "Correlation matrix of all variables",
+          mar=c(0,0,1,0))
+  dev.off()
+
+  # # create df to remove variables over 0.6 correlation
+  # corrdf <- corrmatrix %>%
+  #   as.data.frame() %>%
+  #   tibble::rownames_to_column("Var1") %>%
+  #   gather("Var2", "value", -Var1) 
+    
+  # corrdf %>% filter(value>=0.6|value<=-0.6)
+  # # data normalizatioon -----------------------------------------------------
+  # max_over_x <- function(value){
+  #   if (is.numeric(value)){
+  #     if (max(value,na.rm = T)>1){
+  #       return(TRUE)
+  #     }
+  #     else{
+  #       return(FALSE)
+  #     }
+  #   }
+  #   else{
+  #     return(FALSE)
+  #   }
+  # }
+  # all_var_scaled <- all_var_with_id %>% 
+  #   mutate(year = as.character(year)) %>% 
+  #   # rename_at(vars(contains('count')), ~paste0(., "_log")) %>% 
+  #   rename_if(max_over_x, list(~paste0(., "_log"))) %>% 
+  #   mutate_at(vars(contains("_log")), function(x) log(x+1)) %>% 
+  #   mutate(across(.cols = everything(), ~ ifelse(is.infinite(.x), 0, .x))) %>% 
+  #   mutate(count = all_var$count)
+
+  # # save
+  # all_var_scaled %>% 
+  #   write.csv(paste0(processed_dir, "/all_var_joined_scaled.csv"), row.names = F)
+
+  # pairwise correlation for count and segmentation result
+  if (city=="London"){
+    ss_var_list <- c("ss_vegetation", "ss_bike_lane", "ss_bike_rack", "ss_curb", "ss_curb_cut", "ss_parking", "ss_pothole", "ss_street_light")
+  } else if (city=="Montreal"){
+    ss_var_list <- c("ss_vegetation", "ss_guard_rail", "ss_pedestrian_area", "ss_sidewalk", "ss_street_light", "ss_bench")
+  }
+  count_seg <- all_var %>% 
+    dplyr::select(c("count", "slope", ss_var_list))
+  # count_seg_scaled <- all_var_scaled %>% 
+  #   dplyr::select(c("count_log", "slope_log", ss_var_list))
+  pair_corr <- function(data,title,file_path){
+    # pdf(file_path, height = 7, width = 7)
+    scatter_plot <- function(data, mapping, ...) {
+      p <- ggplot(data = data, mapping=mapping) +
+        stat_bin_2d(bins=50) +
+        scale_fill_gradient(low = "#312146",
+                            high = "#cabadf")
+      return(p)
+    }
+    g <- ggpairs(data, lower=list(continuous=scatter_plot), title=title)+
+      theme_ipsum()+
+      theme(axis.text.x = element_text(size = 2),
+            axis.text.y = element_text(size = 2))
+    ggsave(plot=g,file_path,
+           width = 7,
+           height = 7,
+           units = c("in"))
+    # dev.off()
+  }
+  pair_corr(count_seg, "Pair-wise correlation matrix", paste0(figure_dir, "/pair_wise_correlation.png"))
+  # pair_corr(count_seg_scaled, "Pair-wise correlation matrix", paste0(figure_dir, "/pair_wise_correlation_scaled.png"))
+  # # convert treatment into binary
+  # convert_to_binary <- function(array, percentile){
+  #   tile <- ntile(array,10)
+  #   # return TRUE to those above threshold
+  #   return(ifelse(tile>percentile,1,0))
+  # }
+  # # function to create multiple binary columns with different thresholds
+  # create_binary <- function(data,colname){
+  #   for (i in seq(1,9)){
+  #     data <- data %>% 
+  #       mutate("{{colname}}_binary_{i*10}_percentile" := convert_to_binary({{colname}},i))
+  #   }
+  #   return(data)
+  # }
+  # # apply function for each of ss_var_list with walk
+  # all_var_scaled_binary_treatment <- all_var_scaled
+  # for (ss_var in ss_var_list){
+  #   all_var_scaled_binary_treatment <- create_binary(all_var_scaled_binary_treatment, ss_var)
+  # }
+  # all_var_scaled_binary_treatment %>% 
+  #   write.csv(paste0(processed_dir, "/all_var_joined_scaled_binary.csv"),row.names = FALSE)
 
 
+  # map greenery and cycling ------------------------------------------------
+  count_station <- read_csv(paste0(external_dir, "/count_station_clean.csv")) %>% 
+    st_as_sf(.,coords=c("longitude","latitude"),crs=4326) 
 
+  all_var_map <- read.csv(paste0(processed_dir, "/all_var_joined.csv")) %>% 
+    left_join(.,count_station,by="count_point_id") %>% 
+    st_as_sf()
 
+  hex_grid <- count_station %>% 
+    st_transform(3857) %>% 
+    st_make_grid(cellsize=1000,square=F) %>% 
+    st_as_sf() %>% 
+    st_transform(4326) %>% 
+    mutate(grid_id = row_number()) 
 
+  hex_grid_summarized <- hex_grid %>% 
+    st_join(.,all_var_map) %>% 
+    st_drop_geometry() %>% 
+    st_drop_geometry() %>% 
+    group_by(grid_id) %>% 
+    dplyr::summarize(across(everything(), .f = list(mean), na.rm = TRUE)) %>% 
+    rename_with(.fn=function(x){str_remove(x,"_1")})
+    
+  hex_grid_joined <- hex_grid %>% 
+    left_join(.,hex_grid_summarized,by="grid_id") %>% 
+    drop_na(count,ss_vegetation) %>% 
+    rename(geometry=x) %>% 
+    st_transform(3857)
 
+  map_bivariate(hex_grid_joined,
+                "ss_vegetation", 
+                "count",
+                bivariate_color_scale,
+                map_token = Sys.getenv("MAP_TOKEN"),
+                axis1="More greenery →", 
+                axis2="More cyclists →",
+                title=paste0("Greenery and count in ", city),
+                subtitle="between 2008-2020 (1km grid)",
+                caption="")
 
-# map changes in cyclists' count ------------------------------------------
-count_station <- read_csv(paste0(root_dir,"/data/external/cities/London/count_station.csv")) %>% 
-  st_as_sf(.,coords=c("longitude","latitude"),crs=4326) 
+  hex_grid <- count_station %>% 
+    st_transform(3857) %>% 
+    st_make_grid(cellsize=1000,square=F) %>% 
+    st_as_sf() %>% 
+    st_transform(4326) %>% 
+    mutate(grid_id = row_number()) 
 
-all_var_map <- read.csv(paste0(root_dir,"/data/processed/cities/London/all_var_joined.csv")) %>% 
-  left_join(.,count_station,by="count_point_id") %>% 
-  st_as_sf()
+  hex_grid_summarized <- hex_grid %>% 
+    st_join(.,all_var_map) %>% 
+    st_drop_geometry() %>% 
+    mutate(year_group = cut(year, breaks = c(2007, 2010, 2017, 2023), 
+                            labels = c("2008-2010", "2011-2017", "2018-2020"))) %>% 
+    relocate(year_group, .after = year) %>% 
+    group_by(grid_id, year_group) %>% 
+    dplyr::summarize(across(everything(), .f = list(mean), na.rm = TRUE)) %>% 
+    rename_with(.fn=function(x){str_remove(x,"_1$")}) %>% 
+    filter(year_group %in%  c("2008-2010", "2018-2020")) %>% 
+    dplyr::select(grid_id, year_group, count) %>% 
+    pivot_wider(names_from = year_group, values_from = count) %>% 
+    mutate(change = `2018-2020` - `2008-2010`)
+  
+  hex_grid_joined <- hex_grid %>% 
+    left_join(.,hex_grid_summarized,by="grid_id") %>% 
+    drop_na(change) %>% 
+    rename(geometry=x) %>% 
+    st_transform(3857)
 
-hex_grid <- count_station %>% 
-  st_transform(3857) %>% 
-  st_make_grid(cellsize=1000,square=F) %>% 
-  st_as_sf() %>% 
-  st_transform(4326) %>% 
-  mutate(grid_id = row_number()) 
+  # set up color and breaks
+  my_palette <- colorRampPalette(c("#62428b", "#FFFFFF", "#5d9242"))
+  # Calculate quantiles for the value column
+  quantiles <- quantile(hex_grid_joined$change, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1))
+  # here I define custom labels (the default ones would be ugly)
+  labels <- c()
 
-hex_grid_summarized <- hex_grid %>% 
-  st_join(.,all_var_map) %>% 
-  st_drop_geometry() %>% 
-  mutate(year_group = cut(year, breaks = c(2007, 2010, 2017, 2020), 
-                          labels = c("2008-2010", "2011-2017", "2018-2020"))) %>% 
-  relocate(year_group, .after = year) %>% 
-  group_by(grid_id, year_group) %>% 
-  dplyr::summarize(across(everything(), .f = list(mean), na.rm = TRUE)) %>% 
-  rename_with(.fn=function(x){str_remove(x,"_1$")}) %>% 
-  filter(year_group %in%  c("2008-2010", "2018-2020")) %>% 
-  dplyr::select(grid_id, year_group, pedal_cycles) %>% 
-  pivot_wider(names_from = year_group, values_from = pedal_cycles) %>% 
-  mutate(change = `2018-2020` - `2008-2010`)
+  for(idx in 1:length(quantiles)){
+    labels <- c(labels, paste0(round(quantiles[idx], 2),
+                              " — ",
+                              round(quantiles[idx + 1], 2)))
+  }
+  # I need to remove the last label 
+  # because that would be something like "66.62 - NA"
+  labels <- labels[1:length(labels)-1]
 
-hex_grid_joined <- hex_grid %>% 
-  left_join(.,hex_grid_summarized,by="grid_id") %>% 
-  drop_na(change) %>% 
-  rename(geometry=x) %>% 
-  st_transform(4326)
+  # Create the color scale
+  color_scale <- setNames(my_palette(length(quantiles)-1), labels)
 
+  # here I actually create a new 
+  # variable on the dataset with the quantiles
+  hex_grid_joined$change_quantile <- cut(hex_grid_joined$change, 
+                                      breaks = quantiles, 
+                                      labels = labels,
+                                      include.lowest = T)
+  subtitle <- case_when(
+    city == "London" ~ "between 2008-2010 and 2018-2020",
+    city == "Montreal" ~ "between 2008-2010 and 2018-2023"
+  )
+  flush_cache()
+  map <- basemap_ggplot(st_bbox(hex_grid_joined), map_service="carto", 
+                   map_type = "light_no_labels",map_res = 1,
+                   force=T) +
+    geom_sf(
+      data=hex_grid_joined,
+      mapping = aes(fill = change_quantile),
+      color = "black",
+      size = 0.05) +
+    scale_fill_manual(values = color_scale) +
+    # add titles
+    labs(x = NULL,
+        y = NULL,
+        fill = "Change in count",
+        title = "Change in the average count over time",
+        subtitle = subtitle,
+        caption = "Basemap: carto") +
+    guides(fill = guide_legend(reverse = TRUE)) +
+    # add the theme
+    theme_map()
 
-# reference: https://timogrossenbacher.ch/2019/04/bivariate-maps-with-ggplot2-and-sf/#define-a-map-theme
-theme_map <- function(...,
-                      default_font_color = "#4e4d47",
-                      default_background_color = "#f5f5f2",
-                      default_font_family = "Ubuntu Regular"
-) {
-  theme_ipsum() +
-    theme(
-      text = element_text(family = default_font_family,
-                          color = default_font_color),
-      # remove all axes
-      axis.line = element_blank(),
-      axis.text.x = element_blank(),
-      axis.text.y = element_blank(),
-      axis.ticks = element_blank(),
-      # add a subtle grid
-      panel.grid.major = element_blank(),
-      panel.grid.minor = element_blank(),
-      # background colors
-      # plot.background = element_rect(fill = default_background_color,
-      #                                color = NA),
-      # panel.background = element_rect(fill = default_background_color,
-      #                                 color = NA),
-      # legend.background = element_rect(fill = default_background_color,
-      #                                  color = NA),
-      # borders and margins
-      plot.margin = unit(c(.5, .5, .2, .5), "cm"),
-      panel.border = element_blank(),
-      panel.spacing = unit(c(-.1, 0.2, .2, 0.2), "cm"),
-      # titles
-      legend.title = element_text(size = 11),
-      legend.text = element_text(size = 9, hjust = 0,
-                                 color = default_font_color),
-      plot.title = element_text(size = 15, hjust = 0.5,
-                                color = default_font_color),
-      plot.subtitle = element_text(size = 10, hjust = 0.5,
-                                   color = default_font_color,
-                                   margin = margin(b = -0.1,
-                                                   t = -0.1,
-                                                   l = 2,
-                                                   unit = "cm"),
-                                   debug = F),
-      # captions
-      plot.caption = element_text(size = 7,
-                                  hjust = .5,
-                                  margin = margin(t = 0.2,
-                                                  b = 0,
-                                                  unit = "cm"),
-                                  color = "#939184"),
-      ...
-    )
+  ggsave(plot = map, 
+        filename = paste0(figure_dir, "/map_grid_count_change.png"),
+        width = 7,
+        height = 7,
+        units = c("in"))
 }
-
-# set up color and breaks
-my_palette <- colorRampPalette(c("#62428b", "#FFFFFF", "#5d9242"))
-# Calculate quantiles for the value column
-quantiles <- quantile(hex_grid_joined$change, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1))
-# here I define custom labels (the default ones would be ugly)
-labels <- c()
-
-for(idx in 1:length(quantiles)){
-  labels <- c(labels, paste0(round(quantiles[idx], 2),
-                             " — ",
-                             round(quantiles[idx + 1], 2)))
-}
-# I need to remove the last label 
-# because that would be something like "66.62 - NA"
-labels <- labels[1:length(labels)-1]
-
-# Create the color scale
-color_scale <- setNames(my_palette(length(quantiles)-1), labels)
-
-# here I actually create a new 
-# variable on the dataset with the quantiles
-hex_grid_joined$change_quantile <- cut(hex_grid_joined$change, 
-                                     breaks = quantiles, 
-                                     labels = labels,
-                                     include.lowest = T)
-
-map <- ggplot() +
-  base_map(st_bbox(hex_grid_joined), increase_zoom = 2, 
-           basemap = 'positron', nolabels = T) +
-  geom_sf(
-    data=hex_grid_joined,
-    mapping = aes(fill = change_quantile),
-    color = "black",
-    size = 0.05) +
-  scale_fill_manual(values = color_scale) +
-  # add titles
-  labs(x = NULL,
-       y = NULL,
-       fill = "Change in count",
-       title = "Change in the average cyclists' count over time",
-       subtitle = "between 2008-2010 and 2018-2020",
-       caption = "Basemap: carto \n Data source: Transport for London") +
-  guides(fill = guide_legend(reverse = TRUE)) +
-  # add the theme
-  theme_map()
-
-ggsave(plot = map, 
-       filename = "reports/figures/map_grid_cycle_count_change.png",
-       width = 7,
-       height = 7,
-       units = c("in"))
