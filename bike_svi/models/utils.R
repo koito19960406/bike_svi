@@ -21,10 +21,11 @@ run_psm <- function(data, dep_var_name, ind_var_name, covariates, model_dir, fig
     formula <- as.formula(paste(ind_var_name, " ~ ", covariates_pasted))
     match_result <- matchit(formula = formula, data = data, method = "nearest", distance = "glm")
     summary_match_result <- summary(match_result)
-    capture.output(summary_match_result, file= paste0(model_dir, "/", sub("_binary.*", "", ind_var_name), "/", ind_var_name, "_summary_balance.txt"))
+    capture.output(summary_match_result, file= paste0(model_dir, "/", ind_var_name, "/", ind_var_name, "_summary_balance.txt"))
     summary_match_model <- summary(match_result$model)
-    capture.output(summary_match_model, file= paste0(model_dir, "/", sub("_binary.*", "", ind_var_name),"/", ind_var_name, "_first_stage_model.txt"))
+    capture.output(summary_match_model, file= paste0(model_dir, "/", ind_var_name, "/", ind_var_name, "_first_stage_model.txt"))
     models$first_stage <- match_result$model
+    print(match_result)
     # plot
     # pdf(paste0(figure_dir, "/", ind_var_name,"_match_result.pdf"), height = 2, width = 6)
     # plot(match_result, type = "density", interactive = FALSE)
@@ -32,7 +33,7 @@ run_psm <- function(data, dep_var_name, ind_var_name, covariates, model_dir, fig
         scale_fill_manual(values = alpha(c("#7B52AE", "#74B652"), 0.5))+
         labs(title = paste0("Distributional Balance for ", strsplit(ind_var_name, "_binary")[[1]][1]))+
         theme_ipsum()
-    ggsave(paste0(figuer_dir, "/", ind_var_name,"_match_result.png"),height = 4, width = 10)
+    ggsave(paste0(figure_dir, "/", ind_var_name,"_match_result.png"),height = 4, width = 10)
     # print(plot)
     # dev.off()
     # model
@@ -42,9 +43,9 @@ run_psm <- function(data, dep_var_name, ind_var_name, covariates, model_dir, fig
     ps_df <- data.frame(pr_score = predict(ps, type = "response"),
                         count_point_id = data$count_point_id,
                         treatment=data[[ind_var_name]])
-    write.csv(ps_df, file = paste0(model_dir, "/", sub("_binary.*", "", ind_var_name),"/", ind_var_name, "_propensity_score.csv"))
+    write.csv(ps_df, file = paste0(model_dir, "/", ind_var_name,"/", ind_var_name, "_propensity_score.csv"))
     match_result_df_cor <- match_result_df %>% 
-        dplyr::select({unlist(strsplit(covariates_names," \\+ "))}) %>% 
+        dplyr::select(covariates) %>% 
         dplyr::select(-c(year))
     corrmatrix <- cor(match_result_df_cor,use="complete.obs")
     corrdf <- corrmatrix %>%
@@ -59,13 +60,71 @@ run_psm <- function(data, dep_var_name, ind_var_name, covariates, model_dir, fig
     zero_condition_covariates <- paste(covariates[str_detect(covariates,paste("od_","pop_den","poi",sep="|"))],
                                         collapse = " + ")
     formula <- as.formula(paste(dep_var_name, " ~ ", right_side, "|", zero_condition_covariates))
+    print(formula)
     model_year_zero_inflated <- zeroinfl(formula, dist = "negbin", link = "logit", data = match_result_df, weights=weights) # check if it needs to be inverse
     model_year_zero_inflated_summary <- summary(model_year_zero_inflated, cluster = c("subclass"))
-    capture.output(model_year_zero_inflated_summary, file= paste0(model_dir, "/", sub("_binary.*", "", ind_var_name),"/", ind_var_name, "_psm_year_fe_zinb.txt"))
+    capture.output(model_year_zero_inflated_summary, file= paste0(model_dir, "/", ind_var_name,"/", ind_var_name, "_psm_year_fe_zinb.txt"))
     models$second_stage <- model_year_zero_inflated
     # return model object for stargazer later
     return(models)
 }
+
+run_psm_nb <- function(data, dep_var_name, ind_var_name, covariates, model_dir, figure_dir){
+  require(MASS)  # Ensure the MASS package is loaded
+  
+  models <- list()
+  # check balance
+  covariates_pasted <- paste(covariates, collapse = " + ")
+  formula <- as.formula(paste(ind_var_name, " ~ ", covariates_pasted))
+  match_result <- matchit(formula = formula, data = data, method = "nearest", distance = "glm")
+  summary_match_result <- summary(match_result)
+  capture.output(summary_match_result, file= paste0(model_dir, "/", ind_var_name, "/", ind_var_name, "_summary_balance.txt"))
+  summary_match_model <- summary(match_result$model)
+  capture.output(summary_match_model, file= paste0(model_dir, "/", ind_var_name, "/", ind_var_name, "_first_stage_model.txt"))
+  models$first_stage <- match_result$model
+  print(match_result)
+  
+  # plot
+  # pdf(paste0(figure_dir, "/", ind_var_name,"_match_result.pdf"), height = 2, width = 6)
+  # plot(match_result, type = "density", interactive = FALSE)
+  plot <- bal.plot(match_result, var.name = "distance", which = "both",lwd=0.5) +
+    scale_fill_manual(values = alpha(c("#7B52AE", "#74B652"), 0.5))+
+    labs(title = paste0("Distributional Balance for ", strsplit(ind_var_name, "_binary")[[1]][1]))+
+    theme_ipsum()
+  ggsave(paste0(figure_dir, "/", ind_var_name,"_match_result.png"),height = 4, width = 10)
+  
+  # model
+  match_result_df <- match.data(match_result)
+  
+  # estimate ps and save data
+  ps <- glm(formula, family = binomial(), data = data)
+  ps_df <- data.frame(pr_score = predict(ps, type = "response"),
+                      count_point_id = data$count_point_id,
+                      treatment=data[[ind_var_name]])
+  write.csv(ps_df, file = paste0(model_dir, "/", ind_var_name,"/", ind_var_name, "_propensity_score.csv"))
+  
+  match_result_df_cor <- match_result_df %>% 
+    dplyr::select(covariates) %>% 
+    dplyr::select(-c(year))
+  corrmatrix <- cor(match_result_df_cor,use="complete.obs")
+  corrdf <- corrmatrix %>%
+    as.data.frame() %>%
+    tibble::rownames_to_column("Var1") %>%
+    gather("Var2", "value", -Var1) 
+  
+  print(corrdf %>% 
+          filter((value>=0.6|value<=-0.6)&(Var1!=Var2)))
+  right_side <- paste0(ind_var_name," + ", covariates_pasted)
+  formula <- as.formula(paste(dep_var_name, " ~ ", right_side))
+  print(formula)
+  model_year_negative_binomial <- glm.nb(formula, data = match_result_df)  # No need for weights argument here unless you want to include it
+  model_year_negative_binomial_summary <- summary(model_year_negative_binomial)  # cluster argument removed as it's not applicable to glm.nb
+  capture.output(model_year_negative_binomial_summary, file= paste0(model_dir, "/", ind_var_name,"/", ind_var_name, "_psm_year_fe_nb.txt"))
+  models$second_stage <- model_year_negative_binomial
+  # return model object for stargazer later
+  return(models)
+}
+
 
 #ipw
 run_ipw <- function(data, dep_var_name, ind_var_name, covariates, model_dir, figure_dir){
@@ -75,7 +134,7 @@ run_ipw <- function(data, dep_var_name, ind_var_name, covariates, model_dir, fig
     weight_result <- weightit(formula = formula, data = data,  estimand = "ATT", method = "ps")
     weight_result <- trim(weight_result, at = 0.95)
     summary_weight_result <- bal.tab(weight_result, stats = c("c", "m"), un = TRUE, thresholds = c(cor = .1))
-    capture.output(summary_weight_result, file= paste0(model_dir, "/", gsub("_binary.*", "", ind_var_name),"/", ind_var_name, "_ipw_summary_balance.txt"))
+    capture.output(summary_weight_result, file= paste0(model_dir, "/", gind_var_name,"/", ind_var_name, "_ipw_summary_balance.txt"))
 
     # plot
     love_plot <- love.plot(weight_result, stats = c("c"),
@@ -93,7 +152,7 @@ run_ipw <- function(data, dep_var_name, ind_var_name, covariates, model_dir, fig
     formula <- as.formula(paste(dep_var_name, " ~ ", right_side, "|", zero_condition_covariates))
     model_year_zero_inflated <- zeroinfl(formula, dist = "negbin", link = "logit", data = data, weights=weight_result$weights) 
     model_year_zero_inflated_summary <- summary(model_year_zero_inflated, cluster = c("subclass"))
-    capture.output(model_year_zero_inflated_summary, file= paste0(model_dir, "/", gsub("_binary.*", "", ind_var_name),"/", ind_var_name, "_ipw_year_fe_zinb.txt"))
+    capture.output(model_year_zero_inflated_summary, file= paste0(model_dir, "/", gind_var_name,"/", ind_var_name, "_ipw_year_fe_zinb.txt"))
 
     # return model object for stargazer later
     return(model_year_zero_inflated)
@@ -101,7 +160,7 @@ run_ipw <- function(data, dep_var_name, ind_var_name, covariates, model_dir, fig
 
 
     # causal forest
-    run_causal_forest <- function(data,dep_var_name, ind_var_name, covariates_names, treatment){
+run_causal_forest <- function(data,dep_var_name, ind_var_name, covariates_names, treatment){
     print(ind_var_name)
     X <- data %>% 
         dplyr::select(covariates_names) %>% 
@@ -129,32 +188,32 @@ run_ipw <- function(data, dep_var_name, ind_var_name, covariates, model_dir, fig
     df <- data.frame(var_name=covariates_names, variable_importance=forest.Y.varimp)
     # save the result
     df %>%
-        write.csv(paste0(model_dir, "/", sub("_binary.*", "", ind_var_name),"/", treatment, "_", "causal_forest_var_imp.csv"), row.names = F)
+        write.csv(paste0(model_dir, "/", ind_var_name,"/", treatment, "_", "causal_forest_var_imp.csv"), row.names = F)
 
     # conditional average treatment effect
     cate <- average_treatment_effect(tau.forest, target.sample = "treated")
     t_score <- cate["estimate"] / cate["std.err"]
     cate["p_value"] <- 2*pt(q=abs(t_score), df=length(Y)-1, lower.tail=FALSE)
-    capture.output(cate, file= paste0(model_dir, "/", sub("_binary.*", "", ind_var_name),"/", treatment, "_", "causal_forest_cate.txt"))
+    capture.output(cate, file= paste0(model_dir, "/", ind_var_name,"/", treatment, "_", "causal_forest_cate.txt"))
 
     # Extract the first tree from the fitted forest.
     tau.forest.2 <- causal_forest(X, Y, W, seed=1234, min.node.size=100)
     tree <- get_tree(tau.forest.2, 1)
     # Print the first tree.
     print(tree)
-    capture.output(tree, file= paste0(model_dir, "/", sub("_binary.*", "", ind_var_name),"/", treatment, "_", "causal_tree.txt"))
+    capture.output(tree, file= paste0(model_dir, "/", ind_var_name,"/", treatment, "_", "causal_tree.txt"))
     # Plot the first tree.
     tree_plot <- plot(tree)
     tree_plot <- DiagrammeRsvg::export_svg(tree_plot)
     tree_plot <- charToRaw(tree_plot) # flatten
-    rsvg::rsvg_pdf(tree_plot, paste0(figure_dir, "/",  treatment, "_", sub("_binary.*", "", ind_var_name),"_causal_tree.pdf")) # saved graph as png
+    rsvg::rsvg_pdf(tree_plot, paste0(figure_dir, "/",  treatment, "_", ind_var_name,"_causal_tree.pdf")) # saved graph as png
 
     # plot HTE by ranking
     cf_preds <- predict(tau.forest, estimate.variance = TRUE)
 
     # save as csv
-    cf_preds %>% as.tibble(cf_preds) %>% 
-        write.csv(paste0(model_dir, "/", sub("_binary.*", "", ind_var_name),"/", treatment, "_predictions.csv"), row.names = F)
+    cf_preds %>% new_tibble(cf_preds) %>% 
+        write.csv(paste0(model_dir, "/", ind_var_name,"/", treatment, "_predictions.csv"), row.names = F)
 }
 
 # compute rate
@@ -178,15 +237,15 @@ compute_rate <- function(data,dep_var_name, ind_var_name, covariates_names, trea
     eval.forest <- causal_forest(X[-train, ], Y[-train], W[-train])
     rate <- rank_average_treatment_effect(eval.forest,
                                             predict(train.forest, X[-train, ])$predictions)
-    pdf(paste0(figure_dir, "/", treatment, "_", sub("_binary.*", "", ind_var_name),"_rate.pdf"), height = 7, width = 7)
+    pdf(paste0(figure_dir, "/", treatment, "_", ind_var_name,"_rate.pdf"), height = 7, width = 7)
     plot(rate)
     dev.off()
     autoc <- paste("AUTOC:", round(rate$estimate, 2), "+/", round(1.96 * rate$std.err, 2))
-    capture.output(autoc, file= paste0(model_dir, "/", sub("_binary.*", "", ind_var_name),"/",treatment, "_", "autoc.txt"))
+    capture.output(autoc, file= paste0(model_dir, "/", ind_var_name,"/",treatment, "_", "autoc.txt"))
     }
 
     # compute cate ranking
-    compute_cate_ranking<-function(data,dep_var_name, ind_var_name, covariates_names){
+compute_cate_ranking<-function(data,dep_var_name, ind_var_name, covariates_names){
     # initialize list
     df_list <- list()
     # Valid randomized data and observational data with unconfoundedness+overlap.
@@ -342,9 +401,9 @@ compute_overall_var_imp <- function(data, treatment, model_dir){
 
     regression_forest <- regression_forest(X,Y)
     varimp <- variable_importance(regression_forest)
-    var_name <- all_var_scaled %>%
-        dplyr::select(-contains("pedal_cycles")) %>% 
-        names()
+    var_name <- data %>%
+      dplyr::select(-contains(c("count","binary"))) %>% 
+      names()
     df <- data.frame(var_name=var_name, variable_importance=varimp)
     df %>% 
         write.csv(paste0(model_dir, "/",  treatment, "_", "causal_forest_var_imp.csv"), row.names = F)
@@ -371,11 +430,11 @@ run_random_forest <- function(data, dep_var_name, ind_var_name, covariates_names
         autoplot(rug = TRUE, train = data) + 
         geom_line(color = "#7B52AE") +
         # geom_point(color = "red", size = 2) +
-        labs(x = ind_var_name, y = "Predicted cyclists' counts") +
+        labs(x = ind_var_name, y = "Predicted counts") +
         theme_ipsum()
     # save 
-    ggsave(paste0(figure_dir, "/",  str_remove(ind_var_name,"_binary_70_percentile"),"_pdp.png"), width = 10, height = 10)
-    partial_df %>% write.csv(paste0(model_dir, "/",  str_remove(ind_var_name,"_binary_70_percentile"), "/pdp.csv"))
+    ggsave(paste0(figure_dir, "/",  ind_var_name,"_pdp.png"), width = 10, height = 10)
+    partial_df %>% write.csv(paste0(model_dir, "/",  ind_var_name, "/pdp.csv"))
 }
 
 run_fe_poisson <- function(data, dep_var_name, ind_var_name, model_dir){
@@ -430,8 +489,9 @@ run_zero_inflated <- function(data, dep_var_name, ind_var_name, control_var_vec,
     capture.output(model_year_zero_inflated_summary, file= paste0(model_dir, "/", ind_var_name,"/", "year_zero_inflated_",count_model,"_base.txt"))
     # add other covariates one by one
     data_covar <- data %>%
-        dplyr::select(-c(ind_var_name,dep_var_name, control_var_vec)) %>%
-        dplyr::select(1:ncol(.))
+      dplyr::select(-c(ind_var_name,dep_var_name, control_var_vec)) %>%
+      dplyr::select(1:ncol(.)) %>%
+      dplyr::select(-contains("binary"), -contains("count_point_id"))
     cov_names <- names(data_covar)
     names_agg <- c(ind_var_name, control_var_vec)
     pb <- progress_bar$new(total = length(cov_names))
@@ -465,4 +525,65 @@ run_zero_inflated <- function(data, dep_var_name, ind_var_name, control_var_vec,
     df %>% 
         as.matrix() %>% 
         write.csv(paste0(model_dir, "/", ind_var_name,"/", "year_zero_inflated_",count_model,"_result.csv"), row.names = F)
+}
+
+run_negative_binomial <- function(data, dep_var_name, ind_var_name, control_var_vec, model_dir){
+  # Ensure the MASS package is loaded
+  require(MASS)
+  
+  # list to store result
+  name_list <- list()
+  estimate_list <- list()
+  p_val_list <- list()
+  # create dir
+  if (!dir.exists(paste0(model_dir, "/", ind_var_name))){
+    dir.create(paste0(model_dir, "/", ind_var_name))
+  } else {
+    print("Dir already exists!")
+  }
+  # run base model
+  right_side <- paste(c(ind_var_name,control_var_vec), collapse = " + ")
+  formula <- as.formula(paste(dep_var_name, " ~ ", right_side))
+  print(formula)
+  model_year_negative_binomial <- glm.nb(formula, data = data)
+  model_year_negative_binomial_summary <- summary(model_year_negative_binomial)
+  capture.output(model_year_negative_binomial_summary, file= paste0(model_dir, "/", ind_var_name,"/", "year_negative_binomial_base.txt"))
+  # add other covariates one by one
+  data_covar <- data %>%
+    dplyr::select(-c(ind_var_name,dep_var_name, control_var_vec)) %>%
+    dplyr::select(1:ncol(.)) %>%
+    dplyr::select(-contains("binary"), -contains("count_point_id"))
+  cov_names <- names(data_covar)
+  names_agg <- c(ind_var_name, control_var_vec)
+  pb <- progress_bar$new(total = length(cov_names))
+  counter <- 1
+  for (cov_name in cov_names){
+    print(cov_name)
+    pb$tick()
+    right_side <- paste(c(names_agg,cov_name), collapse = " + ")
+    formula <- as.formula(paste(dep_var_name, " ~ ", right_side))
+    print(formula)
+    model_year_negative_binomial <- glm.nb(formula, data = data)
+    model_year_negative_binomial_summary <- summary(model_year_negative_binomial)
+    print(model_year_negative_binomial_summary)
+    # append the model result
+    # add covariate's name, point estimate, and p-value
+    point_est <- model_year_negative_binomial_summary$coefficients[2,1]
+    p_val <- model_year_negative_binomial_summary$coefficients[2,4]
+    name_list <- append(name_list, cov_name)
+    estimate_list <- append(estimate_list, point_est)
+    p_val_list <- append(p_val_list, p_val)
+    # save to txt file
+    capture.output(model_year_negative_binomial_summary, file= paste0(model_dir, "/", ind_var_name,"/", "year_negative_binomial", as.character(counter),".txt"))
+    counter <- counter + 1
+  }
+  # convert model_result_list to df and save as csv
+  model_result_list <- list(variable = name_list,
+                            point_estimate = estimate_list,
+                            p_value = p_val_list)
+  df <- as.data.frame(do.call(cbind, model_result_list))
+  print(df)
+  df %>% 
+    as.matrix() %>% 
+    write.csv(paste0(model_dir, "/", ind_var_name,"/", "year_negative_binomial_result.csv"), row.names = F)
 }

@@ -22,34 +22,48 @@ def main(gsv_api_key, log_path, dir_input, dir_temp, dir_output, city_name):
     logger = logging.getLogger(__name__)
     logger.info('making final data set from raw data')
     
-    # initialize data cleaner
-    if city_name == "Montreal":
-        data_cleaner = MontrealDataCleaner(dir_input, dir_output)
-    elif city_name == "London":
-        data_cleaner = LondonDataCleaner(dir_input, dir_output)
+    # # initialize data cleaner
+    # if city_name == "Montreal":
+    #     data_cleaner = MontrealDataCleaner(dir_input, dir_output)
+    # elif city_name == "London":
+    #     data_cleaner = LondonDataCleaner(dir_input, dir_output)
         
-    # clean data
-    data_cleaner.clean_all()
+    # # clean data
+    # data_cleaner.clean_all()
     
-    if not Path(dir_temp / "pixel_ratios.csv").exists() or not Path(dir_temp / "label_counts.csv").exists():
-        # initialize StreetViewDownloader
-        downloader = GSVDownloader(gsv_api_key=gsv_api_key, log_path=log_path, 
-                                        distance=10, grid_size=10)
-        
-        # download gsv
-        downloader.download_svi(dir_temp, input_csv_file = str(dir_input / "count_station_clean.csv"),
-                                id_columns = ["count_point_id"],
-                                buffer = 100,
-                                augment_metadata=True)
+    # if not Path(dir_temp / "pixel_ratios.csv").exists() or not Path(dir_temp / "label_counts.csv").exists():
+    # initialize StreetViewDownloader
+    downloader = GSVDownloader(gsv_api_key=gsv_api_key, log_path=log_path, 
+                                    distance=10, grid_size=10)
     
-        # segment gsv
+    # download gsv
+    downloader.download_svi(dir_temp, input_csv_file = str(dir_input / "count_station_clean.csv"),
+                            id_columns = ["count_point_id"],
+                            buffer = 100,
+                            augment_metadata=True,
+                            batch_size=1000)
+
+    # segment gsv
+    # loop through dir_temp / "gsv_panorama"
+    pixel_ratios = []
+    label_counts = []
+    for folder in Path(dir_temp / "gsv_panorama").iterdir():
+        dir_seg_output = dir_temp / "segmentation" / folder.name
+        dir_seg_output.mkdir(parents=True, exist_ok=True)
         segmenter = Segmenter(dataset="mapillary", task = "panoptic")
-        segmenter.segment(dir_temp / "gsv_panorama", 
-                        dir_segmentation_summary_output = dir_temp,
+        segmenter.segment(folder, 
+                        dir_segmentation_summary_output = str(dir_seg_output),
                         pixel_ratio_save_format=["csv"],
                         csv_format="wide",
                         max_workers=4)
-    
+        # merge pixel_ratios.csv and label_counts.csv by looping through dir_temp / folder.name
+        pixel_ratios.append(pd.read_csv(dir_seg_output / "pixel_ratios.csv"))
+        label_counts.append(pd.read_csv(dir_seg_output / "label_counts.csv"))
+    pixel_ratios = pd.concat(pixel_ratios) 
+    label_counts = pd.concat(label_counts)
+    pixel_ratios.to_csv(dir_temp / "pixel_ratios.csv", index=False) 
+    label_counts.to_csv(dir_temp / "label_counts.csv", index=False)
+        
     # left join pids.csv with pixel_ratios.csv
     count_station = pd.read_csv(dir_input / "count_station_clean.csv")
     # convert count_station to geopandas geodataframe from longitude and latitude
@@ -58,36 +72,50 @@ def main(gsv_api_key, log_path, dir_input, dir_temp, dir_output, city_name):
     count_station["geometry"] = ox.projection.project_gdf(count_station).buffer(100).to_crs(epsg=4326)
     # read in pixel_ratios.csv
     pids = pd.read_csv(dir_temp / "gsv_pids.csv")[["panoid", "year", "lat", "lon"]]
-    pixel_ratios = pd.read_csv(dir_temp / "pixel_ratios.csv")
+    pixel_ratios = pd.read_csv(dir_temp / "pixel_ratios.csv").fillna(0)
     # calculate visual complexity (i.e. entropy): ∑𝑖=1𝑘𝑃𝑖×ln(𝑃𝑖)ln(𝑘)
     pixel_ratios["visual_complexity"] = -1 * pixel_ratios.iloc[:, 1:].apply(lambda row: np.sum([val * np.log(val) if val > 0 else 0 for val in row]), axis=1) / np.log(len(pixel_ratios.columns[1:]))
     pids_pixel_ratios = pd.merge(pids, pixel_ratios, left_on="panoid", right_on="filename_key", how="left").drop(columns=["panoid", "filename_key"])
     # convert pids_pixel_ratios to geopandas geodataframe from longitude and latitude
     pids_pixel_ratios = gpd.GeoDataFrame(pids_pixel_ratios, geometry=gpd.points_from_xy(pids_pixel_ratios.lon, pids_pixel_ratios.lat), crs = "EPSG:4326")
-    # spatial join pids_pixel_ratios with count_station
-    pids_pixel_ratios = gpd.sjoin(pids_pixel_ratios, count_station, how="left", op="within")
-    # aggregate all the columns except for count_point_id and year
-    pids_pixel_ratios = pids_pixel_ratios.groupby(["count_point_id", "year"]).agg("mean").reset_index()
+    # spatial join pids_pixel_ratios with count_station by year
+    pids_pixel_ratios_all_year = []
+    for years in pids_pixel_ratios.year.unique():
+        pids_pixel_ratios_year = pids_pixel_ratios[pids_pixel_ratios.year == years]
+        pids_pixel_ratios_year = gpd.sjoin(count_station, pids_pixel_ratios_year, how="left", op="intersects")
+        # aggregate all the columns except for count_point_id and year
+        pids_pixel_ratios_year = pids_pixel_ratios_year.groupby(["count_point_id", "year"]).agg("mean").reset_index()
+        # drop latitude, longitude, lat, lon, and index_right
+        pids_pixel_ratios_year.drop(columns=["latitude", "longitude", "lat", "lon", "index_right"], inplace=True)
+        pids_pixel_ratios_all_year.append(pids_pixel_ratios_year)
+    pids_pixel_ratios_all_year = pd.concat(pids_pixel_ratios_all_year)
     # add prefix to column names
-    pids_pixel_ratios.columns = ["count_point_id", "year"] + ["ss_" + col.lower().\
-        replace(" - ", "_").replace(" ", "_").replace("(", "").replace(")", "") for col in pids_pixel_ratios.columns[2:]]
+    pids_pixel_ratios_all_year.columns = ["count_point_id", "year"] + ["ss_" + col.lower().\
+        replace(" - ", "_").replace(" ", "_").replace("(", "").replace(")", "") for col in pids_pixel_ratios_all_year.columns[2:]]
     
     # left join pids.csv with label_counts.csv
-    label_counts = pd.read_csv(dir_temp / "label_counts.csv")
+    label_counts = pd.read_csv(dir_temp / "label_counts.csv").fillna(0)
     pids_label_counts = pd.merge(pids, label_counts, left_on="panoid", right_on="filename_key", how="left").drop(columns=["panoid", "filename_key"])
     # convert pids_pixel_ratios to geopandas geodataframe from longitude and latitude
     pids_label_counts = gpd.GeoDataFrame(pids_label_counts, geometry=gpd.points_from_xy(pids_label_counts.lon, pids_label_counts.lat), crs = "EPSG:4326")
-    # spatial join pids_pixel_ratios with count_station
-    pids_label_counts = gpd.sjoin(pids_label_counts, count_station, how="left", op="within")
-    # aggregate all the columns except for count_point_id and year
-    pids_label_counts = pids_label_counts.groupby(["count_point_id", "year"]).agg("mean").reset_index()
+    # spatial join pids_label_counts with count_station by year
+    pids_label_counts_all_year = []
+    for years in pids_label_counts.year.unique():
+        pids_label_counts_year = pids_label_counts[pids_label_counts.year == years]
+        pids_label_counts_year = gpd.sjoin(count_station, pids_label_counts_year, how="left", op="intersects")
+        # aggregate all the columns except for count_point_id and year
+        pids_label_counts_year = pids_label_counts_year.groupby(["count_point_id", "year"]).agg("mean").reset_index()
+        # drop latitude, longitude, lat, lon, and index_right
+        pids_label_counts_year.drop(columns=["latitude", "longitude", "lat", "lon", "index_right"], inplace=True)
+        pids_label_counts_all_year.append(pids_label_counts_year)
+    pids_label_counts_all_year = pd.concat(pids_label_counts_all_year)
     # add prefix to column names
-    pids_label_counts.columns = ["count_point_id", "year"] + ["od_" + col.lower().\
-        replace(" - ", "_").replace(" ", "_").replace("(", "").replace(")", "") for col in pids_label_counts.columns[2:]]
+    pids_label_counts_all_year.columns = ["count_point_id", "year"] + ["od_" + col.lower().\
+        replace(" - ", "_").replace(" ", "_").replace("(", "").replace(")", "") for col in pids_label_counts_all_year.columns[2:]]
     
     # save pids_pixel_ratios and pids_label_counts
-    pids_pixel_ratios.to_csv(dir_output / "count_pixel_ratios.csv", index=False)
-    pids_label_counts.to_csv(dir_output / "count_label_counts.csv", index=False)
+    pids_pixel_ratios_all_year.to_csv(dir_output / "count_pixel_ratios.csv", index=False)
+    pids_label_counts_all_year.to_csv(dir_output / "count_label_counts.csv", index=False)
     
 if __name__ == '__main__':
     # find .env automagically by walking up directories until it's found, then

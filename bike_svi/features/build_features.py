@@ -32,14 +32,18 @@ def main(dir_input, dir_output):
             df_combined = pd.merge(df_combined, df, on=['count_point_id', 'year'], how='left')
 
     # feature engineering
-    # Move 'count' column to the first position
-    df_combined = df_combined[ ['count'] + [ col for col in df_combined.columns if col != 'count' ] ]
+    # # log count column
+    # df_combined['count_log'] = np.log(df_combined['count'] + 1)
+    
+
+    # make slope binary with a threshold of 70 percentile
+    df_combined["slope_binary"] = np.where(df_combined['slope'] > df_combined['slope'].quantile(0.7), 1, 0)
 
     # Apply ifelse conditions
     # multiply all the columns whose names start with "ss_" by 100
     df_combined.loc[:, df_combined.columns.str.startswith('ss_')] *= 100
     df_combined['ss_visual_complexity'] = np.where(df_combined['ss_visual_complexity'] > 100, 100, df_combined['ss_visual_complexity'])
-    df_combined['ss_sidewalk_binary'] = np.where(df_combined['ss_sidewalk'] > 0, 1, 0)
+    df_combined['ss_sidewalk_binary'] = np.where(df_combined['ss_sidewalk'] > df_combined['ss_sidewalk'].quantile(0.7), 1, 0)
     df_combined['ss_pedestrian_area_binary'] = np.where(df_combined['ss_pedestrian_area'] > 0, 1, 0)
     df_combined['ss_bike_lane_binary'] = np.where(df_combined['ss_bike_lane'] > 0, 1, 0)
     df_combined['ss_bike_rack_binary'] = np.where(df_combined['ss_bike_rack'] > 0, 1, 0)
@@ -98,6 +102,9 @@ def main(dir_input, dir_output):
 
     # Replace infinite values with 0
     df_combined = df_combined.replace([np.inf, -np.inf], 0)
+
+    # Move 'count' column to the first position
+    df_combined = df_combined[['count', 'count_log'] + [ col for col in df_combined.columns if col != 'count' ]]
     
     # Save df_combined to CSV 
     df_combined.to_csv(dir_output / "all_var_joined.csv", index=False)
@@ -109,7 +116,10 @@ if __name__ == '__main__':
     
     # set up root_dir
     root_dir = Path(os.getenv("ROOT_DIR"))
-    log_path = root_dir / "logs"
+    if not root_dir.exists():
+        # get root_dir from current working directory
+        root_dir = Path(os.getcwd())
+    log_path = root_dir / "logs/logs.txt"
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(filename=log_path, level=logging.INFO, format=log_fmt)
 

@@ -4,6 +4,9 @@ source("./bike_svi/models/utils.R")
 # load data ---------------------------------------------------------------
 load_dot_env()
 root_dir <- Sys.getenv("ROOT_DIR")
+if (!file.exists(root_dir)){
+  root_dir <- here()
+}
 
 # load external/city_list.txt to get the list of cities
 city_list <- read.csv(paste0(root_dir,"/data/external/city_list.txt"), header = FALSE, sep = "\t") %>% 
@@ -65,10 +68,10 @@ for (city in city_list){
   model_year_fe_ols_summary <- summary(model_year_fe_ols)
   capture.output(model_year_fe_ols_summary, file= paste0(model_dir, "/year_fe_ols.txt"))
   
-  # year fixed effect poisson model
-  print("Running year fixed effect poisson model")
-  model_year_fe_poisson <- pglm(count ~ ., model = "within", effect = "time", family = poisson(), data = all_var_pdf)
-  model_year_fe_poisson_summary <- summary(model_year_fe_poisson)
-  capture.output(model_year_fe_poisson_summary, file= paste0(model_dir, "/year_fe_poisson.txt"))
+  # # year fixed effect poisson model
+  # print("Running year fixed effect poisson model")
+  # model_year_fe_poisson <- pglm(count ~ ., model = "within", effect = "time", family = poisson(), data = all_var_pdf)
+  # model_year_fe_poisson_summary <- summary(model_year_fe_poisson)
+  # capture.output(model_year_fe_poisson_summary, file= paste0(model_dir, "/year_fe_poisson.txt"))
 }
 

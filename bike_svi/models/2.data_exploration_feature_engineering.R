@@ -1,11 +1,15 @@
 pacman::p_load(tidyverse, Hmisc, GGally, corrplot, RColorBrewer, ggplot2, 
                hrbrthemes,stargazer,plotly, sf, basemaps, magrittr,cowplot,dotenv,
-               basemapR)
+               basemapR, ggnewscale, here)
 extrafont::loadfonts()
 
 # data exploration --------------------------------------------------------
 load_dot_env()
 root_dir <- Sys.getenv("ROOT_DIR")
+if (!file.exists(root_dir)){
+  root_dir <- here()
+}
+
 
 # load external/city_list.txt to get the list of cities
 city_list <- read.csv(paste0(root_dir,"/data/external/city_list.txt"), header = FALSE, sep = "\t") %>% 
@@ -52,16 +56,18 @@ theme_map <- function(...,
                                 color = default_font_color),
       plot.subtitle = element_text(size = 10, hjust = 0.5,
                                    color = default_font_color,
-                                   margin = margin(b = -0.1,
+                                   margin = ggplot2::margin(b = -0.1,
                                                    t = -0.1,
                                                    l = 2,
+                                                   r = 0,
                                                    unit = "cm"),
                                    debug = F),
       # captions
       plot.caption = element_text(size = 7,
                                   hjust = .5,
-                                  margin = margin(t = 0.2,
+                                  margin = ggplot2::margin(t = 0.2,
                                                   b = 0,
+                                                  r = 0,
                                                   unit = "cm"),
                                   color = "#939184"),
       ...
@@ -225,7 +231,12 @@ for (city in city_list){
   # od_vehicle_count: od_vehicle, od_bus, od_car, od_caravan, od_motorcycle, od_truck, od_other_vehicle, od_trailer, od_train, od_wheeled_slow, od_ego_vehicle
   # od_animal_count: od_bird, od_ground_animal
   all_var_with_id <- read.csv(paste0(processed_dir, "/all_var_joined.csv")) %>%
-    select(-contains("binary")) 
+    dplyr::select(-contains("binary"), -contains("count_log")) %>% 
+    dplyr::select(-c(age_60_90,lu_others,
+                     ss_bike_rack, ss_curb, ss_curb_cut,
+                     ss_pothole,
+                     ss_pedestrian_area, ss_bench
+    ))
     # relocate(count) %>% 
     # mutate(ss_visual_complexity = ifelse(ss_visual_complexity>1,1,ss_visual_complexity),
     #       ss_sidewalk = ifelse(ss_sidewalk>0.05,1,0),
@@ -291,8 +302,8 @@ for (city in city_list){
   # corrdf <- corrmatrix %>%
   #   as.data.frame() %>%
   #   tibble::rownames_to_column("Var1") %>%
-  #   gather("Var2", "value", -Var1) 
-    
+  #   gather("Var2", "value", -Var1)
+  # 
   # corrdf %>% filter(value>=0.6|value<=-0.6)
   # # data normalizatioon -----------------------------------------------------
   # max_over_x <- function(value){
@@ -308,48 +319,48 @@ for (city in city_list){
   #     return(FALSE)
   #   }
   # }
-  # all_var_scaled <- all_var_with_id %>% 
-  #   mutate(year = as.character(year)) %>% 
-  #   # rename_at(vars(contains('count')), ~paste0(., "_log")) %>% 
-  #   rename_if(max_over_x, list(~paste0(., "_log"))) %>% 
-  #   mutate_at(vars(contains("_log")), function(x) log(x+1)) %>% 
-  #   mutate(across(.cols = everything(), ~ ifelse(is.infinite(.x), 0, .x))) %>% 
+  # all_var_scaled <- all_var_with_id %>%
+  #   mutate(year = as.character(year)) %>%
+  #   # rename_at(vars(contains('count')), ~paste0(., "_log")) %>%
+  #   rename_if(max_over_x, list(~paste0(., "_log"))) %>%
+  #   mutate_at(vars(contains("_log")), function(x) log(x+1)) %>%
+  #   mutate(across(.cols = everything(), ~ ifelse(is.infinite(.x), 0, .x))) %>%
   #   mutate(count = all_var$count)
-
+  # 
   # # save
-  # all_var_scaled %>% 
+  # all_var_scaled %>%
   #   write.csv(paste0(processed_dir, "/all_var_joined_scaled.csv"), row.names = F)
 
-  # pairwise correlation for count and segmentation result
-  if (city=="London"){
-    ss_var_list <- c("ss_vegetation", "ss_bike_lane", "ss_bike_rack", "ss_curb", "ss_curb_cut", "ss_parking", "ss_pothole", "ss_street_light")
-  } else if (city=="Montreal"){
-    ss_var_list <- c("ss_vegetation", "ss_guard_rail", "ss_pedestrian_area", "ss_sidewalk", "ss_street_light", "ss_bench")
-  }
-  count_seg <- all_var %>% 
-    dplyr::select(c("count", "slope", ss_var_list))
-  # count_seg_scaled <- all_var_scaled %>% 
-  #   dplyr::select(c("count_log", "slope_log", ss_var_list))
-  pair_corr <- function(data,title,file_path){
-    # pdf(file_path, height = 7, width = 7)
-    scatter_plot <- function(data, mapping, ...) {
-      p <- ggplot(data = data, mapping=mapping) +
-        stat_bin_2d(bins=50) +
-        scale_fill_gradient(low = "#312146",
-                            high = "#cabadf")
-      return(p)
-    }
-    g <- ggpairs(data, lower=list(continuous=scatter_plot), title=title)+
-      theme_ipsum()+
-      theme(axis.text.x = element_text(size = 2),
-            axis.text.y = element_text(size = 2))
-    ggsave(plot=g,file_path,
-           width = 7,
-           height = 7,
-           units = c("in"))
-    # dev.off()
-  }
-  pair_corr(count_seg, "Pair-wise correlation matrix", paste0(figure_dir, "/pair_wise_correlation.png"))
+  # # pairwise correlation for count and segmentation result
+  # if (city=="London"){
+  #   ss_var_list <- c("ss_vegetation", "ss_bike_lane", "ss_bike_rack", "ss_curb", "ss_curb_cut", "ss_parking", "ss_pothole", "ss_street_light")
+  # } else if (city=="Montreal"){
+  #   ss_var_list <- c("ss_vegetation", "ss_guard_rail", "ss_pedestrian_area", "ss_sidewalk", "ss_street_light", "ss_bench")
+  # }
+  # count_seg <- all_var %>% 
+  #   dplyr::select(c("count", "slope", ss_var_list))
+  # # count_seg_scaled <- all_var_scaled %>% 
+  # #   dplyr::select(c("count_log", "slope_log", ss_var_list))
+  # pair_corr <- function(data,title,file_path){
+  #   # pdf(file_path, height = 7, width = 7)
+  #   scatter_plot <- function(data, mapping, ...) {
+  #     p <- ggplot(data = data, mapping=mapping) +
+  #       stat_bin_2d(bins=50) +
+  #       scale_fill_gradient(low = "#312146",
+  #                           high = "#cabadf")
+  #     return(p)
+  #   }
+  #   g <- ggpairs(data, lower=list(continuous=scatter_plot), title=title)+
+  #     theme_ipsum()+
+  #     theme(axis.text.x = element_text(size = 1),
+  #           axis.text.y = element_text(size = 1))
+  #   ggsave(plot=g,file_path,
+  #          width = 7,
+  #          height = 7,
+  #          units = c("in"))
+  #   # dev.off()
+  # }
+  # pair_corr(count_seg, "Pair-wise correlation matrix", paste0(figure_dir, "/pair_wise_correlation.png"))
   # pair_corr(count_seg_scaled, "Pair-wise correlation matrix", paste0(figure_dir, "/pair_wise_correlation_scaled.png"))
   # # convert treatment into binary
   # convert_to_binary <- function(array, percentile){
@@ -414,31 +425,31 @@ for (city in city_list){
                 subtitle="between 2008-2020 (1km grid)",
                 caption="")
 
-  hex_grid <- count_station %>% 
-    st_transform(3857) %>% 
-    st_make_grid(cellsize=1000,square=F) %>% 
-    st_as_sf() %>% 
-    st_transform(4326) %>% 
-    mutate(grid_id = row_number()) 
+  hex_grid <- count_station %>%
+    st_transform(3857) %>%
+    st_make_grid(cellsize=1000,square=F) %>%
+    st_as_sf() %>%
+    st_transform(4326) %>%
+    mutate(grid_id = row_number())
 
-  hex_grid_summarized <- hex_grid %>% 
-    st_join(.,all_var_map) %>% 
-    st_drop_geometry() %>% 
-    mutate(year_group = cut(year, breaks = c(2007, 2010, 2017, 2023), 
-                            labels = c("2008-2010", "2011-2017", "2018-2020"))) %>% 
-    relocate(year_group, .after = year) %>% 
-    group_by(grid_id, year_group) %>% 
-    dplyr::summarize(across(everything(), .f = list(mean), na.rm = TRUE)) %>% 
-    rename_with(.fn=function(x){str_remove(x,"_1$")}) %>% 
-    filter(year_group %in%  c("2008-2010", "2018-2020")) %>% 
-    dplyr::select(grid_id, year_group, count) %>% 
-    pivot_wider(names_from = year_group, values_from = count) %>% 
+  hex_grid_summarized <- hex_grid %>%
+    st_join(.,all_var_map) %>%
+    st_drop_geometry() %>%
+    mutate(year_group = cut(year, breaks = c(2007, 2010, 2017, 2023),
+                            labels = c("2008-2010", "2011-2017", "2018-2020"))) %>%
+    relocate(year_group, .after = year) %>%
+    group_by(grid_id, year_group) %>%
+    dplyr::summarize(across(everything(), .f = list(mean), na.rm = TRUE)) %>%
+    rename_with(.fn=function(x){str_remove(x,"_1$")}) %>%
+    filter(year_group %in%  c("2008-2010", "2018-2020")) %>%
+    dplyr::select(grid_id, year_group, count) %>%
+    pivot_wider(names_from = year_group, values_from = count) %>%
     mutate(change = `2018-2020` - `2008-2010`)
-  
-  hex_grid_joined <- hex_grid %>% 
-    left_join(.,hex_grid_summarized,by="grid_id") %>% 
-    drop_na(change) %>% 
-    rename(geometry=x) %>% 
+
+  hex_grid_joined <- hex_grid %>%
+    left_join(.,hex_grid_summarized,by="grid_id") %>%
+    drop_na(change) %>%
+    rename(geometry=x) %>%
     st_transform(3857)
 
   # set up color and breaks
@@ -453,17 +464,17 @@ for (city in city_list){
                               " — ",
                               round(quantiles[idx + 1], 2)))
   }
-  # I need to remove the last label 
+  # I need to remove the last label
   # because that would be something like "66.62 - NA"
   labels <- labels[1:length(labels)-1]
 
   # Create the color scale
   color_scale <- setNames(my_palette(length(quantiles)-1), labels)
 
-  # here I actually create a new 
+  # here I actually create a new
   # variable on the dataset with the quantiles
-  hex_grid_joined$change_quantile <- cut(hex_grid_joined$change, 
-                                      breaks = quantiles, 
+  hex_grid_joined$change_quantile <- cut(hex_grid_joined$change,
+                                      breaks = quantiles,
                                       labels = labels,
                                       include.lowest = T)
   subtitle <- case_when(
@@ -471,9 +482,10 @@ for (city in city_list){
     city == "Montreal" ~ "between 2008-2010 and 2018-2023"
   )
   flush_cache()
-  map <- basemap_ggplot(st_bbox(hex_grid_joined), map_service="carto", 
+  map <- basemap_ggplot(st_bbox(hex_grid_joined), map_service="carto",
                    map_type = "light_no_labels",map_res = 1,
                    force=T) +
+    new_scale_fill() + # Add this line to introduce a new fill scale
     geom_sf(
       data=hex_grid_joined,
       mapping = aes(fill = change_quantile),
@@ -491,7 +503,7 @@ for (city in city_list){
     # add the theme
     theme_map()
 
-  ggsave(plot = map, 
+  ggsave(plot = map,
         filename = paste0(figure_dir, "/map_grid_count_change.png"),
         width = 7,
         height = 7,
