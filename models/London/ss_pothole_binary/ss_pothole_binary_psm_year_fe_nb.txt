@@ -1,0 +1,51 @@
+
+Call:
+glm.nb(formula = formula, data = match_result_df, init.theta = 1.018535569, 
+    link = log)
+
+Coefficients:
+                          Estimate Std. Error z value Pr(>|z|)    
+(Intercept)              -7.483605   2.084302  -3.590 0.000330 ***
+ss_pothole_binary         0.068015   0.075493   0.901 0.367614    
+year2014                 -0.286432   0.159046  -1.801 0.071712 .  
+year2015                 -0.195609   0.192010  -1.019 0.308326    
+year2016                  0.059425   0.166554   0.357 0.721250    
+year2017                 -0.253350   0.185233  -1.368 0.171393    
+year2018                 -0.510605   0.171587  -2.976 0.002923 ** 
+year2019                 -0.580577   0.165686  -3.504 0.000458 ***
+age_0_19                 -0.009026   0.013117  -0.688 0.491370    
+age_20_39                 0.036606   0.009899   3.698 0.000217 ***
+age_40_59                 0.062573   0.017889   3.498 0.000469 ***
+IMD_score                 0.017996   0.004768   3.774 0.000160 ***
+lu_residential_community  0.007011   0.004910   1.428 0.153352    
+lu_commerce_developed    -0.006096   0.004175  -1.460 0.144247    
+ss_visual_complexity     -0.018937   0.018536  -1.022 0.306970    
+slope                    -0.027603   0.007778  -3.549 0.000387 ***
+ss_construction           0.003403   0.008391   0.406 0.685046    
+ss_road_flat              0.034787   0.011196   3.107 0.001889 ** 
+ss_marking                0.153003   0.044463   3.441 0.000579 ***
+ss_nature                 0.027305   0.027467   0.994 0.320173    
+ss_street_object          0.040281   0.127850   0.315 0.752713    
+od_person_count           0.053289   0.060771   0.877 0.380547    
+od_bicycle_count          1.152293   0.469478   2.454 0.014111 *  
+od_vehicle_count         -0.054719   0.025287  -2.164 0.030471 *  
+od_animal_count           0.255210   2.408110   0.106 0.915599    
+pop_den_log               0.105950   0.055644   1.904 0.056900 .  
+housing_price_log         0.637267   0.117888   5.406 6.45e-08 ***
+poi_log                   0.435637   0.056655   7.689 1.48e-14 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for Negative Binomial(1.0185) family taken to be 1)
+
+    Null deviance: 1508.79  on 703  degrees of freedom
+Residual deviance:  819.82  on 676  degrees of freedom
+AIC: 10564
+
+Number of Fisher Scoring iterations: 1
+
+
+              Theta:  1.0185 
+          Std. Err.:  0.0493 
+
+ 2 x log-likelihood:  -10506.0590 

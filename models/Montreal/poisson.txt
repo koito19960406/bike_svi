@@ -1,0 +1,45 @@
+
+Call:
+glm(formula = count ~ ., family = poisson(), data = all_var)
+
+Coefficients:
+                            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                6.329e-01  2.933e+00   0.216   0.8292    
+year                      -4.085e-04  1.462e-03  -0.279   0.7799    
+age_0_19                  -2.788e-04  8.219e-04  -0.339   0.7345    
+age_20_39                 -8.314e-05  4.786e-04  -0.174   0.8621    
+age_40_59                 -6.743e-05  9.504e-04  -0.071   0.9434    
+lu_residential_community   1.002e-04  1.281e-04   0.782   0.4342    
+slope                     -6.174e-04  4.092e-04  -1.509   0.1314    
+ss_visual_complexity       2.404e-04  1.654e-03   0.145   0.8845    
+count_log.1                1.020e+00  2.887e-03 353.173   <2e-16 ***
+ss_construction            2.975e-04  7.749e-04   0.384   0.7011    
+ss_road_flat              -6.402e-04  1.055e-03  -0.607   0.5441    
+ss_marking                 2.199e-03  5.300e-03   0.415   0.6782    
+ss_nature                 -6.441e-04  1.725e-03  -0.373   0.7089    
+ss_street_object          -9.701e-03  1.666e-02  -0.582   0.5603    
+od_person_count           -2.353e-03  1.036e-02  -0.227   0.8204    
+od_bicycle_count           2.144e-02  3.249e-02   0.660   0.5093    
+od_vehicle_count           4.729e-03  2.352e-03   2.011   0.0443 *  
+od_animal_count            1.487e-01  5.495e-01   0.271   0.7867    
+pop_den_log                3.163e-03  4.095e-03   0.772   0.4398    
+average_income_log         2.718e-03  1.381e-02   0.197   0.8440    
+poi_log                    1.670e-03  4.484e-03   0.372   0.7095    
+ss_vegetation_binary       4.555e-03  1.026e-02   0.444   0.6569    
+ss_guard_rail_binary       5.073e-03  9.438e-03   0.537   0.5909    
+ss_pedestrian_area_binary  1.288e-03  2.924e-02   0.044   0.9649    
+ss_sidewalk_binary         5.661e-03  8.999e-03   0.629   0.5293    
+ss_street_light_binary     4.565e-03  9.122e-03   0.500   0.6168    
+ss_bench_binary            7.173e-03  1.080e-02   0.664   0.5067    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 242417.34  on 1717  degrees of freedom
+Residual deviance:    174.66  on 1691  degrees of freedom
+  (2237 observations deleted due to missingness)
+AIC: Inf
+
+Number of Fisher Scoring iterations: 4
+

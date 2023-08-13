@@ -1,0 +1,40 @@
+
+Call:
+lm(formula = pedal_cycles ~ ., data = all_var)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2630.2  -507.8  -200.5   182.8 11135.8 
+
+Coefficients:
+                Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   -28574.234  10563.402  -2.705  0.00684 ** 
+year              14.266      5.268   2.708  0.00678 ** 
+bicycle        20921.243   1387.757  15.076  < 2e-16 ***
+building         232.355    140.640   1.652  0.09852 .  
+bus             2105.416    155.229  13.563  < 2e-16 ***
+car              927.283    237.868   3.898 9.72e-05 ***
+fence           1080.470    201.199   5.370 7.95e-08 ***
+motorcycle       -92.941   2605.909  -0.036  0.97155    
+person         14604.487    743.757  19.636  < 2e-16 ***
+pole            -244.627   1203.143  -0.203  0.83888    
+rider          35388.532   2424.778  14.595  < 2e-16 ***
+road            4675.155    206.166  22.677  < 2e-16 ***
+sidewalk        3060.744    266.666  11.478  < 2e-16 ***
+sky            -3167.288    181.571 -17.444  < 2e-16 ***
+terrain         -146.607    216.638  -0.677  0.49858    
+traffic.light   9570.267   2159.471   4.432 9.39e-06 ***
+traffic.sign    -841.282   1401.713  -0.600  0.54839    
+train            156.057    397.833   0.392  0.69487    
+truck           1401.866    190.795   7.347 2.09e-13 ***
+vegetation      -990.952    147.570  -6.715 1.93e-11 ***
+wall             -69.842    197.837  -0.353  0.72407    
+period           -78.921     25.166  -3.136  0.00172 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1038 on 20853 degrees of freedom
+  (408 observations deleted due to missingness)
+Multiple R-squared:  0.2335,	Adjusted R-squared:  0.2327 
+F-statistic: 302.5 on 21 and 20853 DF,  p-value: < 2.2e-16
+

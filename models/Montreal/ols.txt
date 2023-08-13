@@ -1,0 +1,45 @@
+
+Call:
+lm(formula = count ~ ., data = all_var)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-215.4  -50.1  -12.6   30.5 4807.9 
+
+Coefficients:
+                            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                385.47806 2587.33196   0.149  0.88158    
+year                        -0.14630    1.29989  -0.113  0.91040    
+age_0_19                    -0.01149    0.79542  -0.014  0.98848    
+age_20_39                    0.33865    0.47155   0.718  0.47276    
+age_40_59                    0.29973    1.07317   0.279  0.78006    
+lu_residential_community    -0.32385    0.16781  -1.930  0.05379 .  
+slope                        1.11909    0.42445   2.637  0.00845 ** 
+ss_visual_complexity        -3.12134    2.19519  -1.422  0.15524    
+count_log.1                 72.07567    3.97324  18.140  < 2e-16 ***
+ss_construction              1.50943    1.08711   1.388  0.16517    
+ss_road_flat                 2.27406    1.50045   1.516  0.12981    
+ss_marking                  -6.60660    6.15953  -1.073  0.28361    
+ss_nature                    2.13231    2.38201   0.895  0.37082    
+ss_street_object             8.55751   18.06426   0.474  0.63576    
+od_person_count             16.93536   17.35561   0.976  0.32931    
+od_bicycle_count          -111.30160   47.67979  -2.334  0.01969 *  
+od_vehicle_count           -12.45876    2.65886  -4.686 3.01e-06 ***
+od_animal_count           -341.33301  620.81257  -0.550  0.58252    
+pop_den_log                 -6.17485    4.36597  -1.414  0.15745    
+average_income_log         -10.88626   15.05721  -0.723  0.46978    
+poi_log                      0.11562    4.23053   0.027  0.97820    
+ss_vegetation_binary        -4.06064   11.09059  -0.366  0.71431    
+ss_guard_rail_binary        -8.69862    9.45743  -0.920  0.35783    
+ss_pedestrian_area_binary   77.40639   48.84824   1.585  0.11324    
+ss_sidewalk_binary          -7.92196   10.70280  -0.740  0.45930    
+ss_street_light_binary     -12.10800    9.71121  -1.247  0.21264    
+ss_bench_binary            -21.86507   12.37479  -1.767  0.07742 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 165.8 on 1691 degrees of freedom
+  (2237 observations deleted due to missingness)
+Multiple R-squared:  0.2799,	Adjusted R-squared:  0.2688 
+F-statistic: 25.28 on 26 and 1691 DF,  p-value: < 2.2e-16
+

@@ -1,0 +1,57 @@
+
+Call:
+zeroinfl(formula = formula, data = match_result_df, weights = weights, dist = "negbin", link = "logit")
+
+Pearson residuals:
+     Min       1Q   Median       3Q      Max 
+-0.94497 -0.66849 -0.41978  0.07467 41.13520 
+
+Count model coefficients (negbin with log link):
+                          Estimate Std. Error z value Pr(>|z|)
+(Intercept)              -2.657367         NA      NA       NA
+ss_street_light_binary   -0.113901         NA      NA       NA
+year2010                 -2.062159         NA      NA       NA
+year2011                 -0.925708         NA      NA       NA
+year2012                 -1.791454         NA      NA       NA
+year2014                 -1.744387         NA      NA       NA
+year2015                 -1.365621         NA      NA       NA
+year2016                 -0.736542         NA      NA       NA
+year2017                 -1.218167         NA      NA       NA
+year2018                 -0.481619         NA      NA       NA
+year2019                  0.264375         NA      NA       NA
+year2020                 -0.660693         NA      NA       NA
+year2021                 -0.590390         NA      NA       NA
+year2022                 -0.598938         NA      NA       NA
+age_0_19                  0.035412         NA      NA       NA
+age_20_39                 0.006686         NA      NA       NA
+age_40_59                -0.022319         NA      NA       NA
+lu_residential_community  0.000776         NA      NA       NA
+slope                     0.011166         NA      NA       NA
+ss_visual_complexity     -0.066461         NA      NA       NA
+ss_construction           0.075373         NA      NA       NA
+ss_road_flat              0.066398         NA      NA       NA
+ss_marking                0.031309         NA      NA       NA
+ss_nature                 0.035189         NA      NA       NA
+ss_street_object          0.093873         NA      NA       NA
+od_person_count           1.104222         NA      NA       NA
+od_bicycle_count         -0.034479         NA      NA       NA
+od_vehicle_count          0.012609         NA      NA       NA
+od_animal_count          -8.689011         NA      NA       NA
+pop_den_log               0.163693         NA      NA       NA
+average_income_log        0.251208         NA      NA       NA
+poi_log                   0.289782         NA      NA       NA
+Log(theta)               -0.087693         NA      NA       NA
+
+Zero-inflation model coefficients (binomial with logit link):
+                   Estimate Std. Error z value Pr(>|z|)
+(Intercept)          5.5971         NA      NA       NA
+od_person_count     -4.5628         NA      NA       NA
+od_bicycle_count -1796.4168         NA      NA       NA
+od_vehicle_count    -0.9139         NA      NA       NA
+od_animal_count   -367.4151         NA      NA       NA
+pop_den_log         -0.5801         NA      NA       NA
+poi_log             -0.5500         NA      NA       NA
+
+Theta = 0.916 
+Number of iterations in BFGS optimization: 82 
+Log-likelihood: -3777 on 40 Df

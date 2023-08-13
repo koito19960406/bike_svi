@@ -1,0 +1,54 @@
+
+Call:
+zeroinfl(formula = formula, data = data, dist = count_model, link = "logit")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-0.8986 -0.6875 -0.4170  0.1911 22.0581 
+
+Count model coefficients (negbin with log link):
+                           Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               1.6911814  0.3828694   4.417 1.00e-05 ***
+ss_street_light_binary    0.2645431  0.0225319  11.741  < 2e-16 ***
+year2011                 -0.0558442  0.3267696  -0.171    0.864    
+year2012                 -0.3152802  0.3227262  -0.977    0.329    
+year2013                  0.3054383  0.4312630   0.708    0.479    
+year2014                 -0.2398037  0.3226597  -0.743    0.457    
+year2015                 -0.1742096  0.3226558  -0.540    0.589    
+year2016                 -0.0354909  0.3226876  -0.110    0.912    
+year2017                 -0.0665210  0.3227049  -0.206    0.837    
+year2018                 -0.1506206  0.3227061  -0.467    0.641    
+year2019                 -0.3111280  0.3224809  -0.965    0.335    
+age_0_19                 -0.0409871  0.0023370 -17.538  < 2e-16 ***
+age_20_39                 0.0386513  0.0018311  21.108  < 2e-16 ***
+age_40_59                 0.0568791  0.0038138  14.914  < 2e-16 ***
+lu_residential_community  0.0065171  0.0013429   4.853 1.22e-06 ***
+lu_commerce_developed     0.0247676  0.0009028  27.435  < 2e-16 ***
+pop_den_log               0.2226738  0.0120899  18.418  < 2e-16 ***
+Log(theta)               -0.2118185  0.0118733 -17.840  < 2e-16 ***
+
+Zero-inflation model coefficients (binomial with logit link):
+                           Estimate Std. Error z value Pr(>|z|)    
+(Intercept)              -1.112e+01  7.935e+02  -0.014   0.9888    
+ss_street_light_binary   -2.038e-01  1.666e-01  -1.223   0.2212    
+year2011                  1.257e+01  7.935e+02   0.016   0.9874    
+year2012                  1.304e+01  7.935e+02   0.016   0.9869    
+year2013                  1.326e+00  1.057e+03   0.001   0.9990    
+year2014                  1.188e+01  7.935e+02   0.015   0.9881    
+year2015                  1.207e+01  7.935e+02   0.015   0.9879    
+year2016                  1.202e+01  7.935e+02   0.015   0.9879    
+year2017                  1.168e+01  7.935e+02   0.015   0.9883    
+year2018                  1.144e+01  7.935e+02   0.014   0.9885    
+year2019                  1.130e+01  7.935e+02   0.014   0.9886    
+age_0_19                  1.600e-01  1.929e-02   8.294   <2e-16 ***
+age_20_39                 1.425e-02  1.895e-02   0.752   0.4519    
+age_40_59                -1.715e-02  3.662e-02  -0.468   0.6395    
+lu_residential_community -1.942e-02  1.021e-02  -1.901   0.0572 .  
+lu_commerce_developed     4.747e-03  5.723e-03   0.829   0.4069    
+pop_den_log              -1.054e+00  7.133e-02 -14.772   <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Theta = 0.8091 
+Number of iterations in BFGS optimization: 37 
+Log-likelihood: -9.092e+04 on 35 Df

@@ -1,0 +1,4 @@
+GRF tree object 
+Number of training samples: 6194 
+Variable splits: 
+(1) * num_samples: 3097  avg_Y: 857.68 avg_W: 0.98 
