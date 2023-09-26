@@ -6,12 +6,18 @@ import pandas as pd
 import os
 import numpy as np
 
+def month_difference(row):
+    date1 = pd.Timestamp(year=int(row['year_x']), month=int(row['month_x']), day=1)
+    date2 = pd.Timestamp(year=int(row['year_y']), month=int(row['month_y']), day=1)
+    
+    return -31 <= (date2 - date1).days <= 31
+
 def main(dir_input, dir_output):
     # Get a list of all CSV files excluding the ones starting with "."
     files = [file for file in dir_input.glob('*.csv') if not file.name.startswith('.')]
     
     # Sort files to make sure "count_station_year.csv" is the first
-    files.sort(key=lambda x: x.name != 'count_station_year.csv')
+    files.sort(key=lambda x: x.name != 'count_station_year_month.csv')
 
     # Initialize an empty DataFrame
     df_combined = pd.DataFrame()
@@ -28,12 +34,33 @@ def main(dir_input, dir_output):
         if df_combined.empty:
             df_combined = df
         else:
-            # Perform left join
-            df_combined = pd.merge(df_combined, df, on=['count_point_id', 'year'], how='left')
+            # Perform simple left join if "month" column is not in df
+            if "month" not in df.columns:
+                df_combined = pd.merge(df_combined, df, on=['count_point_id', 'year'], how='left')
+            else:
+                # Perform left join with the custom condition
+                df_combined = pd.merge(df_combined, df, on=['count_point_id'], suffixes=('_x', '_y'), how='left')
+                # make sure there's no NaN values in year_y and month_y
+                df_combined = df_combined[~df_combined['year_y'].isna()]
+                df_combined = df_combined[~df_combined['month_y'].isna()]
+                df_combined['year_x'] = df_combined['year_x'].astype(int).astype(str)
+                df_combined['year_y'] = df_combined['year_y'].astype(int).astype(str)
+                df_combined['month_x'] = df_combined['month_x'].astype(int).astype(str)
+                df_combined['month_y'] = df_combined['month_y'].astype(int).astype(str)
+                
+                # Applying the custom month difference function
+                df_combined = df_combined[df_combined.apply(month_difference, axis=1)]
+                
+                # drop year_y and month_y and rename year_x and month_x to year and month
+                df_combined = df_combined.drop(['year_y', 'month_y'], axis=1)
+                df_combined = df_combined.rename(columns={'year_x': 'year', 'month_x': 'month'})
+                
+    # After the loop, you can aggregate by the original year and month
+    df_combined = df_combined.groupby(['count_point_id', 'year', 'month']).agg('mean').reset_index()
 
     # feature engineering
-    # # log count column
-    # df_combined['count_log'] = np.log(df_combined['count'] + 1)
+    # log count column
+    df_combined['count_log'] = np.log(df_combined['count'] + 1)
     
 
     # make slope binary with a threshold of 70 percentile
@@ -82,9 +109,6 @@ def main(dir_input, dir_output):
 
     df_combined = df_combined.drop(ss_od_columns_to_drop, axis=1)
 
-    # # Drop rows with NA values
-    # df_combined = df_combined.dropna()
-    
     # Convert 'year' column to string type
     df_combined['year'] = df_combined['year'].astype(str)
 
@@ -105,6 +129,9 @@ def main(dir_input, dir_output):
 
     # Move 'count' column to the first position
     df_combined = df_combined[['count', 'count_log'] + [ col for col in df_combined.columns if col != 'count' ]]
+
+    # remove any columns with "level" in their names
+    df_combined = df_combined.loc[:, ~df_combined.columns.str.contains('level|index')]
     
     # Save df_combined to CSV 
     df_combined.to_csv(dir_output / "all_var_joined.csv", index=False)

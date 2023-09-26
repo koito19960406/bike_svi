@@ -495,13 +495,13 @@ class MontrealDataCleaner(BaseDataCleaner):
             census_data_gdf_year = gpd.GeoDataFrame(census_data_gdf_year, geometry=census_data_gdf_year.geometry).set_crs(census_boundaries["data"].crs)
             # spatial join count_station with census
             # reproject both to UTM by estimating the UTM zone
-            utm_crs = self.count_station_year.estimate_utm_crs()
-            count_station_year_utm = self.count_station_year.to_crs(utm_crs)
+            utm_crs = self.count_station_year_month.estimate_utm_crs()
+            count_station_year_month_utm = self.count_station_year_month.to_crs(utm_crs)
             census_data_gdf_year_utm = census_data_gdf_year.to_crs(utm_crs)
             # calculate area of census boundaries if data_name contains "density"
             if "density" in data_name:
                 census_data_gdf_year_utm["area"] = census_data_gdf_year_utm["geometry"].area / 10**6
-            count_census_year = gpd.sjoin_nearest(count_station_year_utm, census_data_gdf_year_utm, 
+            count_census_year = gpd.sjoin_nearest(count_station_year_month_utm, census_data_gdf_year_utm, 
                                                 how="left", max_distance = 10000, 
                                                 lsuffix = 'count', rsuffix = 'census').reset_index()
             # drop columns that are not needed
@@ -537,17 +537,17 @@ class MontrealDataCleaner(BaseDataCleaner):
     def clean_count_station_data(self):
         # check if the csv file exists
         if os.path.exists(str(Path(self.dir_input) / "count_station_clean.csv")) and \
-            os.path.exists(str(Path(self.dir_output) / "count_station_year.csv")) and \
+            os.path.exists(str(Path(self.dir_output) / "count_station_year_month.csv")) and \
             os.path.exists(str(Path(self.dir_input) / "count_station_old_new.csv")):
             self.count_station = pd.read_csv(str(Path(self.dir_input) / "count_station_clean.csv"))
-            self.count_station_year = pd.read_csv(str(Path(self.dir_output) / "count_station_year.csv"))
-            # join count_station_year with count_station
-            self.count_station_year = self.count_station_year.merge(self.count_station[["count_point_id", "latitude", "longitude"]], on="count_point_id", how="left")
-            # convert count_station_year to geodataframe
-            self.count_station_year = gpd.GeoDataFrame(self.count_station_year, geometry=gpd.points_from_xy(self.count_station_year.longitude, self.count_station_year.latitude)).\
+            self.count_station_year_month = pd.read_csv(str(Path(self.dir_output) / "count_station_year_month.csv"))
+            # join count_station_year_month with count_station
+            self.count_station_year_month = self.count_station_year_month.merge(self.count_station[["count_point_id", "latitude", "longitude"]], on="count_point_id", how="left")
+            # convert count_station_year_month to geodataframe
+            self.count_station_year_month = gpd.GeoDataFrame(self.count_station_year_month, geometry=gpd.points_from_xy(self.count_station_year_month.longitude, self.count_station_year_month.latitude)).\
                 set_crs(epsg=4326)
-            self.count_station_year_min = min(self.count_station_year["year"])
-            self.count_station_year_max = max(self.count_station_year["year"])
+            self.count_station_year_month_min = min(self.count_station_year_month["year"])
+            self.count_station_year_month_max = max(self.count_station_year_month["year"])
             return
         # filter "Description_Code_Banque" to only keep "Pietons"
         self.count_df = self.count_df[self.count_df["Description_Code_Banque"] == "Pietons"]
@@ -555,15 +555,10 @@ class MontrealDataCleaner(BaseDataCleaner):
         self.count_df = self.count_df.rename(columns={"Id_Reference": "count_point_id_old",
                                                         "Latitude": "latitude",
                                                         "Longitude": "longitude"})
-        # get year from "Date"
+        # get year and month from "Date"
         self.count_df["Date"] = pd.to_datetime(self.count_df["Date"])
         self.count_df["year"] = self.count_df["Date"].dt.year
-        
-        # aggregate counts (Approche_Nord, Approche_Sud, Approche_Est, Approche_Ouest) by count_point_id and year
-        self.count_station_year = self.count_df.groupby(["count_point_id_old", "year"], as_index=False).\
-            agg({"Approche_Nord": "mean", "Approche_Sud": "mean", "Approche_Est": "mean", "Approche_Ouest": "mean"})
-        # sum columns: Approche_Nord, Approche_Sud, Approche_Est, Approche_Ouest
-        self.count_station_year["count"] = self.count_station_year[["Approche_Nord", "Approche_Sud", "Approche_Est", "Approche_Ouest"]].sum(axis=1)
+        self.count_df["month"] = self.count_df["Date"].dt.month
         
         # save df.count_station: count_point_id, latitude, longitude
         self.count_station = self.count_df.drop_duplicates(subset=["count_point_id_old"])[["count_point_id_old", "latitude", "longitude"]]
@@ -575,19 +570,24 @@ class MontrealDataCleaner(BaseDataCleaner):
         count_station_new[["count_point_id", "latitude", "longitude"]].to_csv(Path(self.dir_input) / "count_station_clean.csv", index=False)
         # merge the two dataframes
         self.count_station = count_station_new[["count_point_id", "latitude", "longitude"]].merge(self.count_station, on=["latitude", "longitude"], how="left")
-        # merge with count_station_year
-        self.count_station_year = self.count_station_year.merge(self.count_station[["count_point_id_old", "count_point_id", "latitude", "longitude"]], 
+        # merge with count_station_year_month
+        self.count_df = self.count_df.merge(self.count_station[["count_point_id_old", "count_point_id", "latitude", "longitude"]], 
                                                                 on = "count_point_id_old", how="left")
-        # group by count_point_id and year
-        self.count_station_year = self.count_station_year.groupby(["count_point_id", "year"], as_index=False).agg({"count": "sum"})
-        self.count_station_year[["count_point_id", "year", "count"]].to_csv(Path(self.dir_output) / "count_station_year.csv", index=False)
-        # join count_station_year with count_station
-        self.count_station_year = self.count_station_year.merge(count_station_new[["count_point_id", "latitude", "longitude"]], on="count_point_id", how="left")
-        # convert count_station_year to geodataframe
-        self.count_station_year = gpd.GeoDataFrame(self.count_station_year, geometry=gpd.points_from_xy(self.count_station_year.longitude, self.count_station_year.latitude)).\
+        # group by count_point_id and year and month
+        # aggregate counts (Approche_Nord, Approche_Sud, Approche_Est, Approche_Ouest) by count_point_id and year
+        self.count_df["count"] = self.count_df[["Approche_Nord", "Approche_Sud", "Approche_Est", "Approche_Ouest"]].sum(axis=1)
+        self.count_station_year_month = self.count_df.groupby(["count_point_id", "year", "month"], as_index=False).\
+            agg({"count": "mean"}).reset_index()
+        # current count column = count in 15 mins -> multiply by 4 to get count in 1 hour -> multiply by 12 to get count in daytime on a day (12 hours)
+        self.count_station_year_month["count"] = self.count_station_year_month["count"] * 4 * 12
+        self.count_station_year_month[["count_point_id", "year", "month", "count"]].to_csv(Path(self.dir_output) / "count_station_year_month.csv", index=False)
+        # join count_station_year_month with count_station
+        self.count_station_year_month = self.count_station_year_month.merge(count_station_new[["count_point_id", "latitude", "longitude"]], on="count_point_id", how="left")
+        # convert count_station_year_month to geodataframe
+        self.count_station_year_month = gpd.GeoDataFrame(self.count_station_year_month, geometry=gpd.points_from_xy(self.count_station_year_month.longitude, self.count_station_year_month.latitude)).\
             set_crs(epsg=4326)
-        self.count_station_year_min = min(self.count_station_year["year"])
-        self.count_station_year_max = max(self.count_station_year["year"])
+        self.count_station_year_month_min = min(self.count_station_year_month["year"])
+        self.count_station_year_month_max = max(self.count_station_year_month["year"])
     
     def interpolate_missing_years(self, df, missing_years):
         df = df.copy()
@@ -596,8 +596,8 @@ class MontrealDataCleaner(BaseDataCleaner):
         df["year_census"] = df["year_census"].astype(int).astype(str)
         df.sort_values("year_census", inplace=True)
         years = df["year_census"].unique()
-        start_year = min(self.count_station_year_min, int(min(years)))
-        end_year = max(self.count_station_year_max, int(max(years)))
+        start_year = min(self.count_station_year_month_min, int(min(years)))
+        end_year = max(self.count_station_year_month_max, int(max(years)))
         years = pd.date_range(start=str(start_year), end=str(end_year), freq='YS')
         df_fill = pd.DataFrame({'year_census': years})
         # extract year from "year" column
@@ -624,7 +624,7 @@ class MontrealDataCleaner(BaseDataCleaner):
             self.count_age = pd.read_csv(Path(self.dir_output) / "count_age.csv")
             return
 
-        # join count_station_year with count_station
+        # join count_station_year_month with count_station
         self.count_age = self.join_count_station_with_census("age")
         # divide "age_" columns by "total" and multiply by 100
         for col in self.count_age.columns:
@@ -642,7 +642,7 @@ class MontrealDataCleaner(BaseDataCleaner):
             self.count_population_density = pd.read_csv(Path(self.dir_output) / "count_population_density.csv")
             return
     
-        # join count_station_year with count_station
+        # join count_station_year_month with count_station
         self.count_population_density = self.join_count_station_with_census("population_density")
         
         # calculate population density
@@ -657,7 +657,7 @@ class MontrealDataCleaner(BaseDataCleaner):
             self.count_income = pd.read_csv(Path(self.dir_output) / "count_income.csv")
             return
 
-        # join count_station_year with count_station
+        # join count_station_year_month with count_station
         self.count_income = self.join_count_station_with_census("income")
         
         # save to csv
@@ -669,7 +669,7 @@ class MontrealDataCleaner(BaseDataCleaner):
             self.count_housing = pd.read_csv(Path(self.dir_output) / "count_housing.csv")
             return
 
-        # join count_station_year with count_station
+        # join count_station_year_month with count_station
         self.count_housing = self.join_count_station_with_census("housing")
         
         # save to csv
@@ -681,11 +681,11 @@ class MontrealDataCleaner(BaseDataCleaner):
             self.count_land_use = pd.read_csv(Path(self.dir_output) / "count_land_use.csv")
             return
 
-        # join count_station_year with count_station
+        # join count_station_year_month with count_station
         # take 500m from the count station
-        utm_crs = self.count_station_year.estimate_utm_crs()
-        count_station_year_utm = self.count_station_year.to_crs(utm_crs)
-        count_station_year_utm["geometry"] = count_station_year_utm.buffer(500)
+        utm_crs = self.count_station_year_month.estimate_utm_crs()
+        count_station_year_month_utm = self.count_station_year_month.to_crs(utm_crs)
+        count_station_year_month_utm["geometry"] = count_station_year_month_utm.buffer(500)
 
         # convert landuse_2016 to UTM
         land_use = self.landuse_data[2016]["data"].to_crs(utm_crs)
@@ -702,8 +702,8 @@ class MontrealDataCleaner(BaseDataCleaner):
             'Grand espace vert ou récréation': 'lu_others',
             "Centre-ville d'agglomération": 'lu_commerce_developped'})
         
-        # spatial join count_station_year_utm with landuse_2016
-        self.count_land_use = gpd.sjoin(count_station_year_utm, land_use,
+        # spatial join count_station_year_month_utm with landuse_2016
+        self.count_land_use = gpd.sjoin(count_station_year_month_utm, land_use,
                                     how="left", op="intersects").reset_index()
         
         # group by count_point_id, year, and land_use
@@ -760,7 +760,7 @@ class MontrealDataCleaner(BaseDataCleaner):
         results = {}
         # Using ThreadPoolExecutor to parallelize the process
         with ThreadPoolExecutor() as executor:
-            futures = {executor.submit(fetch_poi, row, 500, client): row for row in self.count_station_year.itertuples()}
+            futures = {executor.submit(fetch_poi, row, 500, client): row for row in self.count_station_year_month.itertuples()}
             for future in tqdm(as_completed(futures), total=len(futures)):
                 row = futures[future]
                 try:
@@ -780,7 +780,7 @@ class MontrealDataCleaner(BaseDataCleaner):
             return
         
         # create geopandas GeoDataFrame
-        count_slope = self.count_station_year.to_crs("EPSG:3857")
+        count_slope = self.count_station_year_month.to_crs("EPSG:3857")
         count_slope['geometry'] = count_slope.geometry.buffer(500)
         with rasterio.open(self.slope_path) as src:
             crs = src.crs

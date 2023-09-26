@@ -321,31 +321,36 @@ class LondonDataCleaner(BaseDataCleaner):
     def clean_count_station_data(self):
         """
         create count_station: count_point_id, latitude, longitude
-        create count_station_year: count_point_id, year, count
+        create count_station_year_month: count_point_id, year, month, count
         """
         # read count_station.csv
         self.count_station = pd.read_csv(os.path.join(self.dir_input, "count_station.csv"))
         # only keep count_point_id, latitude, longitude
         self.count_station = self.count_station[["count_point_id", "latitude", "longitude"]]
         # read count_data.csv
-        self.count_data = pd.read_csv(os.path.join(self.dir_input, "count_data.csv"))
-        # only keep count_point_id, year, count
-        self.count_data = self.count_data[["count_point_id", "year", "pedal_cycles"]]
+        self.count_data = pd.read_csv(os.path.join(self.dir_input, "dft_rawcount_region_id_6.csv"))
         # rename column "pedal_cycles" to "count"
         self.count_data.rename(columns={"pedal_cycles": "count"}, inplace=True)
-        # aggregate count_data by count_point_id and year
-        self.count_data = self.count_data.groupby(["count_point_id", "year"]).agg({"count": "mean"}).reset_index()
+        # get sum of count for the count based on count_point_id, count_date, hour
+        self.count_data = self.count_data.groupby(["count_point_id", "count_date", "hour"]).agg({"count": "sum"}).reset_index()
+        # get year and month from count_date
+        self.count_data["year"] = pd.DatetimeIndex(self.count_data["count_date"]).year
+        self.count_data["month"] = pd.DatetimeIndex(self.count_data["count_date"]).month
+        # aggregate count_data by count_point_id and year and month
+        self.count_data = self.count_data.groupby(["count_point_id", "year", "month"]).agg({"count": "mean"}).reset_index()
+        # current count = hourly count -> calculate daily count * 12 
+        self.count_data["count"] = self.count_data["count"] * 12
         # save df.count_station: count_point_id, latitude, longitude
         self.count_station[["count_point_id", "latitude", "longitude"]].to_csv(Path(self.dir_input) / "count_station_clean.csv", index=False)
-        # save df.count_station_year: count_point_id, year, count
-        self.count_data[["count_point_id", "year", "count"]].to_csv(Path(self.dir_output) / "count_station_year.csv", index=False)
-        # join count_station_year with count_station
-        self.count_station_year = self.count_data.merge(self.count_station[["count_point_id", "latitude", "longitude"]], on="count_point_id", how="left")
-        # convert count_station_year to geodataframe
-        self.count_station_year = gpd.GeoDataFrame(self.count_station_year, geometry=gpd.points_from_xy(self.count_station_year.longitude, self.count_station_year.latitude)).\
+        # save df.count_station_year_month: count_point_id, year, month, count
+        self.count_data[["count_point_id", "year", "month", "count"]].to_csv(Path(self.dir_output) / "count_station_year_month.csv", index=False)
+        # join count_station_year_month with count_station
+        self.count_station_year_month = self.count_data.merge(self.count_station[["count_point_id", "latitude", "longitude"]], on="count_point_id", how="left")
+        # convert count_station_year_month to geodataframe
+        self.count_station_year_month = gpd.GeoDataFrame(self.count_station_year_month, geometry=gpd.points_from_xy(self.count_station_year_month.longitude, self.count_station_year_month.latitude)).\
             set_crs(epsg=4326)
-        self.count_station_year_min = min(self.count_station_year["year"])
-        self.count_station_year_max = max(self.count_station_year["year"])
+        self.count_station_year_month_min = min(self.count_station_year_month["year"])
+        self.count_station_year_month_max = max(self.count_station_year_month["year"])
         pass
     
 
@@ -371,25 +376,25 @@ class LondonDataCleaner(BaseDataCleaner):
             census_data_gdf_year = gpd.GeoDataFrame(census_data_gdf_year, geometry=census_data_gdf_year.geometry).set_crs(census_boundaries["data"].crs)
             # spatial join count_station with census
             # reproject both to UTM by estimating the UTM zone
-            utm_crs = self.count_station_year.estimate_utm_crs()
-            count_station_year_utm = self.count_station_year.to_crs(utm_crs)
+            utm_crs = self.count_station_year_month.estimate_utm_crs()
+            count_station_year_month_utm = self.count_station_year_month.to_crs(utm_crs)
             census_data_gdf_year_utm = census_data_gdf_year.to_crs(utm_crs)
             # calculate area of census boundaries if data_name contains "density"
             if "density" in data_name:
                 census_data_gdf_year_utm["area"] = census_data_gdf_year_utm["geometry"].area / 10**6
             # get a list of unique "year" in census_data_gdf_year_utm's "year" column
             if "year" in census_data_gdf_year_utm.columns:
-                unique_years = list(set(count_station_year_utm["year"]))
-                # loop through each year and join count_station_year_utm with census_data_gdf_year_utm
+                unique_years = list(set(count_station_year_month_utm["year"]))
+                # loop through each year and join count_station_year_month_utm with census_data_gdf_year_utm
                 for unique_year in unique_years:
-                    count_census_year = gpd.sjoin_nearest(count_station_year_utm[count_station_year_utm["year"] == unique_year], census_data_gdf_year_utm[census_data_gdf_year_utm["year"] == unique_year], 
+                    count_census_year = gpd.sjoin_nearest(count_station_year_month_utm[count_station_year_month_utm["year"] == unique_year], census_data_gdf_year_utm[census_data_gdf_year_utm["year"] == unique_year], 
                                                         how="left", max_distance = 10000, 
                                                         lsuffix = 'count', rsuffix = 'census').reset_index()
                     # drop columns that are not needed
                     count_census_year = count_census_year.drop(columns=["count", "latitude", "longitude", "index_census", "geometry", "census_id", census_boundaries["census_id"]])
                     count_census_list.append(count_census_year)
             else:
-                count_census_year = gpd.sjoin_nearest(count_station_year_utm, census_data_gdf_year_utm, 
+                count_census_year = gpd.sjoin_nearest(count_station_year_month_utm, census_data_gdf_year_utm, 
                                                         how="left", max_distance = 10000, 
                                                         lsuffix = 'count', rsuffix = 'census').reset_index()
                 # drop columns that are not needed
@@ -436,8 +441,8 @@ class LondonDataCleaner(BaseDataCleaner):
         df["year_census"] = df["year_census"].astype(int).astype(str)
         df.sort_values("year_census", inplace=True)
         years = df["year_census"].unique()
-        start_year = min(self.count_station_year_min, int(min(years)))
-        end_year = max(self.count_station_year_max, int(max(years)))
+        start_year = min(self.count_station_year_month_min, int(min(years)))
+        end_year = max(self.count_station_year_month_max, int(max(years)))
         years = pd.date_range(start=str(start_year), end=str(end_year), freq='YS')
         df_fill = pd.DataFrame({'year_census': years})
         # extract year from "year" column
@@ -464,7 +469,7 @@ class LondonDataCleaner(BaseDataCleaner):
             self.count_age = pd.read_csv(Path(self.dir_output) / "count_age.csv")
             return
 
-        # join count_station_year with count_station
+        # join count_station_year_month with count_station
         self.count_age = self.join_count_station_with_census("age")
         # drop "total" column
         self.count_age = self.count_age.drop(columns=["total"])
@@ -478,7 +483,7 @@ class LondonDataCleaner(BaseDataCleaner):
             self.count_population_density = pd.read_csv(Path(self.dir_output) / "count_population_density.csv")
             return
     
-        # join count_station_year with count_station
+        # join count_station_year_month with count_station
         self.count_population_density = self.join_count_station_with_census("population_density")
         
         # calculate population density
@@ -493,7 +498,7 @@ class LondonDataCleaner(BaseDataCleaner):
             self.count_deprivation = pd.read_csv(Path(self.dir_output) / "count_deprivation.csv")
             return
 
-        # join count_station_year with count_station
+        # join count_station_year_month with count_station
         self.count_deprivation = self.join_count_station_with_census("wealth")
         
         # save to csv
@@ -505,7 +510,7 @@ class LondonDataCleaner(BaseDataCleaner):
             self.count_housing = pd.read_csv(Path(self.dir_output) / "count_housing.csv")
             return
 
-        # join count_station_year with count_station
+        # join count_station_year_month with count_station
         self.count_housing = self.join_count_station_with_census("housing")
         
         # save to csv
@@ -517,7 +522,7 @@ class LondonDataCleaner(BaseDataCleaner):
             self.count_land_use = pd.read_csv(Path(self.dir_output) / "count_land_use.csv")
             return
 
-        # join count_station_year with count_station
+        # join count_station_year_month with count_station
         self.count_land_use = self.join_count_station_with_census("land_use")
         
         # drop "index" column
@@ -564,7 +569,7 @@ class LondonDataCleaner(BaseDataCleaner):
         results = {}
         # Using ThreadPoolExecutor to parallelize the process
         with ThreadPoolExecutor() as executor:
-            futures = {executor.submit(fetch_poi, row, 500, client): row for row in self.count_station_year.itertuples()}
+            futures = {executor.submit(fetch_poi, row, 500, client): row for row in self.count_station_year_month.itertuples()}
             for future in tqdm(as_completed(futures), total=len(futures)):
                 row = futures[future]
                 try:
@@ -586,13 +591,17 @@ class LondonDataCleaner(BaseDataCleaner):
         
         # create geopandas GeoDataFrame
         # reproject both to UTM by estimating the UTM zone
-        utm_crs = self.count_station_year.estimate_utm_crs()
-        count_slope = self.count_station_year.to_crs(utm_crs)
+        utm_crs = self.count_station_year_month.estimate_utm_crs()
+        count_slope = self.count_station_year_month.to_crs(utm_crs)
         count_slope['geometry'] = count_slope.geometry.buffer(500)
         with rasterio.open(self.slope_path) as src:
             crs = src.crs
         count_slope = count_slope.to_crs(crs)
 
+        # check rows with geometry None
+        count_slope = count_slope[count_slope["geometry"].notna()]
+        # make sure no empty geometries
+        count_slope = count_slope[~count_slope["geometry"].is_empty]
         # Compute zonal statistics for each polygon
         stats = zonal_stats(count_slope, self.slope_path, stats=['mean'])
 

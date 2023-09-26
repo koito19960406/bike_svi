@@ -42,7 +42,8 @@ for (city in city_list){
   # remove variables that are not in city_vars
   all_var_pdf <- all_var %>% 
     dplyr::select(-one_of(unlist(ss_var_list), "lu_others", "age_60_90"),
-           -contains("_binary"), one_of(paste0(city_vars, "_binary"))) %>% 
+           -contains("_binary"), one_of(paste0(city_vars, "_binary")),
+           -contains("count_log")) %>% 
     remove_highly_correlated(threshold = 0.9)
   
   all_var <- all_var_pdf %>%
