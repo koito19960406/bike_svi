@@ -1,0 +1,16 @@
+GRF tree object 
+Number of training samples: 6194 
+Variable splits: 
+(1) split_variable: od_person_count  split_value: 0.0357143 
+  (2) * num_samples: 301  avg_Y: 4.2 avg_W: 0.32 
+  (3) split_variable: age_40_59  split_value: 27.0667 
+    (4) split_variable: od_bicycle_count  split_value: 0.047619 
+      (6) split_variable: IMD_score  split_value: 27.7655 
+        (10) split_variable: poi_log  split_value: 2.63906 
+          (12) * num_samples: 297  avg_Y: 4.22 avg_W: 0.58 
+          (13) * num_samples: 495  avg_Y: 5.96 avg_W: 0.71 
+        (11) * num_samples: 520  avg_Y: 5.81 avg_W: 0.67 
+      (7) * num_samples: 634  avg_Y: 6.71 avg_W: 0.82 
+    (5) split_variable: IMD_score  split_value: 12.7695 
+      (8) * num_samples: 313  avg_Y: 5.29 avg_W: 0.63 
+      (9) * num_samples: 537  avg_Y: 5.72 avg_W: 0.73 

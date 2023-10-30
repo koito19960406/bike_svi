@@ -1,0 +1,43 @@
+Oneway (time) effect Within Model
+
+Call:
+plm(formula = pedal_cycles ~ bicycle + building + bus + car + 
+    fence + motorcycle + person + pole + rider + road + sidewalk + 
+    sky + terrain + traffic.light + traffic.sign + train + truck + 
+    vegetation + wall, data = all_var_pdf, effect = "time", model = "within")
+
+Unbalanced Panel: n = 13, T = 1-2593, N = 20875
+
+Residuals:
+    Min.  1st Qu.   Median  3rd Qu.     Max. 
+-3795.10  -477.03  -119.35   246.32  9712.16 
+
+Coefficients:
+               Estimate Std. Error  t-value  Pr(>|t|)    
+bicycle       20556.253   1470.603  13.9781 < 2.2e-16 ***
+building        261.130    149.094   1.7514  0.079886 .  
+bus            2029.703    164.794  12.3166 < 2.2e-16 ***
+car             820.257    249.899   3.2824  0.001031 ** 
+fence          1038.353    211.902   4.9002 9.658e-07 ***
+motorcycle     -546.344   2752.928  -0.1985  0.842688    
+person        13771.571    793.648  17.3522 < 2.2e-16 ***
+pole           -258.759   1267.845  -0.2041  0.838283    
+rider         35663.137   2594.277  13.7469 < 2.2e-16 ***
+road           4184.759    219.607  19.0556 < 2.2e-16 ***
+sidewalk       2690.785    280.680   9.5867 < 2.2e-16 ***
+sky           -2955.977    191.947 -15.3999 < 2.2e-16 ***
+terrain        -274.689    228.049  -1.2045  0.228405    
+traffic.light  8486.486   2282.243   3.7185  0.000201 ***
+traffic.sign  -1495.412   1483.577  -1.0080  0.313479    
+train           207.298    421.894   0.4914  0.623185    
+truck          1200.754    202.870   5.9188 3.300e-09 ***
+vegetation     -926.688    156.006  -5.9401 2.900e-09 ***
+wall             21.009    210.106   0.1000  0.920353    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Total Sum of Squares:    2.435e+10
+Residual Sum of Squares: 1.9215e+10
+R-Squared:      0.21092
+Adj. R-Squared: 0.095477
+F-statistic: 256.177 on 19 and 18210 DF, p-value: < 2.22e-16

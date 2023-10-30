@@ -96,3 +96,12 @@ target/
 # Mypy cache
 .mypy_cache/
 .Rproj.user
+
+# log
+log/
+
+# cache
+cache/
+
+# ohsome_log
+ohsome_log/

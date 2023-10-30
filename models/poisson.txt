@@ -1,0 +1,44 @@
+
+Call:
+glm(formula = pedal_cycles ~ ., family = poisson(), data = all_var)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-95.708  -21.292  -11.213    3.985  248.378  
+
+Coefficients:
+                Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   -3.637e+01  3.919e-01  -92.82   <2e-16 ***
+year           2.089e-02  1.953e-04  106.96   <2e-16 ***
+bicycle        1.515e+01  3.091e-02  490.27   <2e-16 ***
+building      -7.078e-02  4.938e-03  -14.33   <2e-16 ***
+bus            1.855e+00  4.118e-03  450.51   <2e-16 ***
+car            2.878e+00  8.384e-03  343.30   <2e-16 ***
+fence          1.934e+00  6.886e-03  280.88   <2e-16 ***
+motorcycle     1.547e+00  7.617e-02   20.32   <2e-16 ***
+person         9.420e+00  1.633e-02  576.77   <2e-16 ***
+pole           4.488e-01  4.069e-02   11.03   <2e-16 ***
+rider          2.706e+01  5.550e-02  487.62   <2e-16 ***
+road           7.342e+00  7.457e-03  984.53   <2e-16 ***
+sidewalk       6.116e+00  9.389e-03  651.41   <2e-16 ***
+sky           -5.222e+00  6.655e-03 -784.66   <2e-16 ***
+terrain       -6.110e+00  1.292e-02 -472.83   <2e-16 ***
+traffic.light  8.170e+00  5.899e-02  138.50   <2e-16 ***
+traffic.sign   1.839e+00  4.636e-02   39.68   <2e-16 ***
+train          5.471e-01  1.156e-02   47.31   <2e-16 ***
+truck          1.698e+00  5.420e-03  313.28   <2e-16 ***
+vegetation    -1.727e+00  5.508e-03 -313.48   <2e-16 ***
+wall           1.544e-01  6.874e-03   22.47   <2e-16 ***
+period        -1.268e-01  9.039e-04 -140.25   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 25777597  on 20874  degrees of freedom
+Residual deviance: 16283396  on 20853  degrees of freedom
+  (408 observations deleted due to missingness)
+AIC: 16431670
+
+Number of Fisher Scoring iterations: 6
+

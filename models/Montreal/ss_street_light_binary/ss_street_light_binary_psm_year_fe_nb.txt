@@ -1,0 +1,56 @@
+
+Call:
+glm.nb(formula = formula, data = match_result_df, init.theta = 0.708971514, 
+    link = log)
+
+Coefficients:
+                          Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               0.307549   1.778520   0.173 0.862711    
+ss_street_light_binary   -0.021406   0.129363  -0.165 0.868570    
+year2010                 -1.757141   0.392559  -4.476 7.60e-06 ***
+year2011                 -0.732222   0.386100  -1.896 0.057899 .  
+year2012                 -1.656702   0.285651  -5.800 6.64e-09 ***
+year2014                 -1.622472   0.241008  -6.732 1.67e-11 ***
+year2015                 -1.428519   0.191278  -7.468 8.12e-14 ***
+year2016                 -0.752469   0.179054  -4.202 2.64e-05 ***
+year2017                 -0.992591   0.251368  -3.949 7.86e-05 ***
+year2018                 -0.293029   0.203937  -1.437 0.150758    
+year2019                  0.306108   0.196408   1.559 0.119107    
+year2020                 -0.439847   0.279816  -1.572 0.115970    
+year2021                 -0.241406   0.198192  -1.218 0.223208    
+year2022                 -0.313201   0.257566  -1.216 0.223984    
+age_0_19                  0.004454   0.008457   0.527 0.598432    
+age_20_39                -0.002749   0.005038  -0.546 0.585306    
+age_40_59                -0.025210   0.011579  -2.177 0.029461 *  
+lu_residential_community -0.001870   0.001760  -1.063 0.287988    
+slope                     0.012235   0.004671   2.619 0.008815 ** 
+ss_visual_complexity     -0.030854   0.018861  -1.636 0.101876    
+ss_construction           0.055680   0.009736   5.719 1.07e-08 ***
+ss_road_flat              0.013927   0.012907   1.079 0.280597    
+ss_marking                0.111916   0.061041   1.833 0.066733 .  
+ss_nature                -0.007839   0.020705  -0.379 0.704969    
+ss_street_object          0.026396   0.164548   0.160 0.872555    
+od_person_count           1.528850   0.151440  10.095  < 2e-16 ***
+od_bicycle_count         -0.127699   0.438015  -0.292 0.770637    
+od_vehicle_count          0.040460   0.026075   1.552 0.120735    
+od_animal_count          -6.018972   6.028986  -0.998 0.318115    
+pop_den_log               0.166263   0.045805   3.630 0.000284 ***
+average_income_log        0.155248   0.157952   0.983 0.325664    
+poi_log                   0.207376   0.046128   4.496 6.94e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for Negative Binomial(0.7234) family taken to be 1)
+
+    Null deviance: 1681.43  on 845  degrees of freedom
+Residual deviance:  995.41  on 814  degrees of freedom
+AIC: 7817.8
+
+Number of Fisher Scoring iterations: 25
+
+
+              Theta:  0.7090 
+          Std. Err.:  0.0324 
+Warning while fitting theta: alternation limit reached 
+
+ 2 x log-likelihood:  -7751.8030 

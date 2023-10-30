@@ -1,0 +1,8 @@
+GRF tree object 
+Number of training samples: 6194 
+Variable splits: 
+(1) split_variable: od_vehicle_count  split_value: 6.26471 
+  (2) split_variable: pop_den_log  split_value: 9.27612 
+    (4) * num_samples: 1509  avg_Y: 5.4 avg_W: 0.11 
+    (5) * num_samples: 788  avg_Y: 6.59 avg_W: 0.2 
+  (3) * num_samples: 800  avg_Y: 5.16 avg_W: 0.25 
