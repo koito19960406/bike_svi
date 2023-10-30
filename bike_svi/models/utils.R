@@ -5,6 +5,13 @@ pacman::p_load(
     doParallel, caret
 )
 
+clean_var_name <- function(var_name){
+    # Removing _binary, ss_, and _
+    cleaned_var_name <- gsub("_binary", "", var_name)
+    cleaned_var_name <- gsub("ss_", "", cleaned_var_name)
+    cleaned_var_name <- gsub("_", "", cleaned_var_name) 
+    return(cleaned_var_name)
+}
 
 remove_highly_correlated <- function(df, threshold = 0.7) {
     correlation_matrix <- cor(df, use = "complete.obs")
@@ -92,11 +99,21 @@ run_psm_nb <- function(data, dep_var_name, ind_var_name, covariates, model_dir, 
     # plot
     # pdf(paste0(figure_dir, "/", ind_var_name,"_match_result.pdf"), height = 2, width = 6)
     # plot(match_result, type = "density", interactive = FALSE)
-    plot <- bal.plot(match_result, var.name = "distance", which = "adjusted", lwd = 0.5) +
-        scale_fill_manual(values = alpha(c("#7B52AE", "#74B652"), 0.5)) +
-        labs(title = paste0("Distributional Balance for ", strsplit(ind_var_name, "_binary")[[1]][1])) +
+    # create a histogram in ggplot2
+    match_df <- as_tibble(match.data(match_result)) %>% 
+        # conevrt ind_var_name to factor
+        mutate(treatment := factor(!!sym(ind_var_name), levels = c(0, 1)))
+    plot <- ggplot(match_df) +
+        geom_histogram(aes(x = distance, fill = treatment, weight = weights), alpha = 0.7, binwidth = 0.01, colour = "black") +
+        scale_fill_manual(values = c("#7d7d7d", "#74B652")) +
+        labs(title = paste0("Distributional Balance for ", clean_var_name(ind_var_name))) +
         theme_ipsum()
     ggsave(paste0(figure_dir, "/", ind_var_name, "_match_result.png"), height = 4, width = 10)
+    # plot <- bal.plot(match_result, var.name = "distance", which = "adjusted", lwd = 1, type = "histogram", bins = 40) +
+    #     scale_fill_manual(values = alpha(c("#7d7d7d", "#74B652"), 1)) +
+    #     labs(title = paste0("Distributional Balance for ", clean_var_name(ind_var_name))) +
+    #     theme_ipsum()
+    # ggsave(paste0(figure_dir, "/", ind_var_name, "_match_result.png"), height = 4, width = 10)
 
     # model
     match_result_df <- match.data(match_result)

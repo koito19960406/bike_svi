@@ -1,7 +1,7 @@
 pacman::p_load(
   tidyverse, Hmisc, GGally, corrplot, RColorBrewer, ggplot2,
   hrbrthemes, stargazer, plotly, sf, basemaps, magrittr, cowplot, dotenv,
-  basemapR, ggnewscale, here, ggspatial, lwgeom, ggimage, cropcircles, ggrepel,
+  ggnewscale, here, ggspatial, lwgeom, ggimage, cropcircles, ggrepel, osmdata
 )
 extrafont::loadfonts()
 
@@ -248,6 +248,7 @@ for (city in city_list) {
     dir.create(figure_dir)
   }
   external_dir <- paste0(root_dir, "/data/external/cities/", city)
+  raw_dir <- paste0(root_dir, "/data/raw/cities/", city)
   interim_dir <- paste0(root_dir, "/data/interim/cities/", city)
   processed_dir <- paste0(root_dir, "/data/processed/cities/", city)
 
@@ -369,8 +370,8 @@ for (city in city_list) {
     st_join(., count_station_year_month) %>%
     st_drop_geometry() %>%
     mutate(year_group = cut(year,
-      breaks = c(2007, 2010, 2017, 2023),
-      labels = c("2008-2010", "2011-2017", "2018-2020")
+      breaks = c(2007, 2015, 2023),
+      labels = c("2008-2014", "2015-2020")
     )) %>%
     relocate(year_group, .after = year) %>%
     group_by(grid_id, year_group) %>%
@@ -378,10 +379,15 @@ for (city in city_list) {
     rename_with(.fn = function(x) {
       str_remove(x, "_1$")
     }) %>%
-    filter(year_group %in% c("2008-2010", "2018-2020")) %>%
+    filter(year_group %in% c("2008-2014", "2015-2020")) %>%
     dplyr::select(grid_id, year_group, count) %>%
     pivot_wider(names_from = year_group, values_from = count) %>%
-    mutate(change = `2018-2020` - `2008-2010`)
+    mutate(change = (`2015-2020` - `2008-2014`)/`2008-2014`*100) %>%
+    mutate(change = case_when(
+      change > 100 ~ 100,
+      change < -100 ~ -100,
+      TRUE ~ change),
+      change = as.numeric(change))
 
   hex_grid_joined <- hex_grid %>%
     left_join(., hex_grid_summarized, by = "grid_id") %>%
@@ -391,55 +397,38 @@ for (city in city_list) {
 
   # set up color and breaks
   my_palette <- colorRampPalette(c("#62428b", "#FFFFFF", "#5d9242"))
-  # Calculate quantiles for the value column
-  quantiles <- quantile(hex_grid_joined$change, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1))
-  # here I define custom labels (the default ones would be ugly)
-  labels <- c()
-
-  for (idx in 1:length(quantiles)) {
-    labels <- c(labels, paste0(
-      round(quantiles[idx], 2),
-      " — ",
-      round(quantiles[idx + 1], 2)
-    ))
-  }
-  # I need to remove the last label
-  # because that would be something like "66.62 - NA"
-  labels <- labels[1:length(labels) - 1]
 
   # Create the color scale
-  color_scale <- setNames(my_palette(length(quantiles) - 1), labels)
+  color_scale <- my_palette(100)
 
-  # here I actually create a new
-  # variable on the dataset with the quantiles
-  hex_grid_joined$change_quantile <- cut(hex_grid_joined$change,
-    breaks = quantiles,
-    labels = labels,
-    include.lowest = T
-  )
   subtitle <- case_when(
-    city == "London" ~ "Change in the count between 2008-2010 and 2018-2020",
-    city == "Montreal" ~ "Change in the count between 2008-2010 and 2018-2023"
+    city == "London" ~ "Change in the count between 2008-2014 and 2015-2020",
+    city == "Montreal" ~ "Change in the count between 2008-2014 and 2018-2023"
   )
   flush_cache()
   map <- basemap_ggplot(st_bbox(hex_grid_joined),
     map_service = "carto",
     map_type = "light_no_labels", map_res = 1,
-    force = T
-  ) +
+    force = T) +
     new_scale_fill() + # Add this line to introduce a new fill scale
     geom_sf(
-      data = hex_grid_joined,
-      mapping = aes(fill = change_quantile),
+      data = hex_grid_joined %>% dplyr::select(change),
+      mapping = aes(fill = as.numeric(change)),
       color = "black",
       size = 0.05
     ) +
-    scale_fill_manual(values = color_scale) +
+    scale_fill_gradientn(colours = color_scale, 
+      breaks = seq(-100, 100, by = 50),
+      labels = c("<-100%", "-50%", "0%", "50%", ">100%"),
+      limits = c(-100, 100),
+      guide = guide_colourbar(direction = "horizontal",
+        title.position = "bottom")
+    ) +
     # add titles
     labs(
       x = NULL,
       y = NULL,
-      fill = "Change in count",
+      fill = "Change in count (%)",
       title = city,
       subtitle = subtitle,
       caption = "Basemap: carto"
@@ -458,6 +447,113 @@ for (city in city_list) {
   ggsave(
     plot = map,
     filename = paste0(figure_dir, "/map_grid_count_change.png"),
+    width = 7,
+    height = 7,
+    units = c("in")
+  )
+
+  #TODO add map of GSV locations and street networks
+  # london: center = 51.5431569,-0.1382722
+  # montreal: center = 45.5189821,-73.5838274
+  # get street network from OSM with osmdata and save as shapefile
+  if (city == "London"){
+    center_lon <- -0.1382722
+    center_lat <- 51.5431569
+  } else if (city == "Montreal"){
+    center_lon <- -73.5838274
+    center_lat <- 45.5189821
+  }
+  center_sf <- st_sfc(st_point(c(center_lon, center_lat)), crs = 4326) %>% 
+    st_as_sf() %>%
+    mutate(center = 1)
+  # get a hex_grid_joined that touches the center point
+  hex_center_id <- hex_grid_joined %>%
+    st_transform(4326) %>%
+    st_join(., center_sf) %>%
+    dplyr::filter(center == 1) %>%
+    pull(grid_id) # everything outside of this hex will be more transparent
+
+  # create a buffer around the center of the hex
+  center_buffer_1500m <- hex_grid_joined %>%
+    dplyr::filter(grid_id == hex_center_id) %>%
+    st_centroid() %>%
+    st_transform(3857) %>%
+    st_buffer(1500) %>%  # this will be the frame of the plot
+    st_transform(4326)
+  # Identifying the center hexagon and creating an alpha variable
+  hex_grid_joined_intersected <- hex_grid_joined %>%
+    st_transform(4326) %>%
+    st_intersection(center_buffer_1500m) %>%
+    mutate(alpha = 1)
+  
+  # create 100m buffer around count_station
+  count_station_center <- count_station %>%
+    st_intersection(center_buffer_1500m)
+
+  count_station_buffer <- count_station_center %>%
+    st_transform(3857) %>%
+    st_buffer(100) %>%
+    st_transform(4326) %>% 
+    st_intersection(center_buffer_1500m)
+
+  if (!file.exists(paste0(external_dir, "/street_network.geojson"))){
+    street <- st_bbox(center_buffer_1500m) %>%
+      opq() %>%
+      add_osm_feature(key = "highway") %>%
+      osmdata_sf() %>%
+      magrittr::extract2("osm_lines") %>% 
+      dplyr::select(osm_id, name, geometry) %>%
+      st_transform(4326) %>%
+      # crop by the buffer
+      st_intersection(center_buffer_1500m)
+    street %>%
+      st_write(paste0(external_dir, "/street_network.geojson"), driver = "GeoJSON")
+  } else {
+    street <- read_sf(paste0(external_dir, "/street_network.geojson"))
+  }
+  # load GSV points
+  gsv_points <- read_csv(paste0(raw_dir, "/gsv_pids.csv")) %>%
+    st_as_sf(coords = c("lon", "lat"), crs = 4326) %>% 
+    st_intersection(center_buffer_1500m) %>% 
+    st_intersection(count_station_buffer)
+  # plot street network and GSV points: street in black, GSV points in #74B652, and center_sf in #7B52AE
+  plot <- ggplot() +
+    new_scale_fill() + # Add this line to introduce a new fill scale
+    geom_sf(data = hex_grid_joined_intersected %>% dplyr::select(change, alpha),
+      mapping = aes(fill = as.numeric(change), alpha = alpha),
+      color = "black",
+      size = 0.05
+    ) +
+    scale_alpha_continuous(guide = FALSE) +  # Add this line to remove the alpha legend
+    # scale_alpha_manual(values = c(1, 0.2), guide = FALSE) +  # Add this line to set manual alpha values
+    scale_fill_gradient2(
+      low = "#7B52AE",                    # Color for the low end of the scale
+      mid = "white",                   # Color for the midpoint of the scale
+      high = "#74B652",                    # Color for the high end of the scale
+      midpoint = 0,                    # Value at which mid color should be placed
+      breaks = seq(-100, 100, by = 50),
+      labels = c("<-100%", "-50%", "0%", "50%", ">100%"),
+      limits = c(-100, 100),
+      guide = FALSE
+    ) +
+    geom_sf(data = count_station_buffer, color='black', fill='white', alpha = 0.8) +
+    geom_sf(data = count_station_center, shape = 21, color='black', fill='#74B652', size = 0.1) +
+    geom_sf(data = street, color = "black", linewidth = 0.1) +
+    geom_sf(data = gsv_points, shape = 21, color='black', fill='white', size = 0.1) +
+    labs(
+      x = NULL,
+      y = NULL
+    ) +
+    theme_map() +
+    theme(
+      plot.margin = ggplot2::margin(0, 0, 0, 0),
+      legend.margin = ggplot2::margin(0, 0, 0, 0),  # Remove margin around the legend
+      legend.box.margin = ggplot2::margin(0, 0, 0, 0)  # Remove margin around the legend box
+    )
+  # save
+  ggsave(
+    plot = plot,
+    filename = paste0(figure_dir, "/grid_street_network_gsv_points.png"),
     width = 7,
     height = 7,
     units = c("in")

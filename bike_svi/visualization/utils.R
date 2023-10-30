@@ -8,6 +8,14 @@ round_to_n <- function(x, n = 2) {
   return(round(x * shift) / shift)
 }
 
+clean_var_name <- function(var_name){
+    # Removing _binary, ss_, and _
+    cleaned_var_name <- gsub("_binary", "", var_name)
+    cleaned_var_name <- gsub("ss_", "", cleaned_var_name)
+    cleaned_var_name <- gsub("_", " ", cleaned_var_name) 
+    return(cleaned_var_name)
+}
+
 plot_step <- function(file_path, ind_var_name, figure_dir) {
   df <- read.csv(file_path) %>%
     mutate(variable = as.factor(variable)) %>%
@@ -62,7 +70,7 @@ plot_step <- function(file_path, ind_var_name, figure_dir) {
     scale_fill_manual("", values = c("#7B52AE", "#74B652")) +
     theme_ipsum() +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-    labs(title = paste0("Step-wise model result for ", ind_var_name))
+    labs(title = paste0("Step-wise model result for ", clean_var_name(ind_var_name)))
 
   ggsave(paste0(figure_dir, "/", ind_var_name, "/", gsub(".csv", ".png", basename(file_path))), width = 8, height = 4)
 }
@@ -78,7 +86,7 @@ plot_importance <- function(file_path, ind_var_name, figure_dir, top_n=10){
           axis.text.y = element_text(size=10),
           plot.title = element_text(size=10,hjust=0.5),
           plot.title.position="plot") +
-    labs(title=paste0("Variable importance \n when estimating ", ind_var_name, " (top ", as.character(top_n), ")"),
+    labs(title=paste0("Variable importance \n when estimating ", clean_var_name(ind_var_name), " (top ", as.character(top_n), ")"),
          x="Variable names",
          y="Variable importance")
   ggsave(paste0(figure_dir, "/", ind_var_name, "/",str_replace(basename(file_path),".csv",".png")), width = 4, height = 5)
@@ -96,7 +104,7 @@ plot_cate_rank <- function(ind_var_name, forest.ate, figure_dir){
     #                    limits= c(-0.5, NA)) + 
     # scale_color_manual(values = cb_colors[1:2]) + 
     ylab("") + xlab("")  +
-    labs(title=paste0("Average CATT within each ranking \n for ", ind_var_name))+
+    labs(title=paste0("Average CATT within each ranking \n for ", clean_var_name(ind_var_name)))+
     theme_ipsum() +
     theme(plot.title = element_text(hjust=0.5),
           plot.title.position="plot")
@@ -155,7 +163,7 @@ plot_hte_covariate <- function(ind_var_name, model_dir, figure_dir) {
     ) +
     coord_flip() +
     labs(
-      title = paste0("Subgroup CATE for ", ind_var_name),
+      title = paste0("Subgroup CATE for ", clean_var_name(ind_var_name)),
       x = NULL,
       y = "",
       fill = ""
@@ -402,4 +410,26 @@ extract_autoc_and_ci_R <- function(content_line) {
   ci <- numbers[3]
 
   return(list(autoc = autoc, ci = ci))
+}
+
+map_grid <- function(grid, value, figure_dir) {
+  # set up color and breaks
+  my_palette <- colorRampPalette(c("#62428b", "#FFFFFF", "#5d9242"))
+
+  # Create the color scale
+  color_scale <- my_palette(100)
+  # map grid with random values as fill
+  map_grid <- ggplot(grid) +
+    geom_sf(aes(fill = .data[[value]]), color = NA) +
+    # use red to blue color
+    scale_fill_gradientn(colours = color_scale) +
+    theme_minimal() +
+    theme(legend.position = "none",
+          axis.title = element_blank(),
+          axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid = element_blank(),
+          panel.border = element_blank())
+  # save the map
+  ggsave(paste0(figure_dir, "/", ind_var_name, "/grid_map.png"), map_grid, width = 6, height = 6)
 }

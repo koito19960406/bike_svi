@@ -78,6 +78,10 @@ if __name__ == "__main__":
     # create output dir
     output_folder = "reports/images/before_after"
     os.makedirs(output_folder, exist_ok=True)
-    panoid_list = ["EU0H0gXnaSCndsEjiXd5PQ", "lgJTRmBafkPEcZ35pSROzA", "cDz_Uczcmm5l2K0TepfvXw", "1z8WJ3iEYFPEfoKsKA_pVQ"]
+    panoid_list = [
+        "sFWC7xEehg9cPFoRThdC_w", # London before
+        "bFAMQU2ryF12Wlj2yTPtNw", # London after
+        "e8HGLGkJbqCa8f5kwHuTtQ", # Montreal before
+        "JbyV30UD3p15LXGWrEHWRA"] # Montreal after
     for panoid in panoid_list:
         SimplifiedImageTool.save_image(panoid, output_folder)
