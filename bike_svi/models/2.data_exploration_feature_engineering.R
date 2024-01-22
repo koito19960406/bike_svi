@@ -325,7 +325,6 @@ for (city in city_list) {
   hex_grid_summarized <- hex_grid %>%
     st_join(., all_var_map) %>%
     st_drop_geometry() %>%
-    st_drop_geometry() %>%
     group_by(grid_id) %>%
     dplyr::summarize(across(everything(), .f = list(mean), na.rm = TRUE)) %>%
     rename_with(.fn = function(x) {

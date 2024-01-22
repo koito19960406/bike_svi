@@ -1,0 +1,30 @@
+--------------------------------------------
+Maximum Likelihood estimation
+Newton-Raphson maximisation, 2 iterations
+Return code 8: successive function values within relative tolerance limit (reltol)
+Log-Likelihood: -8155991 
+19  free parameters
+Estimates:
+               Estimate Std. error t value Pr(> t)    
+bicycle       15.132741   0.031240  484.40  <2e-16 ***
+building      -0.098277   0.004940  -19.89  <2e-16 ***
+bus            1.816224   0.004129  439.89  <2e-16 ***
+car            2.910452   0.008412  346.00  <2e-16 ***
+fence          1.915872   0.006882  278.41  <2e-16 ***
+motorcycle     1.425443   0.076114   18.73  <2e-16 ***
+person         9.369897   0.016463  569.14  <2e-16 ***
+pole           0.537081   0.040709   13.19  <2e-16 ***
+rider         26.644499   0.055750  477.93  <2e-16 ***
+road           7.403753   0.007498  987.41  <2e-16 ***
+sidewalk       6.185486   0.009410  657.35  <2e-16 ***
+sky           -5.239726   0.006663 -786.42  <2e-16 ***
+terrain       -6.034200   0.012922 -466.98  <2e-16 ***
+traffic.light  8.005862   0.059037  135.61  <2e-16 ***
+traffic.sign   1.636344   0.046249   35.38  <2e-16 ***
+train          0.567528   0.011493   49.38  <2e-16 ***
+truck          1.658161   0.005421  305.87  <2e-16 ***
+vegetation    -1.754161   0.005512 -318.23  <2e-16 ***
+wall           0.151101   0.006897   21.91  <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+--------------------------------------------

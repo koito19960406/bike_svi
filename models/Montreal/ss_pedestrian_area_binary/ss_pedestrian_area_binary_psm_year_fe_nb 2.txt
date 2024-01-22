@@ -1,0 +1,49 @@
+
+Call:
+glm.nb(formula = formula, data = match_result_df, init.theta = 1365484.15, 
+    link = log)
+
+Coefficients:
+                            Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               186.455232  65.106033   2.864 0.004185 ** 
+ss_pedestrian_area_binary  -1.793760   0.413594  -4.337 1.44e-05 ***
+year2015                  -32.813505  11.896024  -2.758 0.005809 ** 
+year2016                  -23.730150   7.566263  -3.136 0.001711 ** 
+year2018                  -27.136763   8.744349  -3.103 0.001913 ** 
+year2019                  -45.304920  17.697871  -2.560 0.010470 *  
+year2022                  -21.955575   7.482078  -2.934 0.003342 ** 
+age_0_19                    0.988447   0.292516   3.379 0.000727 ***
+age_20_39                   0.850066   0.285150   2.981 0.002872 ** 
+age_40_59                   0.214351   0.029757   7.203 5.87e-13 ***
+lu_residential_community    0.009096   0.019843   0.458 0.646661    
+slope                       1.308104   0.436466   2.997 0.002726 ** 
+ss_visual_complexity        1.793639   0.561526   3.194 0.001402 ** 
+ss_construction            -0.375910   0.089060  -4.221 2.43e-05 ***
+ss_road_flat               -0.262697   0.158204  -1.660 0.096814 .  
+ss_marking                 -2.147767   1.127154  -1.905 0.056718 .  
+ss_nature                  -1.789277   0.627172  -2.853 0.004332 ** 
+ss_street_object          -41.876543  14.841405  -2.822 0.004778 ** 
+od_person_count           -10.483353   4.639232  -2.260 0.023839 *  
+od_bicycle_count           19.679189   7.774818   2.531 0.011369 *  
+od_vehicle_count           -2.390545   0.775443  -3.083 0.002051 ** 
+od_animal_count           -73.336403  24.781205  -2.959 0.003083 ** 
+pop_den_log                -4.228539   1.590854  -2.658 0.007860 ** 
+average_income_log        -18.735749   5.854184  -3.200 0.001372 ** 
+poi_log                     3.344526   0.700272   4.776 1.79e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for Negative Binomial(1365484) family taken to be 1)
+
+    Null deviance:  1.0865e+04  on 25  degrees of freedom
+Residual deviance: -3.2017e-10  on  1  degrees of freedom
+AIC: 190.55
+
+Number of Fisher Scoring iterations: 1
+
+
+              Theta:  1365484 
+          Std. Err.:  12518723 
+Warning while fitting theta: iteration limit reached 
+
+ 2 x log-likelihood:  -138.548 
