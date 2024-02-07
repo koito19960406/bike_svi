@@ -1,0 +1,47 @@
+
+Call:
+glm.nb(formula = formula, data = data, init.theta = 0.5433131546, 
+    link = log)
+
+Coefficients:
+                           Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               3.6960368  1.0759995   3.435 0.000593 ***
+slope_binary_65percent   -0.1969992  0.0811200  -2.428 0.015162 *  
+year2011                  0.4052636  0.8203312   0.494 0.621289    
+year2012                 -0.4711446  0.6956081  -0.677 0.498207    
+year2014                 -0.1262532  0.6953292  -0.182 0.855918    
+year2015                  0.5386842  0.6896165   0.781 0.434723    
+year2016                 -0.2109269  0.7007178  -0.301 0.763403    
+year2017                  0.0099097  0.6967258   0.014 0.988652    
+year2018                  0.1675062  0.7045383   0.238 0.812073    
+year2019                  0.2596326  0.6897112   0.376 0.706592    
+month4                    0.1056755  0.2167075   0.488 0.625804    
+month5                   -0.1585417  0.1881889  -0.842 0.399530    
+month6                   -0.1855300  0.1907444  -0.973 0.330721    
+month7                    0.0586788  0.2115052   0.277 0.781447    
+month9                    0.0112773  0.2126836   0.053 0.957713    
+month10                  -0.3283432  0.2124576  -1.545 0.122237    
+month11                  -0.9856081  1.3725361  -0.718 0.472700    
+age_0_19                 -0.0674635  0.0086167  -7.829 4.90e-15 ***
+age_20_39                 0.0309227  0.0071116   4.348 1.37e-05 ***
+age_40_59                -0.0205778  0.0161981  -1.270 0.203950    
+lu_residential_community  0.0002709  0.0056683   0.048 0.961883    
+lu_commerce_developed     0.0267649  0.0035651   7.507 6.03e-14 ***
+ss_visual_complexity      0.0525764  0.0112761   4.663 3.12e-06 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for Negative Binomial(0.5433) family taken to be 1)
+
+    Null deviance: 2217.7  on 1273  degrees of freedom
+Residual deviance: 1571.5  on 1251  degrees of freedom
+AIC: 15777
+
+Number of Fisher Scoring iterations: 1
+
+
+              Theta:  0.5433 
+          Std. Err.:  0.0189 
+Warning while fitting theta: alternation limit reached 
+
+ 2 x log-likelihood:  -15728.9580 

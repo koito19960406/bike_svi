@@ -1,4 +1,12 @@
 GRF tree object 
-Number of training samples: 859 
+Number of training samples: 399 
 Variable splits: 
-(1) * num_samples: 429  avg_Y: 3.03 avg_W: 0.35 
+(1) split_variable: od_vehicle_count  split_value: 6.16667 
+  (2) split_variable: age_0_19  split_value: 20.8009 
+    (4) * num_samples: 92  avg_Y: 6.85 avg_W: 0.29 
+    (5) * num_samples: 44  avg_Y: 6.05 avg_W: 0.25 
+  (3) split_variable: age_40_59  split_value: 27.6442 
+    (6) split_variable: age_40_59  split_value: 23.2775 
+      (8) * num_samples: 12  avg_Y: 7.22 avg_W: 0.67 
+      (9) * num_samples: 30  avg_Y: 6.9 avg_W: 0.47 
+    (7) * num_samples: 21  avg_Y: 6.78 avg_W: 0.29 

@@ -1,0 +1,46 @@
+
+Call:
+glm.nb(formula = formula, data = data, init.theta = 0.5342903352, 
+    link = log)
+
+Coefficients:
+                                Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                     5.739192   1.031349   5.565 2.63e-08 ***
+ss_vegetation_binary_60percent  0.143665   0.082476   1.742 0.081523 .  
+year2011                       -0.053874   0.826766  -0.065 0.948044    
+year2012                       -0.287792   0.699331  -0.412 0.680687    
+year2014                        0.029154   0.699357   0.042 0.966748    
+year2015                        0.712058   0.693573   1.027 0.304584    
+year2016                       -0.040077   0.704313  -0.057 0.954623    
+year2017                        0.213994   0.700365   0.306 0.759950    
+year2018                        0.184089   0.710314   0.259 0.795507    
+year2019                        0.277116   0.695296   0.399 0.690218    
+month4                         -0.005470   0.218577  -0.025 0.980036    
+month5                         -0.200642   0.189933  -1.056 0.290792    
+month6                         -0.247322   0.192286  -1.286 0.198367    
+month7                          0.001895   0.213935   0.009 0.992933    
+month9                         -0.062520   0.214218  -0.292 0.770400    
+month10                        -0.360504   0.214430  -1.681 0.092719 .  
+month11                        -0.880481   1.385523  -0.635 0.525112    
+age_0_19                       -0.075025   0.010260  -7.312 2.63e-13 ***
+age_20_39                       0.028390   0.007498   3.787 0.000153 ***
+age_40_59                      -0.027025   0.016313  -1.657 0.097596 .  
+lu_residential_community        0.003264   0.005710   0.571 0.567662    
+lu_commerce_developed           0.027979   0.003721   7.519 5.52e-14 ***
+IMD_score                       0.008433   0.004439   1.900 0.057460 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for Negative Binomial(0.5343) family taken to be 1)
+
+    Null deviance: 2182.3  on 1273  degrees of freedom
+Residual deviance: 1574.2  on 1251  degrees of freedom
+AIC: 15805
+
+Number of Fisher Scoring iterations: 1
+
+
+              Theta:  0.5343 
+          Std. Err.:  0.0186 
+
+ 2 x log-likelihood:  -15756.6110 

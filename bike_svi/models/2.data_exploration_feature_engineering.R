@@ -1,7 +1,8 @@
 pacman::p_load(
   tidyverse, Hmisc, GGally, corrplot, RColorBrewer, ggplot2,
   hrbrthemes, stargazer, plotly, sf, basemaps, magrittr, cowplot, dotenv,
-  ggnewscale, here, ggspatial, lwgeom, ggimage, cropcircles, ggrepel, osmdata
+  ggnewscale, here, ggspatial, lwgeom, ggimage, cropcircles, ggrepel, osmdata,
+  ggridges
 )
 extrafont::loadfonts()
 
@@ -251,7 +252,10 @@ for (city in city_list) {
   raw_dir <- paste0(root_dir, "/data/raw/cities/", city)
   interim_dir <- paste0(root_dir, "/data/interim/cities/", city)
   processed_dir <- paste0(root_dir, "/data/processed/cities/", city)
-
+  target <- case_when(
+    city == "London" ~ "cyclists",
+    city == "Montreal" ~ "pedestrians"
+  )
   # read in the data
   # binarize some variables: ss_sidewalk, ss_pedestrian_area, ss_bike_lane, ss_bike_rack, ss_parking
   # TODO: only keep some columns from object detection (i.e., columns that start with "od_" + vehicles + people):
@@ -259,7 +263,8 @@ for (city in city_list) {
   # od_bicycle: od_bicyclist, od_bicycle
   # od_vehicle_count: od_vehicle, od_bus, od_car, od_caravan, od_motorcycle, od_truck, od_other_vehicle, od_trailer, od_train, od_wheeled_slow, od_ego_vehicle
   # od_animal_count: od_bird, od_ground_animal
-  all_var_with_id <- read.csv(paste0(processed_dir, "/all_var_joined.csv")) %>%
+  all_var_raw <- read.csv(paste0(processed_dir, "/all_var_joined.csv"))
+  all_var_with_id <- all_var_raw %>%
     dplyr::select(-contains("binary"), -contains("count_log")) %>%
     dplyr::select(-c(
       age_60_90, lu_others,
@@ -301,11 +306,79 @@ for (city in city_list) {
   pdf(paste0(figure_dir, "/correlation_mat.pdf"), height = 7, width = 7)
   corrplot(corrmatrix,
     method = "square", tl.col = "black", tl.cex = 0.6,
-    p.mat = p.mat, sig.level = 0.05, insig = "pch", pch.cex = 1, col = col1(100),
+    p.mat = p.mat, sig.level = 0.05, insig = "pch", pch.cex = 1, col = col1(10),
     title = "Correlation matrix of all variables",
     mar = c(0, 0, 1, 0)
   )
   dev.off()
+
+  # violiin plot of "count" by "year" --------------------------------------
+  count_violin_plot <- all_var_raw %>%
+    # convert count over 1000 to 1000
+    mutate(count = ifelse(count > 1000, 1000, count)) %>%
+    ggplot(aes(x = count, y = year, group = year)) +
+    geom_density_ridges(fill = "#7B52AE", color = "black", alpha = 0.5, from = 0, to = 1000) +
+    labs(
+      x = "Count",
+      y = "Year",
+      title = "Distribution of count by year",
+      subtitle = city,
+      caption = ""
+    ) +
+    # set breaks and labels: x-axis by 250 and y-axis by 1
+    scale_x_continuous(breaks = seq(0, 1000, by = 250), labels = c("0", "250", "500", "750", ">=1000")) +
+    scale_y_continuous(breaks = seq(min(all_var_raw$year), max(all_var_raw$year), by = 1), labels = seq(min(all_var_raw$year), max(all_var_raw$year), by = 1)) +
+    theme_ipsum() +
+    theme(
+      plot.margin = ggplot2::margin(0, 0, 0, 0),
+      legend.margin = ggplot2::margin(0, 0, 0, 0),  # Remove margin around the legend
+      legend.box.margin = ggplot2::margin(0, 0, 0, 0)  # Remove margin around the legend box
+    )
+  # save
+  ggsave(
+    plot = count_violin_plot,
+    filename = paste0(figure_dir, "/count_ridge_plot.png"),
+    width = 7,
+    height = 7,
+    units = c("in")
+  )
+
+  # ridge plot of "od_person_count", "od_vehicle_count", "od_biycle_count": not grouped by year --------------------------------------
+  od_ridge_plot <- all_var_raw %>%
+    # show three variables: od_person_count, od_vehicle_count, od_bicycle_count one by one in the same plot
+    pivot_longer(
+      cols = c(od_person_count, od_vehicle_count, od_bicycle_count),
+      names_to = "variable",
+      values_to = "value"
+    ) %>%
+    # create an order for the variables: 1. od_person_count, 2. od_vehicle_count, 3. od_bicycle_count
+    mutate(variable = factor(variable, levels = c("od_person_count", "od_vehicle_count", "od_bicycle_count"))) %>%
+    ggplot(aes(x = value, y = variable, group = variable)) +
+    geom_density_ridges(fill = "#7B52AE", color = "black", alpha = 0.5, from = 0, to = 15, scale = 1, rel_min_height = 0.001) +
+    labs(
+      x = "Count",
+      y = "Variable",
+      title = "Distribution of object detection count",
+      subtitle = city,
+      caption = ""
+    ) +
+    # set breaks and labels: x-axis by 250 and y-axis by 1
+    scale_x_continuous(breaks = seq(0, 15, by = 3)) +
+    scale_y_discrete(labels = c("Person", "Vehicle", "Bicycle")) +
+    theme_ipsum() +
+    theme(
+      plot.margin = ggplot2::margin(0, 0, 0, 0),
+      legend.margin = ggplot2::margin(0, 0, 0, 0),  # Remove margin around the legend
+      legend.box.margin = ggplot2::margin(0, 0, 0, 0)  # Remove margin around the legend box
+    )
+  # save
+  ggsave(
+    plot = od_ridge_plot,
+    filename = paste0(figure_dir, "/od_ridge_plot.png"),
+    width = 7,
+    height = 7,
+    units = c("in")
+  )
 
   # map greenery and cycling ------------------------------------------------
   count_station <- read_csv(paste0(external_dir, "/count_station_clean.csv")) %>%
@@ -337,11 +410,6 @@ for (city in city_list) {
     rename(geometry = x) %>%
     st_transform(3857)
 
-  target <- case_when(
-    city == "London" ~ "cyclists",
-    city == "Montreal" ~ "pedestrians"
-  )
-
   map_bivariate(hex_grid_joined,
     "ss_vegetation",
     "count",
@@ -354,6 +422,7 @@ for (city in city_list) {
     caption = ""
   )
 
+  # map change in count ----------------------------------------------------
   count_station_year_month <- read.csv(paste0(interim_dir, "/count_station_year_month.csv")) %>%
     left_join(., count_station, by = "count_point_id") %>%
     st_as_sf()
@@ -401,9 +470,14 @@ for (city in city_list) {
   color_scale <- my_palette(100)
 
   subtitle <- case_when(
-    city == "London" ~ "Change in the count between 2008-2014 and 2015-2020",
-    city == "Montreal" ~ "Change in the count between 2008-2014 and 2018-2023"
+    city == "London" ~ "Change in cyclist count between 2008-2014 and 2015-2020",
+    city == "Montreal" ~ "Change in pedestrian count between 2008-2014 and 2018-2023"
   )
+  fill <- case_when(
+    city == "London" ~ "Change in cyclist count (%)",
+    city == "Montreal" ~ "Change in pedestrian count (%)"
+  )
+  
   flush_cache()
   map <- basemap_ggplot(st_bbox(hex_grid_joined),
     map_service = "carto",
@@ -427,7 +501,7 @@ for (city in city_list) {
     labs(
       x = NULL,
       y = NULL,
-      fill = "Change in count (%)",
+      fill = fill,
       title = city,
       subtitle = subtitle,
       caption = "Basemap: carto"

@@ -1,54 +1,60 @@
 
 Call:
-glm.nb(formula = formula, data = match_result_df, init.theta = 1.004395387, 
-    link = log)
+glm.nb(formula = formula, data = match_result_df, weights = weights, 
+    init.theta = 0.6342235296, link = log)
 
 Coefficients:
-                          Estimate Std. Error z value Pr(>|z|)    
-(Intercept)              -7.956700   0.730350 -10.894  < 2e-16 ***
-ss_vegetation_binary      0.195818   0.025707   7.617 2.59e-14 ***
-year2011                 -0.107091   0.459536  -0.233  0.81573    
-year2012                  0.003145   0.449869   0.007  0.99442    
-year2013                  0.481586   0.564264   0.853  0.39339    
-year2014                 -0.108762   0.449972  -0.242  0.80901    
-year2015                 -0.117812   0.450017  -0.262  0.79348    
-year2016                 -0.142119   0.450291  -0.316  0.75229    
-year2017                 -0.244829   0.450308  -0.544  0.58665    
-year2018                 -0.483219   0.450223  -1.073  0.28314    
-year2019                 -0.652488   0.449887  -1.450  0.14696    
-age_0_19                 -0.019119   0.003441  -5.555 2.77e-08 ***
-age_20_39                 0.033294   0.002536  13.130  < 2e-16 ***
-age_40_59                 0.049744   0.004778  10.411  < 2e-16 ***
-IMD_score                 0.022562   0.001388  16.258  < 2e-16 ***
-lu_residential_community  0.003906   0.001355   2.882  0.00395 ** 
-lu_commerce_developed    -0.003113   0.001331  -2.338  0.01937 *  
-ss_visual_complexity     -0.026307   0.006718  -3.916 9.01e-05 ***
-slope                    -0.044353   0.001812 -24.472  < 2e-16 ***
-ss_construction           0.009894   0.003786   2.614  0.00896 ** 
-ss_road_flat              0.004090   0.004388   0.932  0.35128    
-ss_marking                0.177216   0.013017  13.614  < 2e-16 ***
-ss_nature                 0.001065   0.007584   0.140  0.88836    
-ss_street_object          0.380770   0.074810   5.090 3.58e-07 ***
-od_person_count          -0.016084   0.031741  -0.507  0.61236    
-od_bicycle_count          1.434492   0.136339  10.522  < 2e-16 ***
-od_vehicle_count         -0.041380   0.007108  -5.822 5.83e-09 ***
-od_animal_count          -0.687253   1.230922  -0.558  0.57662    
-pop_den_log               0.148622   0.017588   8.450  < 2e-16 ***
-housing_price_log         0.806484   0.031826  25.341  < 2e-16 ***
-poi_log                   0.316299   0.015186  20.828  < 2e-16 ***
+                           Estimate Std. Error z value Pr(>|z|)    
+(Intercept)              -5.1697152  1.8092588  -2.857 0.004272 ** 
+ss_vegetation_binary      0.1871389  0.0791614   2.364 0.018078 *  
+year2011                 -0.2524984  0.9515405  -0.265 0.790734    
+year2012                 -0.8859682  0.8189165  -1.082 0.279307    
+year2014                 -0.7904046  0.8189696  -0.965 0.334484    
+year2015                 -0.3559773  0.8150352  -0.437 0.662283    
+year2016                 -1.1574271  0.8214607  -1.409 0.158839    
+year2017                 -0.8296764  0.8213053  -1.010 0.312403    
+year2018                 -0.6668275  0.8261951  -0.807 0.419605    
+year2019                 -0.7438695  0.8166673  -0.911 0.362369    
+month4                   -0.1054588  0.2169849  -0.486 0.626954    
+month5                   -0.2781464  0.1987786  -1.399 0.161730    
+month6                   -0.1323520  0.1998199  -0.662 0.507743    
+month7                    0.0088564  0.2175311   0.041 0.967524    
+month9                   -0.1471847  0.2187069  -0.673 0.500962    
+month10                  -0.2725161  0.2182175  -1.249 0.211728    
+month11                  -0.3456699  1.4914336  -0.232 0.816716    
+age_0_19                 -0.0224636  0.0107481  -2.090 0.036617 *  
+age_20_39                 0.0366845  0.0078475   4.675 2.94e-06 ***
+age_40_59                 0.0277221  0.0150690   1.840 0.065817 .  
+IMD_score                 0.0089759  0.0045586   1.969 0.048952 *  
+lu_residential_community -0.0008289  0.0053079  -0.156 0.875897    
+lu_commerce_developed     0.0031509  0.0038338   0.822 0.411138    
+ss_visual_complexity      0.0022998  0.0125768   0.183 0.854910    
+slope                    -0.0367955  0.0058460  -6.294 3.09e-10 ***
+ss_construction          -0.0182467  0.0076995  -2.370 0.017796 *  
+ss_road_flat             -0.0211600  0.0077282  -2.738 0.006181 ** 
+ss_marking                0.1801646  0.0247846   7.269 3.62e-13 ***
+ss_nature                -0.0152042  0.0174626  -0.871 0.383934    
+ss_street_object          0.4657207  0.1306622   3.564 0.000365 ***
+od_person_count           0.2010193  0.0707891   2.840 0.004516 ** 
+od_vehicle_count         -0.0248386  0.0178652  -1.390 0.164428    
+od_animal_count           1.4140390  1.4077453   1.004 0.315152    
+pop_den_log               0.1077982  0.0547868   1.968 0.049115 *  
+housing_price_log         0.6374441  0.1010744   6.307 2.85e-10 ***
+poi_log                   0.3305645  0.0464583   7.115 1.12e-12 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-(Dispersion parameter for Negative Binomial(1.0044) family taken to be 1)
+(Dispersion parameter for Negative Binomial(0.6342) family taken to be 1)
 
-    Null deviance: 16500.5  on 7247  degrees of freedom
-Residual deviance:  8452.5  on 7217  degrees of freedom
-AIC: 100331
+    Null deviance: 2750.7  on 1273  degrees of freedom
+Residual deviance: 1546.7  on 1238  degrees of freedom
+AIC: 15240
 
 Number of Fisher Scoring iterations: 1
 
 
-              Theta:  1.0044 
-          Std. Err.:  0.0152 
+              Theta:  0.6342 
+          Std. Err.:  0.0230 
+Warning while fitting theta: alternation limit reached 
 
- 2 x log-likelihood:  -100266.8990 
+ 2 x log-likelihood:  -15165.9610 

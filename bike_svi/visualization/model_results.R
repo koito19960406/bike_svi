@@ -202,6 +202,9 @@ City&Variables&Metrics&Before the matching &After the matching \\\\\\midrule
     file_path <- paste0(model_dir, "/",treatment_var,"/", "year_negative_binomial_result.csv")
     plot_step(file_path, treatment_var, figure_dir)
 
+    # propensity score map ----------------------------------------------------
+    map_propensity_score(city, external_dir, treatment_var, model_dir, figure_dir)
+
     # causal forest feature importance ----------------------------------------
     file_path <- paste0(model_dir, "/",treatment_var,"/", "binary_causal_forest_var_imp.csv")
     plot_importance(file_path, treatment_var, figure_dir)

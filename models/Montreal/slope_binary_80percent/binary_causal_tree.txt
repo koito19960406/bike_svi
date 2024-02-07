@@ -1,0 +1,6 @@
+GRF tree object 
+Number of training samples: 399 
+Variable splits: 
+(1) split_variable: poi_log  split_value: 2.30259 
+  (2) * num_samples: 80  avg_Y: 5.81 avg_W: 0.17 
+  (3) * num_samples: 119  avg_Y: 7.3 avg_W: 0.21 

@@ -1,0 +1,12 @@
+GRF tree object 
+Number of training samples: 399 
+Variable splits: 
+(1) split_variable: pop_den_log  split_value: 7.77685 
+  (2) * num_samples: 30  avg_Y: 5.72 avg_W: 0.33 
+  (3) split_variable: lu_residential_community  split_value: 97.3509 
+    (4) split_variable: age_40_59  split_value: 23.9515 
+      (6) * num_samples: 45  avg_Y: 7.37 avg_W: 0.51 
+      (7) * num_samples: 64  avg_Y: 6.55 avg_W: 0.23 
+    (5) split_variable: ss_nature  split_value: 1.14465 
+      (8) * num_samples: 32  avg_Y: 7.14 avg_W: 0.31 
+      (9) * num_samples: 28  avg_Y: 6.5 avg_W: 0.43 

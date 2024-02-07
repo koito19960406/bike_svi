@@ -1,0 +1,45 @@
+
+Call:
+glm.nb(formula = formula, data = data, init.theta = 0.5356312822, 
+    link = log)
+
+Coefficients:
+                          Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               5.742100   1.019616   5.632 1.79e-08 ***
+slope_binary_60percent   -0.248681   0.079398  -3.132  0.00174 ** 
+year2011                  0.099249   0.825384   0.120  0.90429    
+year2012                 -0.228706   0.698611  -0.327  0.74339    
+year2014                  0.057869   0.698567   0.083  0.93398    
+year2015                  0.761641   0.692815   1.099  0.27162    
+year2016                  0.008220   0.703568   0.012  0.99068    
+year2017                  0.247436   0.699569   0.354  0.72357    
+year2018                  0.184233   0.709418   0.260  0.79510    
+year2019                  0.309106   0.694502   0.445  0.65626    
+month4                    0.034732   0.218158   0.159  0.87351    
+month5                   -0.176793   0.189392  -0.933  0.35057    
+month6                   -0.196226   0.191939  -1.022  0.30662    
+month7                    0.021665   0.212788   0.102  0.91890    
+month9                   -0.041925   0.213746  -0.196  0.84450    
+month10                  -0.345742   0.213689  -1.618  0.10567    
+month11                  -1.086073   1.382403  -0.786  0.43208    
+age_0_19                 -0.069321   0.008661  -8.004 1.21e-15 ***
+age_20_39                 0.030510   0.007146   4.270 1.96e-05 ***
+age_40_59                -0.024620   0.016301  -1.510  0.13095    
+lu_residential_community  0.002927   0.005694   0.514  0.60725    
+lu_commerce_developed     0.027921   0.003587   7.783 7.09e-15 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for Negative Binomial(0.5356) family taken to be 1)
+
+    Null deviance: 2187.6  on 1273  degrees of freedom
+Residual deviance: 1573.8  on 1252  degrees of freedom
+AIC: 15798
+
+Number of Fisher Scoring iterations: 1
+
+
+              Theta:  0.5356 
+          Std. Err.:  0.0186 
+
+ 2 x log-likelihood:  -15752.4900 

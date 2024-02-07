@@ -3,54 +3,56 @@ Call:
 zeroinfl(formula = formula, data = data, dist = count_model, link = "logit")
 
 Pearson residuals:
-    Min      1Q  Median      3Q     Max 
--0.8349 -0.6590 -0.4068  0.1015 67.6681 
+     Min       1Q   Median       3Q      Max 
+-0.84058 -0.66134 -0.39987  0.08963 68.58669 
 
 Count model coefficients (negbin with log link):
-                          Estimate Std. Error z value Pr(>|z|)
-(Intercept)               3.910497         NA      NA       NA
-slope_binary              0.199754         NA      NA       NA
-year2010                 -1.412826         NA      NA       NA
-year2011                 -1.343322         NA      NA       NA
-year2012                 -1.194132         NA      NA       NA
-year2014                 -1.064008         NA      NA       NA
-year2015                 -0.829215         NA      NA       NA
-year2016                 -0.085694         NA      NA       NA
-year2017                 -0.203955         NA      NA       NA
-year2018                  0.618418         NA      NA       NA
-year2019                  1.029219         NA      NA       NA
-year2020                  0.198040         NA      NA       NA
-year2021                  0.633450         NA      NA       NA
-year2022                  0.437177         NA      NA       NA
-age_0_19                 -0.009365         NA      NA       NA
-age_20_39                 0.032479         NA      NA       NA
-age_40_59                -0.016171         NA      NA       NA
-lu_residential_community -0.010508         NA      NA       NA
-ss_nature                -0.035011         NA      NA       NA
-Log(theta)               -0.352689         NA      NA       NA
+                         Estimate Std. Error z value Pr(>|z|)
+(Intercept)               0.68261         NA      NA       NA
+slope_binary              0.27896         NA      NA       NA
+year2010                 -1.25929         NA      NA       NA
+year2011                 -1.22497         NA      NA       NA
+year2012                 -1.04867         NA      NA       NA
+year2014                 -0.91841         NA      NA       NA
+year2015                 -0.78621         NA      NA       NA
+year2016                  0.01402         NA      NA       NA
+year2017                 -0.06388         NA      NA       NA
+year2018                  0.77091         NA      NA       NA
+year2019                  1.14756         NA      NA       NA
+year2020                  0.21703         NA      NA       NA
+year2021                  0.72873         NA      NA       NA
+year2022                  0.52728         NA      NA       NA
+age_0_19                 -0.01072         NA      NA       NA
+age_20_39                 0.02967         NA      NA       NA
+age_40_59                -0.01759         NA      NA       NA
+lu_commerce_developped    0.03018         NA      NA       NA
+lu_residential_community  0.02016         NA      NA       NA
+ss_street_object          0.30946         NA      NA       NA
+Log(theta)               -0.33950         NA      NA       NA
 
 Zero-inflation model coefficients (binomial with logit link):
-                          Estimate Std. Error z value Pr(>|z|)
-(Intercept)               -0.09617         NA      NA       NA
-slope_binary              -1.01431         NA      NA       NA
-year2010                 -10.53072         NA      NA       NA
-year2011                  -2.05533         NA      NA       NA
-year2012                 -14.75671         NA      NA       NA
-year2014                 -17.15902         NA      NA       NA
-year2015                   2.84699         NA      NA       NA
-year2016                  -0.23829         NA      NA       NA
-year2017                 -15.22714         NA      NA       NA
-year2018                  -1.81418         NA      NA       NA
-year2019                  -0.32105         NA      NA       NA
-year2020                 -17.78395         NA      NA       NA
-year2021                  -1.47690         NA      NA       NA
-year2022                  -0.13157         NA      NA       NA
-age_0_19                   0.08572         NA      NA       NA
-age_20_39                 -0.14868         NA      NA       NA
-age_40_59                  0.03855         NA      NA       NA
-lu_residential_community  -0.05335         NA      NA       NA
-ss_nature                  0.16558         NA      NA       NA
+                           Estimate Std. Error z value Pr(>|z|)
+(Intercept)               -8.309414         NA      NA       NA
+slope_binary               0.257978         NA      NA       NA
+year2010                   3.218795         NA      NA       NA
+year2011                  -4.017115         NA      NA       NA
+year2012                 -13.857317         NA      NA       NA
+year2014                   3.777375         NA      NA       NA
+year2015                   3.051943         NA      NA       NA
+year2016                  -0.591259         NA      NA       NA
+year2017                 -15.316022         NA      NA       NA
+year2018                 -22.607994         NA      NA       NA
+year2019                  -0.288518         NA      NA       NA
+year2020                 -15.817151         NA      NA       NA
+year2021                  -2.153274         NA      NA       NA
+year2022                  -0.600667         NA      NA       NA
+age_0_19                  -0.017566         NA      NA       NA
+age_20_39                 -0.172312         NA      NA       NA
+age_40_59                  0.204527         NA      NA       NA
+lu_commerce_developped     0.053624         NA      NA       NA
+lu_residential_community   0.001131         NA      NA       NA
+ss_street_object           1.964829         NA      NA       NA
 
-Theta = 0.7028 
-Number of iterations in BFGS optimization: 67 
-Log-likelihood: -7750 on 39 Df
+Theta = 0.7121 
+Number of iterations in BFGS optimization: 75 
+Log-likelihood: -7739 on 41 Df

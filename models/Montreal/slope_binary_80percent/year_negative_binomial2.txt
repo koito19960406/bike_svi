@@ -1,0 +1,52 @@
+
+Call:
+glm.nb(formula = formula, data = data, init.theta = 4482671.156, 
+    link = log)
+
+Coefficients:
+                           Estimate Std. Error  z value Pr(>|z|)    
+(Intercept)              -1.086e-02  1.324e-02   -0.820    0.412    
+slope_binary_80percent    6.676e-05  2.363e-03    0.028    0.977    
+year2010                 -4.679e-04  1.164e-02   -0.040    0.968    
+year2011                  2.878e-04  2.109e-02    0.014    0.989    
+year2012                  2.466e-04  8.853e-03    0.028    0.978    
+year2014                  2.658e-04  9.726e-03    0.027    0.978    
+year2015                  1.832e-04  6.224e-03    0.029    0.977    
+year2016                  3.999e-04  3.770e-03    0.106    0.916    
+year2017                  2.589e-04  7.537e-03    0.034    0.973    
+year2018                  3.181e-04  4.067e-03    0.078    0.938    
+year2019                  3.752e-04  3.787e-03    0.099    0.921    
+year2020                  7.255e-04  6.340e-03    0.114    0.909    
+year2021                  4.271e-04  2.839e-03    0.150    0.880    
+year2022                  2.017e-04  4.219e-03    0.048    0.962    
+month4                    1.773e-04  3.125e-03    0.057    0.955    
+month5                    2.356e-04  3.518e-03    0.067    0.947    
+month6                    4.458e-04  4.681e-03    0.095    0.924    
+month7                    2.921e-04  7.095e-03    0.041    0.967    
+month8                    2.388e-04  6.985e-03    0.034    0.973    
+month9                    2.834e-04  4.173e-03    0.068    0.946    
+month10                   2.267e-04  4.643e-03    0.049    0.961    
+month11                   1.608e-04  4.839e-03    0.033    0.973    
+month12                   8.583e-05  9.995e-03    0.009    0.993    
+age_0_19                 -1.039e-06  1.829e-04   -0.006    0.995    
+age_20_39                -1.062e-06  1.189e-04   -0.009    0.993    
+age_40_59                 1.105e-05  2.061e-04    0.054    0.957    
+lu_residential_community  6.415e-06  2.610e-05    0.246    0.806    
+count_log.1               1.001e+00  9.851e-04 1016.264   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for Negative Binomial(4482689) family taken to be 1)
+
+    Null deviance: 2.4070e+06  on 797  degrees of freedom
+Residual deviance: 3.6543e+01  on 770  degrees of freedom
+AIC: 6824.4
+
+Number of Fisher Scoring iterations: 1
+
+
+              Theta:  4482671 
+          Std. Err.:  4055154 
+Warning while fitting theta: alternation limit reached 
+
+ 2 x log-likelihood:  -6766.387 

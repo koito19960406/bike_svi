@@ -3,56 +3,56 @@ Call:
 zeroinfl(formula = formula, data = data, dist = count_model, link = "logit")
 
 Pearson residuals:
-     Min       1Q   Median       3Q      Max 
--0.83313 -0.65902 -0.40977  0.09274 64.95262 
+    Min      1Q  Median      3Q     Max 
+-0.8474 -0.6584 -0.4048  0.1215 63.4892 
 
 Count model coefficients (negbin with log link):
-                           Estimate Std. Error z value Pr(>|z|)    
-(Intercept)               -1.075016   1.167203  -0.921   0.3570    
-ss_pedestrian_area_binary  0.841539   0.352736   2.386   0.0170 *  
-year2010                  -1.469127   0.277750  -5.289 1.23e-07 ***
-year2011                  -1.477378   0.283880  -5.204 1.95e-07 ***
-year2012                  -1.148277   0.169831  -6.761 1.37e-11 ***
-year2014                  -1.120867   0.204894  -5.470 4.49e-08 ***
-year2015                  -1.050373   0.133165  -7.888 3.08e-15 ***
-year2016                  -0.133404   0.112575  -1.185   0.2360    
-year2017                  -0.273222   0.151127  -1.808   0.0706 .  
-year2018                   0.550701   0.126249   4.362 1.29e-05 ***
-year2019                   1.005565   0.118270   8.502  < 2e-16 ***
-year2020                   0.003477   0.176968   0.020   0.9843    
-year2021                   0.469959   0.108967   4.313 1.61e-05 ***
-year2022                   0.257630   0.160783   1.602   0.1091    
-age_0_19                   0.002433   0.005771   0.422   0.6733    
-age_20_39                  0.039281   0.003546  11.078  < 2e-16 ***
-age_40_59                 -0.033076   0.008055  -4.106 4.02e-05 ***
-lu_residential_community  -0.008664   0.001144  -7.572 3.66e-14 ***
-average_income_log         0.473381   0.113056   4.187 2.83e-05 ***
-Log(theta)                -0.356080   0.032867 -10.834  < 2e-16 ***
+                            Estimate Std. Error z value Pr(>|z|)
+(Intercept)               -34.995740         NA      NA       NA
+ss_pedestrian_area_binary   0.817489         NA      NA       NA
+year2010                   -2.043529         NA      NA       NA
+year2011                   -2.482727         NA      NA       NA
+year2012                   -2.642743         NA      NA       NA
+year2014                   -3.246335         NA      NA       NA
+year2015                   -3.288177         NA      NA       NA
+year2016                   -2.690902         NA      NA       NA
+year2017                   -3.836696         NA      NA       NA
+year2018                   -3.708959         NA      NA       NA
+year2019                   -4.014807         NA      NA       NA
+year2020                   -5.172070         NA      NA       NA
+year2021                   -5.018251         NA      NA       NA
+year2022                   -5.255229         NA      NA       NA
+age_0_19                   -0.003503         NA      NA       NA
+age_20_39                   0.032476         NA      NA       NA
+age_40_59                  -0.017571         NA      NA       NA
+lu_commerce_developped      0.028508         NA      NA       NA
+lu_residential_community    0.017966         NA      NA       NA
+housing_price_log           2.165362         NA      NA       NA
+Log(theta)                 -0.321073         NA      NA       NA
 
 Zero-inflation model coefficients (binomial with logit link):
-                            Estimate Std. Error z value Pr(>|z|)    
-(Intercept)               -5.164e+00  1.120e+01  -0.461 0.644682    
-ss_pedestrian_area_binary -1.574e+01  1.228e+04  -0.001 0.998977    
-year2010                  -1.346e+01  5.215e+03  -0.003 0.997941    
-year2011                  -1.801e+01  2.690e+03  -0.007 0.994657    
-year2012                  -1.472e+01  1.764e+03  -0.008 0.993341    
-year2014                  -1.058e+01  1.558e+03  -0.007 0.994583    
-year2015                   2.163e+00  1.009e+00   2.144 0.032016 *  
-year2016                  -1.490e+00  1.091e+00  -1.367 0.171754    
-year2017                  -1.529e+01  3.397e+03  -0.005 0.996408    
-year2018                  -1.011e+00  1.352e+00  -0.748 0.454572    
-year2019                   5.248e-01  1.703e+00   0.308 0.757900    
-year2020                  -1.776e+01  7.207e+03  -0.002 0.998033    
-year2021                  -2.033e+00  1.377e+00  -1.477 0.139785    
-year2022                  -1.816e+01  3.935e+03  -0.005 0.996317    
-age_0_19                   1.655e-01  6.086e-02   2.719 0.006544 ** 
-age_20_39                 -7.118e-02  4.785e-02  -1.487 0.136905    
-age_40_59                  2.382e-01  1.032e-01   2.308 0.020992 *  
-lu_residential_community  -6.536e-02  1.982e-02  -3.297 0.000977 ***
-average_income_log        -3.657e-01  1.144e+00  -0.320 0.749206    
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+                            Estimate Std. Error z value Pr(>|z|)
+(Intercept)               -74.975305         NA      NA       NA
+ss_pedestrian_area_binary -15.930069         NA      NA       NA
+year2010                  -42.076519         NA      NA       NA
+year2011                  -94.453607         NA      NA       NA
+year2012                  -36.926289         NA      NA       NA
+year2014                  -34.853316         NA      NA       NA
+year2015                   -1.471331         NA      NA       NA
+year2016                   -5.189625         NA      NA       NA
+year2017                  -14.433558         NA      NA       NA
+year2018                   -8.086276         NA      NA       NA
+year2019                   -8.062618         NA      NA       NA
+year2020                  -35.216504         NA      NA       NA
+year2021                  -12.039888         NA      NA       NA
+year2022                  -94.305918         NA      NA       NA
+age_0_19                    0.131080         NA      NA       NA
+age_20_39                  -0.064203         NA      NA       NA
+age_40_59                   0.301867         NA      NA       NA
+lu_commerce_developped      0.046566         NA      NA       NA
+lu_residential_community   -0.006868         NA      NA       NA
+housing_price_log           3.610759         NA      NA       NA
 
-Theta = 0.7004 
+Theta = 0.7254 
 Number of iterations in BFGS optimization: 66 
-Log-likelihood: -7746 on 39 Df
+Log-likelihood: -7718 on 41 Df

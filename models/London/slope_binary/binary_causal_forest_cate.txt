@@ -1,2 +1,2 @@
-     estimate       std.err       p_value 
--4.261739e-01  2.280801e-02  7.400495e-77 
+   estimate     std.err     p_value 
+-0.19759497  0.08780157  0.02458914 

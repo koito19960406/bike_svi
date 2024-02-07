@@ -1,16 +1,18 @@
 GRF tree object 
-Number of training samples: 6194 
+Number of training samples: 637 
 Variable splits: 
-(1) split_variable: od_person_count  split_value: 0.0357143 
-  (2) * num_samples: 301  avg_Y: 4.2 avg_W: 0.32 
-  (3) split_variable: age_40_59  split_value: 27.0667 
-    (4) split_variable: od_bicycle_count  split_value: 0.047619 
-      (6) split_variable: IMD_score  split_value: 27.7655 
-        (10) split_variable: poi_log  split_value: 2.63906 
-          (12) * num_samples: 297  avg_Y: 4.22 avg_W: 0.58 
-          (13) * num_samples: 495  avg_Y: 5.96 avg_W: 0.71 
-        (11) * num_samples: 520  avg_Y: 5.81 avg_W: 0.67 
-      (7) * num_samples: 634  avg_Y: 6.71 avg_W: 0.82 
-    (5) split_variable: IMD_score  split_value: 12.7695 
-      (8) * num_samples: 313  avg_Y: 5.29 avg_W: 0.63 
-      (9) * num_samples: 537  avg_Y: 5.72 avg_W: 0.73 
+(1) split_variable: od_person_count  split_value: 0.186813 
+  (2) split_variable: ss_marking  split_value: 1.37148 
+    (4) * num_samples: 71  avg_Y: 3.83 avg_W: 0.18 
+    (5) * num_samples: 42  avg_Y: 3.77 avg_W: 0.36 
+  (3) split_variable: od_person_count  split_value: 0.380952 
+    (6) split_variable: slope  split_value: 14.9223 
+      (8) * num_samples: 33  avg_Y: 3.99 avg_W: 0.61 
+      (9) * num_samples: 26  avg_Y: 3.69 avg_W: 0.5 
+    (7) split_variable: age_0_19  split_value: 23.1138 
+      (10) split_variable: age_20_39  split_value: 46.7157 
+        (12) * num_samples: 50  avg_Y: 4.5 avg_W: 0.5 
+        (13) * num_samples: 30  avg_Y: 5.64 avg_W: 0.5 
+      (11) split_variable: ss_construction  split_value: 7.87627 
+        (14) * num_samples: 26  avg_Y: 4.23 avg_W: 0.38 
+        (15) * num_samples: 40  avg_Y: 4.47 avg_W: 0.38 

@@ -1,0 +1,42 @@
+
+Call:
+glm.nb(formula = formula, data = data, init.theta = 0.5351147467, 
+    link = log)
+
+Coefficients: (2 not defined because of singularities)
+                          Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               6.893537   1.006243   6.851 7.35e-12 ***
+slope_binary             -0.188518   0.084727  -2.225 0.026081 *  
+age_0_19                 -0.070125   0.008702  -8.059 7.70e-16 ***
+age_20_39                 0.028265   0.007631   3.704 0.000212 ***
+age_40_59                -0.025406   0.016350  -1.554 0.120215    
+age_60_90                       NA         NA      NA       NA    
+lu_residential_community -0.011335   0.007138  -1.588 0.112323    
+lu_commerce_developed     0.007681   0.006790   1.131 0.257995    
+lu_others                -0.014304   0.004809  -2.974 0.002936 ** 
+year_2012                -0.177300   0.472486  -0.375 0.707475    
+year_2015                 0.724110   0.463163   1.563 0.117958    
+year_2017                 0.248788   0.474199   0.525 0.599827    
+year_2019                 0.343280   0.463228   0.741 0.458657    
+year_2010                 0.100935   0.824372   0.122 0.902552    
+year_2014                 0.060163   0.472420   0.127 0.898662    
+year_2018                 0.253224   0.487708   0.519 0.603613    
+year_2016                 0.051903   0.479176   0.108 0.913744    
+year_2011                       NA         NA      NA       NA    
+month_7                   0.170465   0.127302   1.339 0.180552    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for Negative Binomial(0.5351) family taken to be 1)
+
+    Null deviance: 2185.5  on 1273  degrees of freedom
+Residual deviance: 1574.1  on 1257  degrees of freedom
+AIC: 15790
+
+Number of Fisher Scoring iterations: 1
+
+
+              Theta:  0.5351 
+          Std. Err.:  0.0186 
+
+ 2 x log-likelihood:  -15754.1390 

@@ -2,7 +2,7 @@ pacman::p_load(
     tidyverse, stats, plm, utils, pglm, progress, MatchIt, lmtest, sandwich,
     pscl, cobalt, grf, AER, DiagrammeRsvg, rsvg, stargazer, hrbrthemes, Hmisc,
     WeightIt, gbm, CBPS, caret, car, notifier, corrplot, randomForest, pdp, doMC,
-    doParallel, caret
+    doParallel, caret, marginaleffects
 )
 
 clean_var_name <- function(var_name){
@@ -81,7 +81,7 @@ run_psm <- function(data, dep_var_name, ind_var_name, covariates, model_dir, fig
     return(models)
 }
 
-run_psm_nb <- function(data, dep_var_name, ind_var_name, covariates, model_dir, figure_dir) {
+run_psm_nb <- function(data, dep_var_name, ind_var_name, covariates, model_dir, figure_dir, with_gcomp = FALSE) {
     require(MASS) # Ensure the MASS package is loaded
 
     models <- list()
@@ -123,6 +123,8 @@ run_psm_nb <- function(data, dep_var_name, ind_var_name, covariates, model_dir, 
     ps_df <- data.frame(
         pr_score = predict(ps, type = "response"),
         count_point_id = data$count_point_id,
+        year = as.character(data$year),
+        month = as.character(data$month),
         treatment = data[[ind_var_name]]
     )
     write.csv(ps_df, file = paste0(model_dir, "/", ind_var_name, "/", ind_var_name, "_propensity_score.csv"))
@@ -141,10 +143,20 @@ run_psm_nb <- function(data, dep_var_name, ind_var_name, covariates, model_dir, 
     right_side <- paste0(ind_var_name, " + ", covariates_pasted)
     formula <- as.formula(paste(dep_var_name, " ~ ", right_side))
     print(formula)
-    model_year_negative_binomial <- glm.nb(formula, data = match_result_df) # No need for weights argument here unless you want to include it
-    model_year_negative_binomial_summary <- summary(model_year_negative_binomial) # cluster argument removed as it's not applicable to glm.nb
-    capture.output(model_year_negative_binomial_summary, file = paste0(model_dir, "/", ind_var_name, "/", ind_var_name, "_psm_year_fe_nb.txt"))
-    models$second_stage <- model_year_negative_binomial
+    model_year_negative_binomial <- glm.nb(formula, data = match_result_df, weights = weights) # No need for weights argument here unless you want to include it
+    if (with_gcomp) {
+        model_year_negative_binomial_summary_gcomp <- avg_comparisons(model_year_negative_binomial,
+                variables = ind_var_name,
+                vcov = ~subclass,
+                newdata = match_result_df,
+                wts = "weights")
+        capture.output(model_year_negative_binomial_summary_gcomp, file = paste0(model_dir, "/", ind_var_name, "/", ind_var_name, "_psm_year_fe_nb_gcomp.txt"))
+        models$second_stage <- model_year_negative_binomial_summary_gcomp
+    } else {
+        model_year_negative_binomial_summary <- summary(model_year_negative_binomial) # cluster argument removed as it's not applicable to glm.nb
+        capture.output(model_year_negative_binomial_summary, file = paste0(model_dir, "/", ind_var_name, "/", ind_var_name, "_psm_year_fe_nb.txt"))
+        models$second_stage <- model_year_negative_binomial
+    }
     # return model object for stargazer later
     return(models)
 }
