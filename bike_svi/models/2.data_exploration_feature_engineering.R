@@ -321,7 +321,7 @@ for (city in city_list) {
     labs(
       x = "Count",
       y = "Year",
-      title = "Distribution of count by year",
+      title = paste0("Distribution of ", target, " count by year"),
       subtitle = city,
       caption = ""
     ) +
@@ -470,8 +470,8 @@ for (city in city_list) {
   color_scale <- my_palette(100)
 
   subtitle <- case_when(
-    city == "London" ~ "Change in cyclist count between 2008-2014 and 2015-2020",
-    city == "Montreal" ~ "Change in pedestrian count between 2008-2014 and 2018-2023"
+    city == "London" ~ "Change in cyclist count between 2010-2014 and 2015-2019",
+    city == "Montreal" ~ "Change in pedestrian count between 2009-2014 and 2015-2022"
   )
   fill <- case_when(
     city == "London" ~ "Change in cyclist count (%)",
