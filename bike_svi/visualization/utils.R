@@ -72,7 +72,11 @@ plot_step <- function(file_path, ind_var_name, figure_dir) {
     ) +
     scale_fill_manual("", values = c("#7B52AE", "#74B652")) +
     theme_ipsum() +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14), # Bigger X axis texts
+          axis.text.y = element_text(size=14), # Bigger Y axis texts
+          # bigger legend texts
+          legend.text = element_text(size = 14),
+          ) + 
     labs(title = paste0("Step-wise model result for ", clean_var_name(ind_var_name)))
 
   ggsave(paste0(figure_dir, "/", ind_var_name, "/", gsub(".csv", ".png", basename(file_path))), width = 8, height = 4)
@@ -162,7 +166,7 @@ plot_hte_covariate <- function(ind_var_name, model_dir, figure_dir) {
     geom_point(aes(x = category, y = estimate, color = category), size = 1) +
     geom_errorbar(aes(x = category, ymin = ci_low, ymax = ci_high, color = category, width = .2), size = 1) +
     geom_text(aes(x = category, y = estimate, label = round(estimate, 2)),
-      hjust = .5, vjust = -.5, size = 4.7
+      hjust = .5, vjust = -.5, size = 4
     ) +
     coord_flip() +
     labs(
@@ -173,18 +177,19 @@ plot_hte_covariate <- function(ind_var_name, model_dir, figure_dir) {
     ) +
     theme_ipsum() +
     theme(
-      axis.text.x = element_text(size = 14),
+      axis.text.x = element_text(size = 10),
       axis.text.y = element_blank(),
       plot.title = element_text(size = 20, hjust = 0.5),
       plot.title.position = "plot",
-      strip.text.y.left = element_text(angle = 0, size = 14),
+      strip.text.y.left = element_text(angle = 0, size = 17),
       legend.text = element_text(size = 14), # Increase size of legend text
       legend.title = element_text(size = 14), # Increase size of legend title
+      panel.spacing.y = unit(-0.01, "lines"), # You may need to adjust this value
       legend.key.size = unit(0.5, "cm")
     ) +
     scale_color_manual(values = group_colors) +
     facet_grid(covariate ~ ., switch = "y")
-  ggsave(paste0(figure_dir, "/", ind_var_name, "/hte_by_covariate.png"), width = 6, height = 7.5)
+  ggsave(paste0(figure_dir, "/", ind_var_name, "/hte_by_covariate.png"), width = 6, height = 6)
 
   # Plot predictions for all groups and 95% confidence intervals around them.
   ggplot(data_pred_all) +
@@ -236,7 +241,7 @@ plot_hte_ranking <- function(ind_var_name, model_dir, figure_dir) {
       colour = "black", linetype = "dashed", size = 3
     ) +
     labs(
-      title = paste0("Heterogeneous Treatment Effects by Ranking for ", ind_var_name),
+      title = paste0("Heterogeneous Treatment Effects by Ranking for ", clean_var_name(ind_var_name)),
       x = "Rank",
       y = "Estimated Treatment Effect"
     ) +

@@ -284,7 +284,7 @@ for (city in city_list) {
   capture.output(summary_stats_latetx, file = paste0(model_dir, "/summary_stats_latetx.txt"))
 
   # correlation matrix
-  corrmatrix <- cor(all_var, use = "complete.obs")
+  corrmatrix <- cor(all_var %>% dplyr::select(-c(year, month)), use = "complete.obs")
   cor.mtest <- function(mat, ...) {
     mat <- as.matrix(mat)
     n <- ncol(mat)
@@ -300,12 +300,12 @@ for (city in city_list) {
     p.mat
   }
   # matrix of the p-value of the correlation
-  p.mat <- cor.mtest(all_var)
+  p.mat <- cor.mtest(all_var %>% dplyr::select(-c(year, month)))
   # original color: purple(#7B52AE) and green (#74B652)
   col1 <- colorRampPalette(c("#62428b", "#FFFFFF", "#5d9242"))
   pdf(paste0(figure_dir, "/correlation_mat.pdf"), height = 7, width = 7)
   corrplot(corrmatrix,
-    method = "square", tl.col = "black", tl.cex = 0.6,
+    method = "square", tl.col = "black", tl.cex = 1 ,
     p.mat = p.mat, sig.level = 0.05, insig = "pch", pch.cex = 1, col = col1(10),
     title = "Correlation matrix of all variables",
     mar = c(0, 0, 1, 0)
@@ -477,7 +477,10 @@ for (city in city_list) {
     city == "London" ~ "Change in cyclist count (%)",
     city == "Montreal" ~ "Change in pedestrian count (%)"
   )
-  
+  data_source <- case_when(
+    city == "London" ~ "Transport for London",
+    city == "Montreal" ~ "Ville de Montréal"
+  )
   flush_cache()
   map <- basemap_ggplot(st_bbox(hex_grid_joined),
     map_service = "carto",
@@ -504,7 +507,7 @@ for (city in city_list) {
       fill = fill,
       title = city,
       subtitle = subtitle,
-      caption = "Basemap: carto"
+      caption = paste0("Basemap: carto \nData: ", data_source)
     ) +
     guides(fill = guide_legend(reverse = TRUE)) +
     # add the theme

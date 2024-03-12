@@ -65,7 +65,8 @@ for (city in city_list) {
     drop_na() %>%
     dplyr::select(
       -one_of(unlist(treatment_var_list)),
-      -contains("_binary"), one_of(treatment_var_list)
+      -contains("_binary"), one_of(treatment_var_list),
+      -any_of("count_log.1")
     ) %>%
     remove_highly_correlated(threshold = 0.9) %>%
     mutate(
@@ -172,7 +173,7 @@ for (city in city_list) {
     morans_i <- moran.test(residuals(fe_nb), weights)
     capture.output(morans_i, file = paste0(model_dir, "/", treatment_var, "/morans_i.txt"))
     # run spatial lag model with glmmfields
-    formula_spatial <- as.formula(paste("count_log.1", " ~ ", covariates_pasted))
+    formula_spatial <- as.formula(paste("count_log", " ~ ", covariates_pasted))
     spatial_model_summary <- summary(lagsarlm(formula_spatial, data = all_var_spatial, listw = weights))
     capture.output(spatial_model_summary, file = paste0(model_dir, "/", treatment_var, "/spatial_model.txt"))
     spatial_test <- lm.LMtests(fe_nb, test = c("LMlag", "LMerr", "RLMlag", "RLMerr", "SARMA"), listw = weights)

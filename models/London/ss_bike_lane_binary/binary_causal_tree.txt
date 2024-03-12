@@ -1,6 +1,0 @@
-GRF tree object 
-Number of training samples: 637 
-Variable splits: 
-(1) split_variable: od_vehicle_count  split_value: 3.86275 
-  (2) * num_samples: 75  avg_Y: 4.22 avg_W: 0.13 
-  (3) * num_samples: 243  avg_Y: 4.21 avg_W: 0.08 

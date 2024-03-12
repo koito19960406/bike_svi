@@ -1,6 +1,7 @@
 from PIL import Image
 import requests
 import os
+from zensvi.cv import Segmenter
 
 class SimplifiedImageTool:
 
@@ -74,6 +75,11 @@ class SimplifiedImageTool:
 
         return f"{pano_id}.png"
 
+    @staticmethod
+    def segment_image(input_folder, output_folder):
+        segmenter = Segmenter(dataset="mapillary", task="panoptic")
+        segmenter.segment(input_folder, output_folder, max_workers=4)
+
 if __name__ == "__main__":
     # create output dir
     output_folder = "reports/images/before_after"
@@ -84,4 +90,9 @@ if __name__ == "__main__":
         "e8HGLGkJbqCa8f5kwHuTtQ", # Montreal before
         "JbyV30UD3p15LXGWrEHWRA"] # Montreal after
     for panoid in panoid_list:
-        SimplifiedImageTool.save_image(panoid, output_folder)
+        if not os.path.exists(f"{output_folder}/{panoid}.png"):
+            SimplifiedImageTool.save_image(panoid, output_folder)
+    segment_input_folder = output_folder
+    segment_output_folder = "reports/images/before_after_segmented"
+    os.makedirs(segment_output_folder, exist_ok=True)
+    SimplifiedImageTool.segment_image(segment_input_folder, segment_output_folder)

@@ -1,9 +1,0 @@
-
-                 Term Contrast Estimate Std. Error     z Pr(>|z|)   S 2.5 %
- ss_guard_rail_binary    1 - 0     -341        298 -1.14    0.252 2.0  -925
- 97.5 %
-    243
-
-Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
-Type:  response 
-
