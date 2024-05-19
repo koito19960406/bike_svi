@@ -1,0 +1,9 @@
+
+                   Term Contrast Estimate Std. Error     z Pr(>|z|)    S 2.5 %
+ slope_binary_60percent    1 - 0     -122       25.4 -4.82   <0.001 19.4  -172
+ 97.5 %
+  -72.7
+
+Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
+Type:  response 
+

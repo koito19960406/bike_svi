@@ -63,14 +63,19 @@ def main(dir_input, dir_output):
     df_combined['count_log'] = np.log(df_combined['count'] + 1)
     
 
-    # make slope binary with a threshold of 70 percentile
+    # make slope binary with a threshold of 80, 70, 60 percentile
+    df_combined["slope_binary_80percent"] = np.where(df_combined['slope'] > df_combined['slope'].quantile(0.80), 1, 0)
     df_combined["slope_binary"] = np.where(df_combined['slope'] > df_combined['slope'].quantile(0.7), 1, 0)
+    df_combined["slope_binary_60percent"] = np.where(df_combined['slope'] > df_combined['slope'].quantile(0.60), 1, 0)
 
     # Apply ifelse conditions
     # multiply all the columns whose names start with "ss_" by 100
     df_combined.loc[:, df_combined.columns.str.startswith('ss_')] *= 100
     df_combined['ss_visual_complexity'] = np.where(df_combined['ss_visual_complexity'] > 100, 100, df_combined['ss_visual_complexity'])
     df_combined['ss_sidewalk_binary'] = np.where(df_combined['ss_sidewalk'] > df_combined['ss_sidewalk'].quantile(0.7), 1, 0)
+    # add 60% and 80% percentile binary columns for ss_sidewalk
+    df_combined['ss_sidewalk_binary_80percent'] = np.where(df_combined['ss_sidewalk'] > df_combined['ss_sidewalk'].quantile(0.80), 1, 0)
+    df_combined['ss_sidewalk_binary_60percent'] = np.where(df_combined['ss_sidewalk'] > df_combined['ss_sidewalk'].quantile(0.60), 1, 0)
     df_combined['ss_pedestrian_area_binary'] = np.where(df_combined['ss_pedestrian_area'] > 0, 1, 0)
     df_combined['ss_bike_lane_binary'] = np.where(df_combined['ss_bike_lane'] > 0, 1, 0)
     df_combined['ss_bike_rack_binary'] = np.where(df_combined['ss_bike_rack'] > 0, 1, 0)
@@ -81,8 +86,10 @@ def main(dir_input, dir_output):
     df_combined['ss_street_light_binary'] = np.where(df_combined['ss_street_light'] > 0, 1, 0)
     df_combined['ss_guard_rail_binary'] = np.where(df_combined['ss_guard_rail'] > 0, 1, 0)
     df_combined['ss_bench_binary'] = np.where(df_combined['ss_bench'] > 0, 1, 0)
-    # for vegetation, threshold should be determined by 70% percentile of the distribution
+    # for vegetation, threshold should be determined by 80, 70, 60 % percentile of the distribution
+    df_combined['ss_vegetation_binary_80percent'] = np.where(df_combined['ss_vegetation'] > df_combined['ss_vegetation'].quantile(0.80), 1, 0)
     df_combined['ss_vegetation_binary'] = np.where(df_combined['ss_vegetation'] > df_combined['ss_vegetation'].quantile(0.7), 1, 0)
+    df_combined['ss_vegetation_binary_60percent'] = np.where(df_combined['ss_vegetation'] > df_combined['ss_vegetation'].quantile(0.60), 1, 0)
 
     # Calculate new columns
     new_columns = ['ss_construction', 'ss_road_flat', 'ss_marking', 'ss_nature', 'ss_street_object', 'od_person_count', 'od_bicycle_count', 'od_vehicle_count', 'od_animal_count']

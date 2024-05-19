@@ -1,0 +1,50 @@
+
+	Lagrange multiplier diagnostics for spatial dependence
+
+data:  
+model: glm.nb(formula = formula, data = all_var, init.theta =
+1.268748511, link = log)
+weights: weights
+
+LMlag = 0.51478, df = 1, p-value = 0.4731
+
+
+	Lagrange multiplier diagnostics for spatial dependence
+
+data:  
+model: glm.nb(formula = formula, data = all_var, init.theta =
+1.268748511, link = log)
+weights: weights
+
+LMerr = 107.07, df = 1, p-value < 2.2e-16
+
+
+	Lagrange multiplier diagnostics for spatial dependence
+
+data:  
+model: glm.nb(formula = formula, data = all_var, init.theta =
+1.268748511, link = log)
+weights: weights
+
+RLMlag = 0.51977, df = 1, p-value = 0.4709
+
+
+	Lagrange multiplier diagnostics for spatial dependence
+
+data:  
+model: glm.nb(formula = formula, data = all_var, init.theta =
+1.268748511, link = log)
+weights: weights
+
+RLMerr = 107.07, df = 1, p-value < 2.2e-16
+
+
+	Lagrange multiplier diagnostics for spatial dependence
+
+data:  
+model: glm.nb(formula = formula, data = all_var, init.theta =
+1.268748511, link = log)
+weights: weights
+
+SARMA = 107.58, df = 2, p-value < 2.2e-16
+

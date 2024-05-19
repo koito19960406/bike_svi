@@ -1,40 +1,46 @@
 
 Call:
-glm.nb(formula = formula, data = data, init.theta = 0.7801175601, 
+glm.nb(formula = formula, data = data, init.theta = 0.6370716095, 
     link = log)
 
 Coefficients:
-                           Estimate Std. Error z value Pr(>|z|)    
-(Intercept)              -1.005e+01  5.293e-01 -18.991  < 2e-16 ***
-slope_binary             -5.348e-01  2.303e-02 -23.227  < 2e-16 ***
-year2011                  3.538e-02  3.327e-01   0.106   0.9153    
-year2012                 -2.632e-01  3.287e-01  -0.801   0.4232    
-year2013                  1.279e-01  4.394e-01   0.291   0.7710    
-year2014                 -3.747e-01  3.287e-01  -1.140   0.2543    
-year2015                 -3.885e-01  3.288e-01  -1.182   0.2374    
-year2016                 -3.325e-01  3.289e-01  -1.011   0.3121    
-year2017                 -4.135e-01  3.290e-01  -1.257   0.2088    
-year2018                 -4.459e-01  3.289e-01  -1.356   0.1752    
-year2019                 -5.883e-01  3.287e-01  -1.790   0.0735 .  
-age_0_19                  4.522e-03  2.843e-03   1.591   0.1116    
-age_20_39                 6.381e-02  2.112e-03  30.213  < 2e-16 ***
-age_40_59                 5.799e-02  4.203e-03  13.795  < 2e-16 ***
-lu_residential_community  8.827e-03  1.336e-03   6.605 3.98e-11 ***
-lu_commerce_developed     2.157e-02  9.484e-04  22.748  < 2e-16 ***
-housing_price_log         9.369e-01  2.507e-02  37.374  < 2e-16 ***
+                          Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               4.463144   0.939871   4.749 2.05e-06 ***
+slope_binary             -0.289368   0.078180  -3.701 0.000214 ***
+year2011                 -0.688175   0.758396  -0.907 0.364191    
+year2012                 -0.773822   0.641466  -1.206 0.227689    
+year2014                 -0.481644   0.641599  -0.751 0.452837    
+year2015                  0.025172   0.636379   0.040 0.968448    
+year2016                 -0.698963   0.646246  -1.082 0.279442    
+year2017                 -0.385668   0.642649  -0.600 0.548424    
+year2018                 -0.681236   0.651766  -1.045 0.295923    
+year2019                 -0.509041   0.638271  -0.798 0.425143    
+month4                    0.313810   0.200237   1.567 0.117069    
+month5                    0.097698   0.174034   0.561 0.574545    
+month6                    0.005291   0.176238   0.030 0.976050    
+month7                    0.238900   0.195735   1.221 0.222265    
+month9                    0.120582   0.196299   0.614 0.539033    
+month10                  -0.148006   0.196129  -0.755 0.450467    
+month11                  -0.201124   1.267648  -0.159 0.873938    
+age_0_19                 -0.023713   0.008095  -2.930 0.003395 ** 
+age_20_39                 0.003714   0.006970   0.533 0.594153    
+age_40_59                -0.018542   0.015261  -1.215 0.224384    
+lu_residential_community -0.005600   0.005271  -1.062 0.288098    
+lu_commerce_developed     0.005347   0.003445   1.552 0.120577    
+poi_log                   0.651063   0.036621  17.778  < 2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-(Dispersion parameter for Negative Binomial(0.7801) family taken to be 1)
+(Dispersion parameter for Negative Binomial(0.6371) family taken to be 1)
 
-    Null deviance: 22377  on 12388  degrees of freedom
-Residual deviance: 14810  on 12372  degrees of freedom
-AIC: 181332
+    Null deviance: 2584.4  on 1273  degrees of freedom
+Residual deviance: 1547.9  on 1251  degrees of freedom
+AIC: 15520
 
 Number of Fisher Scoring iterations: 1
 
 
-              Theta:  0.78012 
-          Std. Err.:  0.00880 
+              Theta:  0.6371 
+          Std. Err.:  0.0227 
 
- 2 x log-likelihood:  -181295.72000 
+ 2 x log-likelihood:  -15471.6140 

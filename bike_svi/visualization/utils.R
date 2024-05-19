@@ -1,6 +1,9 @@
-library(ggplot2)
-library(tidyr)
-library(dplyr)
+pacman::p_load(
+  tidyverse, Hmisc, GGally, corrplot, RColorBrewer, ggplot2,
+  hrbrthemes, stargazer, plotly, sf, basemaps, magrittr, cowplot, dotenv,
+  ggnewscale, here, ggspatial, lwgeom, ggimage, cropcircles, ggrepel, osmdata
+)
+
 
 # Function to round to n significant digits
 round_to_n <- function(x, n = 2) {
@@ -69,7 +72,11 @@ plot_step <- function(file_path, ind_var_name, figure_dir) {
     ) +
     scale_fill_manual("", values = c("#7B52AE", "#74B652")) +
     theme_ipsum() +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=14), # Bigger X axis texts
+          axis.text.y = element_text(size=14), # Bigger Y axis texts
+          # bigger legend texts
+          legend.text = element_text(size = 14),
+          ) + 
     labs(title = paste0("Step-wise model result for ", clean_var_name(ind_var_name)))
 
   ggsave(paste0(figure_dir, "/", ind_var_name, "/", gsub(".csv", ".png", basename(file_path))), width = 8, height = 4)
@@ -159,7 +166,7 @@ plot_hte_covariate <- function(ind_var_name, model_dir, figure_dir) {
     geom_point(aes(x = category, y = estimate, color = category), size = 1) +
     geom_errorbar(aes(x = category, ymin = ci_low, ymax = ci_high, color = category, width = .2), size = 1) +
     geom_text(aes(x = category, y = estimate, label = round(estimate, 2)),
-      hjust = .5, vjust = -.5, size = 4.7
+      hjust = .5, vjust = -.5, size = 4
     ) +
     coord_flip() +
     labs(
@@ -170,18 +177,19 @@ plot_hte_covariate <- function(ind_var_name, model_dir, figure_dir) {
     ) +
     theme_ipsum() +
     theme(
-      axis.text.x = element_text(size = 14),
+      axis.text.x = element_text(size = 10),
       axis.text.y = element_blank(),
       plot.title = element_text(size = 20, hjust = 0.5),
       plot.title.position = "plot",
-      strip.text.y.left = element_text(angle = 0, size = 14),
+      strip.text.y.left = element_text(angle = 0, size = 17),
       legend.text = element_text(size = 14), # Increase size of legend text
       legend.title = element_text(size = 14), # Increase size of legend title
+      panel.spacing.y = unit(-0.01, "lines"), # You may need to adjust this value
       legend.key.size = unit(0.5, "cm")
     ) +
     scale_color_manual(values = group_colors) +
     facet_grid(covariate ~ ., switch = "y")
-  ggsave(paste0(figure_dir, "/", ind_var_name, "/hte_by_covariate.png"), width = 6, height = 7.5)
+  ggsave(paste0(figure_dir, "/", ind_var_name, "/hte_by_covariate.png"), width = 6, height = 6)
 
   # Plot predictions for all groups and 95% confidence intervals around them.
   ggplot(data_pred_all) +
@@ -233,7 +241,7 @@ plot_hte_ranking <- function(ind_var_name, model_dir, figure_dir) {
       colour = "black", linetype = "dashed", size = 3
     ) +
     labs(
-      title = paste0("Heterogeneous Treatment Effects by Ranking for ", ind_var_name),
+      title = paste0("Heterogeneous Treatment Effects by Ranking for ", clean_var_name(ind_var_name)),
       x = "Rank",
       y = "Estimated Treatment Effect"
     ) +
@@ -412,24 +420,136 @@ extract_autoc_and_ci_R <- function(content_line) {
   return(list(autoc = autoc, ci = ci))
 }
 
-map_grid <- function(grid, value, figure_dir) {
+theme_map <- function(...,
+                      default_font_color = "#4e4d47",
+                      default_background_color = "#f5f5f2",
+                      default_font_family = "Ubuntu Regular") {
+  theme_ipsum() +
+    theme(
+      text = element_text(
+        family = default_font_family,
+        color = default_font_color
+      ),
+      # remove all axes
+      axis.line = element_blank(),
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks = element_blank(),
+      # add a subtle grid
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      # background colors
+      # plot.background = element_rect(fill = default_background_color,
+      #                                color = NA),
+      # panel.background = element_rect(fill = default_background_color,
+      #                                 color = NA),
+      # legend.background = element_rect(fill = default_background_color,
+      #                                  color = NA),
+      # borders and margins
+      plot.margin = ggplot2::margin(c(.5, .5, .2, .5), "cm"),
+      panel.border = element_blank(),
+      panel.spacing = ggplot2::margin(c(-.1, 0.2, .2, 0.2), "cm"),
+      # titles
+      legend.title = element_text(size = 11),
+      legend.text = element_text(
+        size = 9, hjust = 0,
+        color = default_font_color
+      ),
+      plot.title = element_text(
+        size = 15, hjust = 0.5,
+        color = default_font_color
+      ),
+      plot.subtitle = element_text(
+        size = 10, hjust = 0.5,
+        color = default_font_color,
+        margin = ggplot2::margin(
+          b = -0.1,
+          t = -0.1,
+          l = 2,
+          r = 0,
+          unit = "cm"
+        ),
+        debug = F
+      ),
+      # captions
+      plot.caption = element_text(
+        size = 7,
+        hjust = .5,
+        margin = ggplot2::margin(
+          t = 0.2,
+          b = 0,
+          r = 0,
+          unit = "cm"
+        ),
+        color = "#939184"
+      ),
+      ...
+    )
+}
+
+map_grid <- function(grid, value, file_path, city, treatment_var) {
   # set up color and breaks
   my_palette <- colorRampPalette(c("#62428b", "#FFFFFF", "#5d9242"))
 
   # Create the color scale
   color_scale <- my_palette(100)
   # map grid with random values as fill
-  map_grid <- ggplot(grid) +
-    geom_sf(aes(fill = .data[[value]]), color = NA) +
-    # use red to blue color
-    scale_fill_gradientn(colours = color_scale) +
-    theme_minimal() +
-    theme(legend.position = "none",
-          axis.title = element_blank(),
-          axis.text = element_blank(),
-          axis.ticks = element_blank(),
-          panel.grid = element_blank(),
-          panel.border = element_blank())
+  flush_cache()
+  map_grid <- basemap_ggplot(st_bbox(grid),
+    map_service = "carto",
+    map_type = "light_no_labels", map_res = 1,
+    force = T) +
+    new_scale_fill() + # Add this line to introduce a new fill scale
+    geom_sf(
+      data = grid,
+      mapping = aes(fill = .data[[value]]),
+      color = "black",
+      size = 0.05
+    ) +
+    scale_fill_gradientn(colours = color_scale, 
+      breaks = seq(0, 1, by = 0.25),
+      labels = c("0", "0.25", "0.5", "0.75", "1"),
+      limits = c(0, 1),
+      guide = guide_colourbar(direction = "horizontal",
+      title.position = "bottom")
+    ) +
+    # add titles
+    labs(
+      x = NULL,
+      y = NULL,
+      fill = "Propensity Score",
+      title = paste0("Distribution of propensity score for ", str_replace(str_replace(str_replace(treatment_var, "ss_", ""), "_binary", ""), "_", " ")),
+      subtitle = paste0("in ", city),
+      caption = "Basemap: carto"
+    ) +
+    guides(fill = guide_legend(reverse = TRUE)) +
+    # add the theme
+    theme_map() +
+    # make sure margins are 0
+    theme(
+      plot.margin = ggplot2::margin(0, 0, 0, 0),
+      legend.margin = ggplot2::margin(0, 0, 0, 0),  # Remove margin around the legend
+      legend.box.margin = ggplot2::margin(0, 0, 0, 0)  # Remove margin around the legend box
+    )
   # save the map
-  ggsave(paste0(figure_dir, "/", ind_var_name, "/grid_map.png"), map_grid, width = 6, height = 6)
+  ggsave(file_path, map_grid, width = 6, height = 6)
+}
+
+map_propensity_score <- function(city, external_dir, treatment_var, model_dir, figure_dir){
+  # in this function, we will plot the propensity score for input treatment variable: 1. pooled (all the years); 2. by year
+  propensity_score_df <- read_csv(paste0(model_dir, "/", treatment_var, "/", treatment_var, "_propensity_score.csv"))
+  count_station_sf <- read_csv(paste0(external_dir, "/count_station_clean.csv")) %>% 
+    left_join(propensity_score_df, .) %>% 
+    st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+  grid <- count_station_sf %>% 
+    st_transform(3857) %>% 
+    st_make_grid(1000, square = FALSE) %>%
+    st_as_sf() %>%  
+    st_transform(4326) %>% 
+    st_join(count_station_sf) %>% 
+    drop_na(pr_score) %>% 
+    st_transform(3857)
+  file_path <- paste0(figure_dir, "/", treatment_var, "/", treatment_var, "_propensity_score_map.png")
+  # map them
+  map_grid(grid, "pr_score", file_path, city, treatment_var)
 }

@@ -1,0 +1,61 @@
+
+Call:
+lagsarlm(formula = formula_spatial, data = all_var_spatial, listw = weights)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-5.21811 -0.61160  0.10200  0.75342  3.63193 
+
+Type: lag 
+Coefficients: (asymptotic standard errors) 
+                            Estimate  Std. Error z value  Pr(>|z|)
+(Intercept)              -8.3873e-01  1.6594e+00 -0.5054  0.613244
+year2011                 -1.3474e+00  7.4754e-01 -1.8024  0.071482
+year2012                 -1.2613e+00  6.2188e-01 -2.0282  0.042543
+year2014                 -1.0338e+00  6.2268e-01 -1.6602  0.096875
+year2015                 -5.6326e-01  6.1875e-01 -0.9103  0.362654
+year2016                 -1.1193e+00  6.2854e-01 -1.7809  0.074934
+year2017                 -8.3970e-01  6.2536e-01 -1.3427  0.179355
+year2018                 -9.2551e-01  6.3274e-01 -1.4627  0.143551
+year2019                 -9.3666e-01  6.2012e-01 -1.5104  0.130931
+month4                    2.5850e-01  1.9561e-01  1.3215  0.186339
+month5                    1.1603e-02  1.6952e-01  0.0684  0.945433
+month6                   -6.7902e-02  1.7200e-01 -0.3948  0.693004
+month7                    3.0899e-02  1.9070e-01  0.1620  0.871286
+month9                    1.3025e-01  1.9192e-01  0.6786  0.497361
+month10                  -1.3938e-01  1.9131e-01 -0.7286  0.466261
+month11                  -3.3371e-01  1.2321e+00 -0.2709  0.786502
+age_0_19                 -2.1446e-03  9.9175e-03 -0.2162  0.828796
+age_20_39                 9.4161e-03  7.3392e-03  1.2830  0.199499
+age_40_59                -2.8337e-03  1.4894e-02 -0.1903  0.849100
+IMD_score                -4.7918e-03  4.2697e-03 -1.1223  0.261733
+lu_residential_community  1.9345e-04  5.1352e-03  0.0377  0.969950
+lu_commerce_developed    -5.2154e-05  3.5799e-03 -0.0146  0.988376
+ss_visual_complexity      8.1877e-03  1.1598e-02  0.7060  0.480203
+ss_construction          -1.6335e-02  7.2877e-03 -2.2414  0.024997
+ss_road_flat             -1.8045e-02  8.0307e-03 -2.2470  0.024639
+ss_marking                4.8639e-02  2.1677e-02  2.2438  0.024847
+ss_nature                -2.8052e-02  1.5587e-02 -1.7997  0.071907
+ss_street_object          4.3118e-01  1.3540e-01  3.1845  0.001450
+od_person_count           1.7346e-01  6.5353e-02  2.6542  0.007951
+od_bicycle_count          2.8700e-01  2.2867e-01  1.2551  0.209451
+od_vehicle_count         -3.9217e-02  1.6048e-02 -2.4438  0.014535
+od_animal_count           6.2189e-01  1.2247e+00  0.5078  0.611612
+pop_den_log               6.6176e-02  4.9597e-02  1.3343  0.182116
+housing_price_log         2.1539e-01  9.4810e-02  2.2718  0.023100
+poi_log                   3.1943e-01  4.6612e-02  6.8530 7.232e-12
+slope_binary_65percent   -1.3908e-01  7.3560e-02 -1.8907  0.058665
+
+Rho: 0.46078, LR test value: 375.69, p-value: < 2.22e-16
+Asymptotic standard error: 0.019638
+    z-value: 23.464, p-value: < 2.22e-16
+Wald statistic: 550.55, p-value: < 2.22e-16
+
+Log likelihood: -2111.862 for lag model
+ML residual variance (sigma squared): 1.4747, (sigma: 1.2144)
+Number of observations: 1274 
+Number of parameters estimated: 38 
+AIC: 4299.7, (AIC for lm: 4673.4)
+LM test for residual autocorrelation
+test value: 0.058953, p-value: 0.80816
+

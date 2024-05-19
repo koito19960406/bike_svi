@@ -1,0 +1,169 @@
+
+Call:
+matchit(formula = formula, data = data, method = "full", distance = "glm", 
+    estimand = "ATE")
+
+Summary of Balance for All Data:
+                         Means Treated Means Control Std. Mean Diff. Var. Ratio
+distance                        0.6238        0.2487          1.6194     1.3544
+year2010                        0.0039        0.0026          0.0234          .
+year2011                        0.0039        0.0091         -0.0643          .
+year2012                        0.1006        0.1082         -0.0249          .
+year2014                        0.0947        0.1121         -0.0573          .
+year2015                        0.2288        0.3207         -0.2070          .
+year2016                        0.0671        0.0756         -0.0333          .
+year2017                        0.1065        0.0887          0.0602          .
+year2018                        0.0611        0.0456          0.0690          .
+year2019                        0.3333        0.2373          0.2139          .
+month3                          0.0572        0.0495          0.0341          .
+month4                          0.0927        0.0756          0.0616          .
+month5                          0.2584        0.2216          0.0861          .
+month6                          0.2821        0.2712          0.0243          .
+month7                          0.0947        0.1082         -0.0449          .
+month9                          0.0927        0.1447         -0.1613          .
+month10                         0.1223        0.1278         -0.0166          .
+month11                         0.0000        0.0013         -0.0511          .
+age_0_19                       23.7078       23.5230          0.0329     0.9249
+age_20_39                      31.5898       36.1618         -0.4410     0.8493
+age_40_59                      26.3273       24.9387          0.3665     0.8850
+IMD_score                      19.7829       23.2047         -0.3082     1.0660
+lu_residential_community        5.6681        5.4629          0.0294     1.1854
+lu_commerce_developed          21.7304       27.6313         -0.4869     0.7360
+ss_visual_complexity           38.6990       38.0649          0.1662     0.7813
+slope                          15.5810       15.7908         -0.0322     1.0161
+ss_construction                 6.9835       11.4393         -0.6675     0.5700
+ss_road_flat                   29.6765       29.5897          0.0148     0.9514
+ss_marking                      1.5341        1.6360         -0.0588     0.9311
+ss_nature                       1.2553        0.9094          0.1438     0.7573
+ss_street_object                0.2998        0.4317         -0.5007     0.4676
+od_person_count                 0.3889        0.5249         -0.2375     0.7300
+od_vehicle_count                5.2382        5.7867         -0.2236     1.0368
+od_animal_count                 0.0006        0.0022         -0.0586     0.0308
+pop_den_log                     8.5698        8.8014         -0.2464     1.1538
+housing_price_log              13.1163       12.9837          0.2526     1.1440
+poi_log                         2.7650        2.9757         -0.1609     0.8925
+                         eCDF Mean eCDF Max
+distance                    0.3624   0.5899
+year2010                    0.0013   0.0013
+year2011                    0.0052   0.0052
+year2012                    0.0076   0.0076
+year2014                    0.0175   0.0175
+year2015                    0.0919   0.0919
+year2016                    0.0086   0.0086
+year2017                    0.0179   0.0179
+year2018                    0.0155   0.0155
+year2019                    0.0960   0.0960
+month3                      0.0077   0.0077
+month4                      0.0171   0.0171
+month5                      0.0367   0.0367
+month6                      0.0109   0.0109
+month7                      0.0135   0.0135
+month9                      0.0520   0.0520
+month10                     0.0055   0.0055
+month11                     0.0013   0.0013
+age_0_19                    0.0201   0.0480
+age_20_39                   0.1200   0.1894
+age_40_59                   0.0999   0.1649
+IMD_score                   0.0956   0.1590
+lu_residential_community    0.0124   0.0458
+lu_commerce_developed       0.1489   0.2270
+ss_visual_complexity        0.0505   0.0934
+slope                       0.0188   0.0599
+ss_construction             0.2245   0.3636
+ss_road_flat                0.0203   0.0588
+ss_marking                  0.0212   0.0592
+ss_nature                   0.1548   0.2317
+ss_street_object            0.1520   0.2425
+od_person_count             0.0853   0.1379
+od_vehicle_count            0.0647   0.1077
+od_animal_count             0.0022   0.0045
+pop_den_log                 0.0789   0.1311
+housing_price_log           0.0721   0.1248
+poi_log                     0.0379   0.1027
+
+Summary of Balance for Matched Data:
+                         Means Treated Means Control Std. Mean Diff. Var. Ratio
+distance                        0.3979        0.3980         -0.0006     1.0029
+year2010                        0.0024        0.0020          0.0071          .
+year2011                        0.0041        0.0075         -0.0422          .
+year2012                        0.0768        0.1018         -0.0816          .
+year2014                        0.1145        0.0958          0.0614          .
+year2015                        0.3004        0.2710          0.0662          .
+year2016                        0.0731        0.0789         -0.0226          .
+year2017                        0.1250        0.0918          0.1118          .
+year2018                        0.0586        0.0646         -0.0265          .
+year2019                        0.2452        0.2867         -0.0925          .
+month3                          0.0425        0.0410          0.0066          .
+month4                          0.0725        0.1069         -0.1239          .
+month5                          0.2212        0.2181          0.0073          .
+month6                          0.2581        0.2711         -0.0290          .
+month7                          0.1495        0.1066          0.1420          .
+month9                          0.1348        0.1237          0.0343          .
+month10                         0.1213        0.1316         -0.0311          .
+month11                         0.0000        0.0009         -0.0336          .
+age_0_19                       24.3292       23.6834          0.1150     1.3407
+age_20_39                      33.1178       34.3404         -0.1179     0.9217
+age_40_59                      25.7687       25.4117          0.0942     1.0150
+IMD_score                      21.6172       22.2004         -0.0525     0.9093
+lu_residential_community        5.6629        5.8768         -0.0307     0.9360
+lu_commerce_developed          24.0071       24.9443         -0.0773     0.9978
+ss_visual_complexity           38.3583       38.2325          0.0330     0.8826
+slope                          15.9291       16.1008         -0.0264     0.9634
+ss_construction                10.2462        9.9885          0.0386     1.9320
+ss_road_flat                   28.5496       29.7200         -0.1995     1.8825
+ss_marking                      1.3910        1.5292         -0.0798     0.8371
+ss_nature                       1.3161        0.9616          0.1474     0.7568
+ss_street_object                0.3593        0.3707         -0.0435     0.8759
+od_person_count                 0.4503        0.4578         -0.0132     1.0009
+od_vehicle_count                5.5051        5.5131         -0.0033     1.0614
+od_animal_count                 0.0003        0.0016         -0.0487     0.0245
+pop_den_log                     8.6817        8.6914         -0.0103     1.0723
+housing_price_log              13.0202       13.0157          0.0085     1.2416
+poi_log                         2.8031        2.9632         -0.1223     1.3434
+                         eCDF Mean eCDF Max Std. Pair Dist.
+distance                    0.0040   0.0322          0.0156
+year2010                    0.0004   0.0004          0.0674
+year2011                    0.0034   0.0034          0.1316
+year2012                    0.0250   0.0250          0.5167
+year2014                    0.0187   0.0187          0.6267
+year2015                    0.0294   0.0294          0.9091
+year2016                    0.0058   0.0058          0.5540
+year2017                    0.0332   0.0332          0.6658
+year2018                    0.0059   0.0059          0.5017
+year2019                    0.0415   0.0415          0.8196
+month3                      0.0015   0.0015          0.3472
+month4                      0.0344   0.0344          0.5728
+month5                      0.0031   0.0031          0.7857
+month6                      0.0130   0.0130          0.9046
+month7                      0.0429   0.0429          0.7628
+month9                      0.0111   0.0111          0.6664
+month10                     0.0103   0.0103          0.6903
+month11                     0.0009   0.0009          0.0378
+age_0_19                    0.0493   0.1299          1.1524
+age_20_39                   0.0333   0.0962          1.0162
+age_40_59                   0.0291   0.0839          1.0648
+IMD_score                   0.0276   0.0678          1.0809
+lu_residential_community    0.0246   0.0561          0.9113
+lu_commerce_developed       0.0346   0.0751          1.0347
+ss_visual_complexity        0.0222   0.0617          0.9424
+slope                       0.0151   0.0454          1.1434
+ss_construction             0.0863   0.1696          1.0184
+ss_road_flat                0.0279   0.0902          1.2138
+ss_marking                  0.0376   0.1194          0.7654
+ss_nature                   0.1236   0.2090          0.7110
+ss_street_object            0.0267   0.0710          1.0107
+od_person_count             0.0243   0.0570          0.9833
+od_vehicle_count            0.0139   0.0557          1.0236
+od_animal_count             0.0034   0.0057          0.0761
+pop_den_log                 0.0214   0.0627          1.0240
+housing_price_log           0.0392   0.1011          1.0823
+poi_log                     0.0402   0.1101          1.1775
+
+Sample Sizes:
+              Control Treated
+All            767.    507.  
+Matched (ESS)  259.68  143.19
+Matched        767.    507.  
+Unmatched        0.      0.  
+Discarded        0.      0.  
+

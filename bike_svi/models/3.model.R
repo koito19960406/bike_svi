@@ -2,7 +2,7 @@ pacman::p_load(
   tidyverse, stats, plm, utils, pglm, progress, MatchIt, lmtest, sandwich,
   pscl, cobalt, grf, AER, DiagrammeRsvg, rsvg, stargazer, hrbrthemes, Hmisc,
   WeightIt, gbm, CBPS, caret, car, notifier, corrplot, randomForest, pdp, doMC,
-  doParallel, here, DiagrammeR, dotenv
+  doParallel, here, DiagrammeR, dotenv, spdep, spatialreg, MASS, glmmfields
 )
 source(here("bike_svi/models/utils.R"))
 
@@ -40,11 +40,13 @@ for (city in city_list) {
   # set treatment variable
   # pairwise correlation for count and segmentation result
   if (city == "London") {
-    ss_var_list <- c("ss_vegetation_binary", "ss_bike_lane_binary", "ss_parking_binary", "ss_street_light_binary")
+    ss_var_list <- c("ss_vegetation_binary", "ss_bike_lane_binary", "ss_parking_binary", "ss_street_light_binary", 
+      "ss_vegetation_binary_60percent", "ss_vegetation_binary_80percent")
   } else if (city == "Montreal") {
-    ss_var_list <- c("ss_vegetation_binary", "ss_guard_rail_binary", "ss_sidewalk_binary", "ss_street_light_binary")
+    ss_var_list <- c("ss_vegetation_binary", "ss_guard_rail_binary", "ss_sidewalk_binary", "ss_street_light_binary",
+      "ss_vegetation_binary_60percent", "ss_vegetation_binary_80percent", "ss_sidewalk_binary_60percent", "ss_sidewalk_binary_80percent")
   }
-  treatment_var_list <- c(ss_var_list, "slope_binary")
+  treatment_var_list <- c(ss_var_list, "slope_binary", "slope_binary_60percent", "slope_binary_80percent")
   treatment_var_list_collapsed <- paste(treatment_var_list, collapse = "|")
 
   # load data
@@ -63,13 +65,45 @@ for (city in city_list) {
     drop_na() %>%
     dplyr::select(
       -one_of(unlist(treatment_var_list)),
-      -contains("_binary"), one_of(treatment_var_list)
+      -contains("_binary"), one_of(treatment_var_list),
+      -any_of("count_log.1")
     ) %>%
     remove_highly_correlated(threshold = 0.9) %>%
     mutate(
       year = as.factor(year),
-      month = as.factor(month)
-    )
+      month = as.factor(month) 
+    ) 
+    # remove od_person_count if city is Montreal. And remove od_bicycle_count if city is London
+  # Apply conditional logic based on city value
+  if (city == "Montreal") {
+    all_var <- all_var %>% dplyr::select(-contains("od_person_count"))
+  } else if (city == "London") {
+    all_var <- all_var %>% dplyr::select(-contains("od_bicycle_count"))
+  }
+  count_station <- read.csv(paste0(external_dir, "/count_station_clean.csv"))
+  all_var_spatial <- all_var %>%
+    left_join(count_station, by = c("count_point_id" = "count_point_id")) %>%
+    drop_na() %>% 
+    st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
+  # all_var <- read.csv(paste0(processed_dir, "/all_var_joined.csv")) %>%
+  #   mutate(
+  #     count = as.integer(count),
+  #     year = as.numeric(year),
+  #     month = as.numeric(month)
+  #   ) %>%
+  #   dplyr::select(-c(
+  #     age_60_90, lu_others
+  #   )) %>%
+  #   drop_na() %>%
+  #   dplyr::select(
+  #     -one_of(unlist(treatment_var_list)),
+  #     -contains("_binary"), one_of(treatment_var_list)
+  #   ) %>%
+  #   remove_highly_correlated(threshold = 0.9) %>%
+  #   mutate(
+  #     year = as.factor(year),
+  #     month = as.factor(month) 
+  #   )
 
   # background check --------------------------------------------------------
   # check overdispersion
@@ -90,6 +124,10 @@ for (city in city_list) {
   simple_ols_summary <- summary(simple_ols)
   capture.output(simple_ols_summary, file = paste0(model_dir, "/simple_ols.txt"))
 
+  # run VIF test
+  vif_test <- vif(simple_ols)
+  capture.output(vif_test, file = paste0(model_dir, "/vif_test.txt"))
+
   # run pooled ZINB
   zero_condition_covariates <- paste(covariates[str_detect(covariates, paste("od_", "pop_den", "poi", sep = "|"))],
     collapse = " + "
@@ -109,34 +147,67 @@ for (city in city_list) {
 
   # run FE NB
   for (treatment_var in treatment_var_list) {
-    covariates_pasted <- paste(c(covariates, treatment_var), collapse = " + ")
+    # create a folder for each treatment variable if it doesn't exist
+    if (!dir.exists(paste0(model_dir, "/", treatment_var))) {
+      dir.create(paste0(model_dir, "/", treatment_var))
+    }
+    treatment_var_continous <- str_split_1(treatment_var, "_binary")[1]
+    covariates_temp <- covariates[!str_detect(covariates, treatment_var_continous)]
+    covariates_pasted <- paste(c(covariates_temp, treatment_var), collapse = " + ")
 
     formula <- as.formula(paste("count", " ~ ", covariates_pasted))
     fe_nb <- glm.nb(formula, data = all_var)
+    # compute g-computation with compare_average
+    gcomp_nb <- avg_comparisons(
+      fe_nb,
+       variables = treatment_var,
+      newdata = all_var)
+    # capture
+    capture.output(gcomp_nb, file = paste0(model_dir, "/", treatment_var, "/fe_nb_gcomp.txt"))
     fe_nb_summary <- summary(fe_nb)
     capture.output(fe_nb_summary, file = paste0(model_dir, "/", treatment_var, "/fe_nb.txt"))
+
+    # run spatial lag model
+    neighbors <- knn2nb(knearneigh(st_coordinates(all_var_spatial), k = 2))
+    weights <- nb2listw(neighbors, style = "W")
+    morans_i <- moran.test(residuals(fe_nb), weights)
+    capture.output(morans_i, file = paste0(model_dir, "/", treatment_var, "/morans_i.txt"))
+    # run spatial lag model with glmmfields
+    formula_spatial <- as.formula(paste("count_log", " ~ ", covariates_pasted))
+    spatial_model_summary <- summary(lagsarlm(formula_spatial, data = all_var_spatial, listw = weights))
+    capture.output(spatial_model_summary, file = paste0(model_dir, "/", treatment_var, "/spatial_model.txt"))
+    spatial_test <- lm.LMtests(fe_nb, test = c("LMlag", "LMerr", "RLMlag", "RLMerr", "SARMA"), listw = weights)
+    capture.output(spatial_test, file = paste0(model_dir, "/", treatment_var, "/spatial_test.txt"))
   }
 
   # fe poisson by step ------------------------------------------------------
   # list of baseline control variables
   control_var_vec <- names(all_var)[str_detect(names(all_var), "^age_|year|month|^lu_")]
   for (treatment_var in treatment_var_list) {
+    treatment_var_continous <- str_split_1(treatment_var, "_binary")[1]
     # run_fe_poisson(all_var_scaled, "count_log",ind_var_name, model_dir)
     # run_zero_inflated(all_var_scaled, "count",ind_var_name, control_var_vec, "poisson")
     # run_zero_inflated(all_var, "count",treatment_var, control_var_vec, "negbin", model_dir)
-    run_negative_binomial(all_var %>% dplyr::select(-c("slope", "count_log.1")), "count", treatment_var, control_var_vec, model_dir)
+    run_negative_binomial(all_var %>% dplyr::select(-tidyselect::any_of(c("count_log", treatment_var_continous))), "count", treatment_var, control_var_vec, model_dir)
   }
 
   # psm ---------------------------------------------------------------------
   model_list <- list()
+  model_gcomp_list <- list()
   pb <- progress_bar$new(total = length(treatment_var_list))
   for (treatment_var in treatment_var_list) {
     pb$tick()
     print(treatment_var)
-    treat_var_wo_binary <- sub("_binary", "", treatment_var)
-    covariates_temp <- covariates[!str_detect(covariates, treat_var_wo_binary)]
+    treatment_var_continous <- str_split_1(treatment_var, "_binary")[1]
+    covariates_temp <- covariates[!str_detect(covariates, treatment_var_continous)]
+    # if treatment variable is slope, remove "ss_street_light" from covariates: due to data issue
+    if (str_detect(treatment_var, "slope_binary")) {
+      covariates_temp <- covariates_temp[!str_detect(covariates_temp, "ss_street_light")]
+    }
     models <- run_psm_nb(all_var, "count", treatment_var, covariates_temp, model_dir, figure_dir)
+    models_gcom_psm <- run_psm_nb(all_var, "count", treatment_var, covariates_temp, model_dir, figure_dir, with_gcomp = TRUE)
     model_list[[treatment_var]] <- models
+    model_gcomp_list[[treatment_var]] <- models_gcom_psm
   }
 
   # create stargazer
@@ -160,6 +231,7 @@ for (city in city_list) {
     models <- lapply(models_se, function(x) x$model)
     se <- lapply(models_se, function(x) x$se)
 
+    # model results for normal psm
     stargazer(models,
       se = se,
       single.row = TRUE,
@@ -168,6 +240,15 @@ for (city in city_list) {
       font.size = "small",
       type = "latex",
       out = paste0(model_dir, "/psm_", stage, ".tex")
+    )
+    # model results for gcomp psm
+    stargazer(model_gcomp_list,
+      single.row = TRUE,
+      column.sep.width = "1pt",
+      no.space = TRUE,
+      font.size = "small",
+      type = "latex",
+      out = paste0(model_dir, "/psm_gcomp.tex")
     )
   }
 
@@ -199,8 +280,8 @@ for (city in city_list) {
   pb <- progress_bar$new(total = length(treatment_var_list))
   for (treatment_var in treatment_var_list) {
     pb$tick()
-    treat_var_wo_binary <- sub("_binary", "", treatment_var)
-    covariates_temp <- covariates[!str_detect(covariates, treat_var_wo_binary)]
+    treatment_var_continous <- str_split_1(treatment_var, "_binary")[1]
+    covariates_temp <- covariates[!str_detect(covariates, treatment_var_continous)]
     # random forest
     # remove "year" and "month" from covariates
     covariates_temp <- covariates_temp[!str_detect(covariates_temp, "year|month")]

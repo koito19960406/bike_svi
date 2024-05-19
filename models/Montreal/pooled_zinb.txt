@@ -4,43 +4,41 @@ zeroinfl(formula = formula, data = all_var, dist = "negbin", link = "logit")
 
 Pearson residuals:
     Min      1Q  Median      3Q     Max 
--0.9112 -0.6795 -0.3903  0.1502 62.5613 
+-1.0587 -0.7241 -0.3599  0.2901  8.1759 
 
 Count model coefficients (negbin with log link):
-                          Estimate Std. Error z value Pr(>|z|)    
-(Intercept)              -2.682099   1.248988  -2.147 0.031760 *  
-age_0_19                  0.006425   0.005586   1.150 0.250113    
-age_20_39                 0.002631   0.003435   0.766 0.443808    
-age_40_59                -0.011286   0.007696  -1.466 0.142528    
-lu_residential_community  0.002787   0.001142   2.439 0.014713 *  
-slope                     0.019847   0.003196   6.210 5.28e-10 ***
-ss_visual_complexity     -0.054686   0.014640  -3.735 0.000187 ***
-ss_construction           0.085532   0.006737  12.696  < 2e-16 ***
-ss_road_flat              0.056394   0.009944   5.671 1.42e-08 ***
-ss_marking                0.089450   0.040168   2.227 0.025954 *  
-ss_nature                 0.038730   0.016218   2.388 0.016936 *  
-ss_street_object         -0.235261   0.120662  -1.950 0.051205 .  
-od_person_count           1.145250   0.113143  10.122  < 2e-16 ***
-od_bicycle_count         -0.462139   0.308508  -1.498 0.134138    
-od_vehicle_count          0.051038   0.017587   2.902 0.003706 ** 
-od_animal_count          -2.115369   4.150210  -0.510 0.610260    
-pop_den_log               0.171691   0.029833   5.755 8.66e-09 ***
-average_income_log        0.199658   0.105143   1.899 0.057576 .  
-poi_log                   0.221410   0.023927   9.254  < 2e-16 ***
-Log(theta)               -0.173935   0.034098  -5.101 3.38e-07 ***
+                           Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               7.2387598  1.5802165   4.581 4.63e-06 ***
+age_0_19                 -0.0228225  0.0069845  -3.268  0.00108 ** 
+age_20_39                -0.0006341  0.0045931  -0.138  0.89020    
+age_40_59                -0.0098088  0.0091087  -1.077  0.28154    
+lu_residential_community -0.0027091  0.0014492  -1.869  0.06158 .  
+ss_visual_complexity      0.0408937  0.0129672   3.154  0.00161 ** 
+slope                    -0.0118516  0.0043274  -2.739  0.00617 ** 
+ss_construction           0.0559705  0.0080095   6.988 2.79e-12 ***
+ss_road_flat             -0.0061822  0.0101750  -0.608  0.54346    
+ss_marking                0.0729028  0.0387088   1.883  0.05965 .  
+ss_nature                 0.0025846  0.0181395   0.142  0.88670    
+ss_street_object          0.0337134  0.1562374   0.216  0.82916    
+od_bicycle_count          0.1910225  0.2602489   0.734  0.46295    
+od_vehicle_count          0.0838798  0.0205019   4.091 4.29e-05 ***
+od_animal_count           3.2326541  4.1795686   0.773  0.43926    
+pop_den_log               0.2020738  0.0386055   5.234 1.66e-07 ***
+average_income_log       -0.3357073  0.1340128  -2.505  0.01224 *  
+poi_log                   0.2180960  0.0261822   8.330  < 2e-16 ***
+Log(theta)                0.1306685  0.0459739   2.842  0.00448 ** 
 
 Zero-inflation model coefficients (binomial with logit link):
-                 Estimate Std. Error z value Pr(>|z|)    
-(Intercept)        4.1933     1.4762   2.841 0.004503 ** 
-od_person_count   -3.0745     2.3729  -1.296 0.195082    
-od_bicycle_count  -1.0178     9.6157  -0.106 0.915700    
-od_vehicle_count  -0.9916     0.2575  -3.851 0.000118 ***
-od_animal_count    6.0433    72.2618   0.084 0.933351    
-pop_den_log       -0.3836     0.2085  -1.840 0.065822 .  
-poi_log           -0.7754     0.3758  -2.063 0.039094 *  
+                 Estimate Std. Error z value Pr(>|z|)  
+(Intercept)       -0.9008     1.5565  -0.579   0.5627  
+od_bicycle_count   0.1203     2.7825   0.043   0.9655  
+od_vehicle_count  -0.2162     0.1531  -1.412   0.1580  
+od_animal_count   23.8509    18.9963   1.256   0.2093  
+pop_den_log       -0.1443     0.2214  -0.652   0.5147  
+poi_log           -0.4562     0.2192  -2.081   0.0375 *
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
 
-Theta = 0.8404 
-Number of iterations in BFGS optimization: 56 
-Log-likelihood: -7576 on 27 Df
+Theta = 1.1396 
+Number of iterations in BFGS optimization: 28 
+Log-likelihood: -6527 on 25 Df

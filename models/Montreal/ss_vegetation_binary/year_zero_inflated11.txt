@@ -3,56 +3,56 @@ Call:
 zeroinfl(formula = formula, data = data, dist = count_model, link = "logit")
 
 Pearson residuals:
-     Min       1Q   Median       3Q      Max 
--0.84752 -0.65037 -0.40934  0.06916 61.98548 
+    Min      1Q  Median      3Q     Max 
+-0.8494 -0.6575 -0.3996  0.1112 60.9311 
 
 Count model coefficients (negbin with log link):
-                          Estimate Std. Error z value Pr(>|z|)    
-(Intercept)               3.602077   0.302849  11.894  < 2e-16 ***
-ss_vegetation_binary     -0.448035   0.066063  -6.782 1.19e-11 ***
-year2010                 -1.473697   0.275286  -5.353 8.64e-08 ***
-year2011                 -1.083982   0.287219  -3.774 0.000161 ***
-year2012                 -1.160268   0.168557  -6.884 5.84e-12 ***
-year2014                 -1.042811   0.209539  -4.977 6.47e-07 ***
-year2015                 -0.758472   0.130877  -5.795 6.82e-09 ***
-year2016                 -0.092105   0.109284  -0.843 0.399340    
-year2017                 -0.115734   0.149712  -0.773 0.439497    
-year2018                  0.785807   0.123870   6.344 2.24e-10 ***
-year2019                  1.160155   0.116220   9.982  < 2e-16 ***
-year2020                  0.304984   0.169298   1.801 0.071631 .  
-year2021                  0.729956   0.095786   7.621 2.52e-14 ***
-year2022                  0.466764   0.152762   3.056 0.002247 ** 
-age_0_19                 -0.012422   0.005580  -2.226 0.025995 *  
-age_20_39                 0.030644   0.003402   9.008  < 2e-16 ***
-age_40_59                -0.019231   0.007463  -2.577 0.009972 ** 
-lu_residential_community -0.008390   0.001134  -7.400 1.36e-13 ***
-od_vehicle_count          0.069549   0.018400   3.780 0.000157 ***
-Log(theta)               -0.324568   0.032688  -9.929  < 2e-16 ***
+                         Estimate Std. Error z value Pr(>|z|)
+(Intercept)               1.12652         NA      NA       NA
+ss_vegetation_binary     -0.40272         NA      NA       NA
+year2010                 -1.52661         NA      NA       NA
+year2011                 -1.22592         NA      NA       NA
+year2012                 -1.11302         NA      NA       NA
+year2014                 -0.98907         NA      NA       NA
+year2015                 -0.77326         NA      NA       NA
+year2016                 -0.09887         NA      NA       NA
+year2017                 -0.17012         NA      NA       NA
+year2018                  0.76384         NA      NA       NA
+year2019                  1.09893         NA      NA       NA
+year2020                  0.26649         NA      NA       NA
+year2021                  0.68864         NA      NA       NA
+year2022                  0.44128         NA      NA       NA
+age_0_19                 -0.01099         NA      NA       NA
+age_20_39                 0.03034         NA      NA       NA
+age_40_59                -0.02077         NA      NA       NA
+lu_commerce_developped    0.02978         NA      NA       NA
+lu_residential_community  0.02075         NA      NA       NA
+od_animal_count           1.52805         NA      NA       NA
+Log(theta)               -0.31933         NA      NA       NA
 
 Zero-inflation model coefficients (binomial with logit link):
-                           Estimate Std. Error z value Pr(>|z|)    
-(Intercept)               4.973e-01  2.595e+00   0.192 0.848026    
-ss_vegetation_binary     -2.248e+01  4.197e+03  -0.005 0.995727    
-year2010                 -1.742e+01  5.622e+03  -0.003 0.997527    
-year2011                 -2.819e+00  2.038e+00  -1.383 0.166580    
-year2012                  8.222e-01  1.803e+00   0.456 0.648382    
-year2014                  3.080e+00  1.677e+00   1.837 0.066200 .  
-year2015                  2.694e+00  9.139e-01   2.948 0.003201 ** 
-year2016                 -5.069e+00  2.161e+00  -2.346 0.018973 *  
-year2017                 -1.543e+01  1.038e+03  -0.015 0.988138    
-year2018                 -2.007e+01  6.916e+03  -0.003 0.997684    
-year2019                 -1.375e+01  9.193e+02  -0.015 0.988064    
-year2020                 -1.649e+01  2.938e+03  -0.006 0.995521    
-year2021                 -2.259e+01  1.530e+04  -0.001 0.998822    
-year2022                 -1.821e+01  4.589e+03  -0.004 0.996834    
-age_0_19                  1.710e-02  5.822e-02   0.294 0.769039    
-age_20_39                -5.702e-02  3.902e-02  -1.461 0.143938    
-age_40_59                 1.830e-01  8.151e-02   2.245 0.024794 *  
-lu_residential_community -2.486e-02  9.867e-03  -2.519 0.011760 *  
-od_vehicle_count         -1.549e+00  4.239e-01  -3.655 0.000257 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+                          Estimate Std. Error z value Pr(>|z|)
+(Intercept)              -10.91939         NA      NA       NA
+ss_vegetation_binary     -38.45395         NA      NA       NA
+year2010                   1.63101         NA      NA       NA
+year2011                 -38.63800         NA      NA       NA
+year2012                 -32.55324         NA      NA       NA
+year2014                   3.15802         NA      NA       NA
+year2015                   3.45488         NA      NA       NA
+year2016                  -0.88231         NA      NA       NA
+year2017                 -15.13746         NA      NA       NA
+year2018                 -61.96440         NA      NA       NA
+year2019                  -0.56935         NA      NA       NA
+year2020                 -30.44596         NA      NA       NA
+year2021                  -2.28334         NA      NA       NA
+year2022                  -0.50470         NA      NA       NA
+age_0_19                  -0.03250         NA      NA       NA
+age_20_39                 -0.13942         NA      NA       NA
+age_40_59                  0.24611         NA      NA       NA
+lu_commerce_developped     0.07506         NA      NA       NA
+lu_residential_community   0.03600         NA      NA       NA
+od_animal_count           19.95158         NA      NA       NA
 
-Theta = 0.7228 
-Number of iterations in BFGS optimization: 68 
-Log-likelihood: -7705 on 39 Df
+Theta = 0.7266 
+Number of iterations in BFGS optimization: 66 
+Log-likelihood: -7724 on 41 Df
