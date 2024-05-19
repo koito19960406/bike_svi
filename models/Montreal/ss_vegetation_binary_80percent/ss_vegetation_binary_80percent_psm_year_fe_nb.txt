@@ -1,0 +1,63 @@
+
+Call:
+glm.nb(formula = formula, data = match_result_df, weights = weights, 
+    init.theta = 1.452372941, link = log)
+
+Coefficients:
+                                 Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                     8.570e+00  1.695e+00   5.055 4.30e-07 ***
+ss_vegetation_binary_80percent  2.048e-01  1.021e-01   2.006 0.044891 *  
+year2010                       -1.069e+00  2.454e-01  -4.356 1.32e-05 ***
+year2011                       -8.647e-01  4.420e-01  -1.956 0.050417 .  
+year2012                       -3.767e-01  2.207e-01  -1.707 0.087859 .  
+year2014                       -1.709e+00  2.248e-01  -7.602 2.92e-14 ***
+year2015                       -1.377e+00  1.638e-01  -8.406  < 2e-16 ***
+year2016                       -6.074e-01  1.655e-01  -3.671 0.000242 ***
+year2017                       -5.102e-01  2.339e-01  -2.181 0.029178 *  
+year2018                       -2.411e-01  1.805e-01  -1.335 0.181804    
+year2019                       -9.032e-02  1.741e-01  -0.519 0.603810    
+year2020                       -3.717e-01  2.552e-01  -1.457 0.145204    
+year2021                       -3.316e-01  1.626e-01  -2.040 0.041398 *  
+year2022                       -5.615e-01  2.089e-01  -2.687 0.007199 ** 
+month4                         -5.780e-01  1.925e-01  -3.003 0.002672 ** 
+month5                         -5.230e-01  1.947e-01  -2.687 0.007219 ** 
+month6                         -1.215e+00  2.124e-01  -5.721 1.06e-08 ***
+month7                         -1.137e+00  2.669e-01  -4.260 2.05e-05 ***
+month8                         -1.222e+00  2.564e-01  -4.767 1.87e-06 ***
+month9                         -7.557e-01  2.176e-01  -3.473 0.000515 ***
+month10                        -5.427e-01  2.220e-01  -2.445 0.014486 *  
+month11                        -8.742e-01  2.482e-01  -3.522 0.000428 ***
+month12                        -1.270e+00  4.088e-01  -3.106 0.001899 ** 
+age_0_19                       -1.336e-02  6.296e-03  -2.122 0.033831 *  
+age_20_39                      -6.054e-05  4.093e-03  -0.015 0.988199    
+age_40_59                      -1.446e-02  8.839e-03  -1.636 0.101856    
+lu_residential_community       -2.597e-03  1.287e-03  -2.019 0.043506 *  
+ss_visual_complexity            1.930e-02  1.297e-02   1.488 0.136770    
+slope                          -1.092e-02  3.909e-03  -2.792 0.005230 ** 
+ss_construction                 4.954e-02  6.603e-03   7.503 6.23e-14 ***
+ss_road_flat                    1.544e-02  8.802e-03   1.754 0.079369 .  
+ss_marking                      1.293e-01  3.703e-02   3.490 0.000482 ***
+ss_nature                       1.284e-04  1.664e-02   0.008 0.993842    
+ss_street_object                1.847e-03  1.461e-01   0.013 0.989915    
+od_bicycle_count                3.511e-01  2.500e-01   1.404 0.160175    
+od_vehicle_count                9.596e-02  1.933e-02   4.963 6.94e-07 ***
+od_animal_count                -7.892e-01  3.997e+00  -0.197 0.843489    
+pop_den_log                     2.553e-01  4.034e-02   6.329 2.47e-10 ***
+average_income_log             -4.524e-01  1.432e-01  -3.159 0.001581 ** 
+poi_log                         3.011e-01  3.349e-02   8.993  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for Negative Binomial(1.4524) family taken to be 1)
+
+    Null deviance: 2020.69  on 797  degrees of freedom
+Residual deviance:  904.01  on 758  degrees of freedom
+AIC: 12901
+
+Number of Fisher Scoring iterations: 1
+
+
+              Theta:  1.4524 
+          Std. Err.:  0.0679 
+
+ 2 x log-likelihood:  -12818.5510 

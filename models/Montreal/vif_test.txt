@@ -1,0 +1,12 @@
+                age_0_19                age_20_39                age_40_59 
+                1.730728                 2.014101                 1.648913 
+lu_residential_community     ss_visual_complexity                    slope 
+                1.648852                 1.584463                 1.229124 
+         ss_construction             ss_road_flat               ss_marking 
+                2.345282                 2.542534                 1.333964 
+               ss_nature         ss_street_object         od_bicycle_count 
+                2.178703                 1.088966                 1.186883 
+        od_vehicle_count          od_animal_count              pop_den_log 
+                1.334122                 1.032028                 1.619757 
+      average_income_log                  poi_log 
+                1.371885                 1.878718 

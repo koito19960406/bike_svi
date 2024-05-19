@@ -1,0 +1,46 @@
+
+Call:
+glm.nb(formula = formula, data = data, init.theta = 0.5381051909, 
+    link = log)
+
+Coefficients:
+                          Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               5.809522   1.018920   5.702 1.19e-08 ***
+ss_parking_binary         0.051644   0.136223   0.379   0.7046    
+year2011                 -0.008299   0.823754  -0.010   0.9920    
+year2012                 -0.178279   0.697231  -0.256   0.7982    
+year2014                  0.177216   0.697367   0.254   0.7994    
+year2015                  0.859855   0.691420   1.244   0.2136    
+year2016                  0.023554   0.702277   0.034   0.9732    
+year2017                  0.336314   0.698182   0.482   0.6300    
+year2018                  0.290376   0.708622   0.410   0.6820    
+year2019                  0.324729   0.693373   0.468   0.6395    
+month4                   -0.055230   0.218751  -0.252   0.8007    
+month5                   -0.211047   0.189376  -1.114   0.2651    
+month6                   -0.243229   0.191616  -1.269   0.2043    
+month7                    0.005198   0.212820   0.024   0.9805    
+month9                   -0.152071   0.214631  -0.709   0.4786    
+month10                  -0.410639   0.214055  -1.918   0.0551 .  
+month11                  -1.165445   1.379489  -0.845   0.3982    
+age_0_19                 -0.066940   0.008623  -7.763 8.30e-15 ***
+age_20_39                 0.031960   0.007163   4.462 8.12e-06 ***
+age_40_59                -0.021700   0.016349  -1.327   0.1844    
+lu_residential_community  0.006339   0.005684   1.115   0.2647    
+lu_commerce_developed     0.028520   0.003582   7.962 1.69e-15 ***
+od_vehicle_count         -0.072565   0.016416  -4.420 9.86e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for Negative Binomial(0.5381) family taken to be 1)
+
+    Null deviance: 2197.3  on 1273  degrees of freedom
+Residual deviance: 1573.0  on 1251  degrees of freedom
+AIC: 15793
+
+Number of Fisher Scoring iterations: 1
+
+
+              Theta:  0.5381 
+          Std. Err.:  0.0187 
+
+ 2 x log-likelihood:  -15744.7870 

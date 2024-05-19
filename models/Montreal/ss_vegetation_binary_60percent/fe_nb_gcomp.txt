@@ -1,0 +1,9 @@
+
+                           Term Contrast Estimate Std. Error     z Pr(>|z|)   S
+ ss_vegetation_binary_60percent    1 - 0     -222        190 -1.17    0.244 2.0
+ 2.5 % 97.5 %
+  -595    151
+
+Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
+Type:  response 
+

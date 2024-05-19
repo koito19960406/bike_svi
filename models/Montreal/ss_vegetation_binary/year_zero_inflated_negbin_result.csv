@@ -1,0 +1,16 @@
+"variable","point_estimate","p_value"
+slope,-0.436908758999517,NA
+ss_visual_complexity,-0.572668753466345,NA
+ss_construction,-0.107968077897934,NA
+ss_road_flat,-0.43557016111269,3.27833387719379e-11
+ss_marking,-0.392952831187835,2.0088611757582e-09
+ss_nature,-0.38927091544878,NA
+ss_street_object,-0.415957984116801,NA
+od_person_count,-0.385975394800518,NA
+od_bicycle_count,-0.409426286920931,1.94567761344926e-10
+od_vehicle_count,-0.437728309239538,NA
+od_animal_count,-0.40271621094623,NA
+pop_den_log,-0.442484676190957,NA
+average_income_log,-0.42530727297345,NA
+housing_price_log,-0.372517890886388,NA
+poi_log,-0.392930022824739,NA
