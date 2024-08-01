@@ -1,0 +1,10 @@
+GRF tree object 
+Number of training samples: 399 
+Variable splits: 
+(1) split_variable: lu_residential_community  split_value: 91.7241 
+  (2) split_variable: slope  split_value: 11.1805 
+    (4) * num_samples: 44  avg_Y: 6.51 avg_W: 0.25 
+    (5) * num_samples: 36  avg_Y: 7.4 avg_W: 0.53 
+  (3) split_variable: ss_marking  split_value: 0.262117 
+    (6) * num_samples: 25  avg_Y: 6.22 avg_W: 0.2 
+    (7) * num_samples: 94  avg_Y: 6.64 avg_W: 0.31 

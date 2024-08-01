@@ -1,0 +1,37 @@
+
+Call:
+glm(formula = formula, data = all_var)
+
+Coefficients:
+                          Estimate Std. Error t value Pr(>|t|)    
+(Intercept)              -1622.479    779.252  -2.082 0.037536 *  
+age_0_19                    -6.027      5.131  -1.175 0.240306    
+age_20_39                    4.189      3.783   1.107 0.268375    
+age_40_59                   -8.371      7.732  -1.083 0.279161    
+IMD_score                    1.486      2.200   0.675 0.499634    
+lu_residential_community     1.465      2.672   0.548 0.583553    
+lu_commerce_developed        2.153      1.857   1.160 0.246468    
+ss_visual_complexity         9.589      5.650   1.697 0.089900 .  
+slope                      -10.927      2.785  -3.923 9.22e-05 ***
+ss_construction              3.035      3.668   0.827 0.408249    
+ss_road_flat                -3.876      3.858  -1.005 0.315276    
+ss_marking                  15.461     11.189   1.382 0.167296    
+ss_nature                   -2.095      8.099  -0.259 0.795969    
+ss_street_object           133.174     69.469   1.917 0.055460 .  
+od_person_count             49.996     33.803   1.479 0.139379    
+od_vehicle_count           -14.410      8.274  -1.742 0.081824 .  
+od_animal_count            616.506    604.843   1.019 0.308265    
+pop_den_log                -87.688     25.754  -3.405 0.000683 ***
+housing_price_log          166.397     46.316   3.593 0.000340 ***
+poi_log                    183.038     23.675   7.731 2.17e-14 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for gaussian family taken to be 403984.8)
+
+    Null deviance: 689114154  on 1273  degrees of freedom
+Residual deviance: 506596888  on 1254  degrees of freedom
+AIC: 20084
+
+Number of Fisher Scoring iterations: 2
+

@@ -1,0 +1,9 @@
+
+                         Term Contrast Estimate Std. Error    z Pr(>|z|)    S
+ ss_sidewalk_binary_80percent    1 - 0     1357        391 3.47   <0.001 10.9
+ 2.5 % 97.5 %
+   590   2124
+
+Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
+Type:  response 
+

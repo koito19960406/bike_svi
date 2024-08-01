@@ -1,0 +1,12 @@
+
+	Moran I test under randomisation
+
+data:  residuals(fe_nb)  
+weights: weights    
+
+Moran I statistic standard deviate = 18.047, p-value < 2.2e-16
+alternative hypothesis: greater
+sample estimates:
+Moran I statistic       Expectation          Variance 
+     0.4617310134     -0.0007855460      0.0006568044 
+

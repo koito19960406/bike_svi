@@ -1,0 +1,58 @@
+
+Call:
+zeroinfl(formula = formula, data = data, dist = count_model, link = "logit")
+
+Pearson residuals:
+    Min      1Q  Median      3Q     Max 
+-0.9172 -0.6777 -0.4061  0.1122 54.2027 
+
+Count model coefficients (negbin with log link):
+                          Estimate Std. Error z value Pr(>|z|)
+(Intercept)               1.635652         NA      NA       NA
+ss_vegetation_binary     -0.392930         NA      NA       NA
+year2010                 -1.789497         NA      NA       NA
+year2011                 -1.510873         NA      NA       NA
+year2012                 -1.535301         NA      NA       NA
+year2014                 -1.724826         NA      NA       NA
+year2015                 -1.592841         NA      NA       NA
+year2016                 -0.999653         NA      NA       NA
+year2017                 -1.312629         NA      NA       NA
+year2018                 -0.478143         NA      NA       NA
+year2019                  0.089215         NA      NA       NA
+year2020                 -0.855112         NA      NA       NA
+year2021                 -0.627532         NA      NA       NA
+year2022                 -1.039075         NA      NA       NA
+age_0_19                  0.006019         NA      NA       NA
+age_20_39                 0.017230         NA      NA       NA
+age_40_59                -0.023214         NA      NA       NA
+lu_commerce_developped    0.020083         NA      NA       NA
+lu_residential_community  0.015035         NA      NA       NA
+poi_log                   0.439338         NA      NA       NA
+Log(theta)               -0.160984         NA      NA       NA
+
+Zero-inflation model coefficients (binomial with logit link):
+                          Estimate Std. Error z value Pr(>|z|)
+(Intercept)               -9.87443         NA      NA       NA
+ss_vegetation_binary      -4.07846         NA      NA       NA
+year2010                 -16.62650         NA      NA       NA
+year2011                 -23.13355         NA      NA       NA
+year2012                 -16.32527         NA      NA       NA
+year2014                   2.83716         NA      NA       NA
+year2015                   4.45683         NA      NA       NA
+year2016                  -0.96079         NA      NA       NA
+year2017                 -14.27753         NA      NA       NA
+year2018                   1.41009         NA      NA       NA
+year2019                 -16.90736         NA      NA       NA
+year2020                 -16.78989         NA      NA       NA
+year2021                  -1.10988         NA      NA       NA
+year2022                 -20.14490         NA      NA       NA
+age_0_19                  -0.03605         NA      NA       NA
+age_20_39                 -0.03118         NA      NA       NA
+age_40_59                  0.16262         NA      NA       NA
+lu_commerce_developped     0.06403         NA      NA       NA
+lu_residential_community   0.03639         NA      NA       NA
+poi_log                   -1.83152         NA      NA       NA
+
+Theta = 0.8513 
+Number of iterations in BFGS optimization: 99 
+Log-likelihood: -7570 on 41 Df
