@@ -284,7 +284,7 @@ for (city in city_list) {
   capture.output(summary_stats_latetx, file = paste0(model_dir, "/summary_stats_latetx.txt"))
 
   # correlation matrix
-  corrmatrix <- cor(all_var %>% dplyr::select(-c(year, month)), use = "complete.obs")
+  corrmatrix <- cor(all_var %>% dplyr::select(-c(year)), use = "complete.obs")
   cor.mtest <- function(mat, ...) {
     mat <- as.matrix(mat)
     n <- ncol(mat)
@@ -300,7 +300,7 @@ for (city in city_list) {
     p.mat
   }
   # matrix of the p-value of the correlation
-  p.mat <- cor.mtest(all_var %>% dplyr::select(-c(year, month)))
+  p.mat <- cor.mtest(all_var %>% dplyr::select(-c(year)))
   # original color: purple(#7B52AE) and green (#74B652)
   col1 <- colorRampPalette(c("#62428b", "#FFFFFF", "#5d9242"))
   pdf(paste0(figure_dir, "/correlation_mat.pdf"), height = 7, width = 7)
@@ -338,6 +338,38 @@ for (city in city_list) {
   ggsave(
     plot = count_violin_plot,
     filename = paste0(figure_dir, "/count_ridge_plot.png"),
+    width = 7,
+    height = 7,
+    units = c("in")
+  )
+
+  # Boxplot of "count" by "year" --------------------------------------
+  count_boxplot <- all_var_raw %>%
+    # convert count over 1000 to 1000
+    mutate(count = ifelse(count > 1000, 1000, count)) %>%
+    ggplot(aes(x = factor(year), y = count)) +
+    geom_boxplot(fill = "#7B52AE", color = "black", alpha = 0.5) +
+    labs(
+      x = "Year",
+      y = "Count",
+      title = paste0("Distribution of ", target, " count by year"),
+      subtitle = city,
+      caption = ""
+    ) +
+    # set breaks and labels: y-axis by 250
+    scale_y_continuous(breaks = seq(0, 1000, by = 250), labels = c("0", "250", "500", "750", ">=1000")) +
+    theme_ipsum() +
+    theme(
+      plot.margin = ggplot2::margin(0, 0, 0, 0),
+      legend.margin = ggplot2::margin(0, 0, 0, 0),  # Remove margin around the legend
+      legend.box.margin = ggplot2::margin(0, 0, 0, 0),  # Remove margin around the legend box
+      axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis labels for better readability
+    )
+
+  # save
+  ggsave(
+    plot = count_boxplot,
+    filename = paste0(figure_dir, "/count_boxplot.png"),
     width = 7,
     height = 7,
     units = c("in")
@@ -450,12 +482,7 @@ for (city in city_list) {
     filter(year_group %in% c("2008-2014", "2015-2020")) %>%
     dplyr::select(grid_id, year_group, count) %>%
     pivot_wider(names_from = year_group, values_from = count) %>%
-    mutate(change = (`2015-2020` - `2008-2014`)/`2008-2014`*100) %>%
-    mutate(change = case_when(
-      change > 100 ~ 100,
-      change < -100 ~ -100,
-      TRUE ~ change),
-      change = as.numeric(change))
+    mutate(change = (`2015-2020` - `2008-2014`))
 
   hex_grid_joined <- hex_grid %>%
     left_join(., hex_grid_summarized, by = "grid_id") %>%
@@ -474,8 +501,8 @@ for (city in city_list) {
     city == "Montreal" ~ "Change in pedestrian count between 2009-2014 and 2015-2022"
   )
   fill <- case_when(
-    city == "London" ~ "Change in cyclist count (%)",
-    city == "Montreal" ~ "Change in pedestrian count (%)"
+    city == "London" ~ "Change in cyclist count",
+    city == "Montreal" ~ "Change in pedestrian count"
   )
   data_source <- case_when(
     city == "London" ~ "Transport for London",
@@ -494,9 +521,9 @@ for (city in city_list) {
       size = 0.05
     ) +
     scale_fill_gradientn(colours = color_scale, 
-      breaks = seq(-100, 100, by = 50),
-      labels = c("<-100%", "-50%", "0%", "50%", ">100%"),
-      limits = c(-100, 100),
+      breaks = scales::pretty_breaks(n = 5)(range(hex_grid_joined$change, na.rm = TRUE)),
+      labels = scales::label_number()(scales::pretty_breaks(n = 5)(range(hex_grid_joined$change, na.rm = TRUE))),
+      limits = range(hex_grid_joined$change, na.rm = TRUE),
       guide = guide_colourbar(direction = "horizontal",
         title.position = "bottom")
     ) +
