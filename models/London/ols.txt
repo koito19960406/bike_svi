@@ -4,46 +4,51 @@ lm(formula = count ~ ., data = all_var)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--2022.8  -260.8   -62.2   119.7  8395.4 
+-2031.1  -261.8   -52.9   127.3  8362.7 
 
 Coefficients:
-                          Estimate Std. Error t value Pr(>|t|)    
-(Intercept)              31296.885  19875.811   1.575 0.115598    
-year                       -16.613      9.928  -1.673 0.094511 .  
-month                        4.278      9.595   0.446 0.655769    
-age_0_19                    -3.350      5.145  -0.651 0.515115    
-age_20_39                    4.270      3.772   1.132 0.257897    
-age_40_59                   -7.781      7.691  -1.012 0.311873    
-IMD_score                    1.910      2.184   0.875 0.381966    
-lu_residential_community     1.064      2.651   0.401 0.688235    
-lu_commerce_developed        1.557      1.855   0.839 0.401389    
-ss_visual_complexity         5.991      5.904   1.015 0.310422    
-slope                      -10.996      2.766  -3.976 7.42e-05 ***
-ss_construction              1.657      3.870   0.428 0.668593    
-ss_road_flat                -3.585      4.063  -0.882 0.377732    
-ss_marking                  14.311     11.229   1.274 0.202727    
-ss_nature                   -1.584      8.048  -0.197 0.843994    
-ss_street_object            97.514     71.336   1.367 0.171885    
-od_person_count             38.988     33.769   1.155 0.248501    
-od_bicycle_count           350.466    114.775   3.053 0.002310 ** 
-od_vehicle_count            -9.411      8.602  -1.094 0.274114    
-od_animal_count             78.868    631.806   0.125 0.900678    
-pop_den_log                -88.053     25.576  -3.443 0.000595 ***
-housing_price_log          209.265     47.549   4.401 1.17e-05 ***
-poi_log                    177.315     23.731   7.472 1.49e-13 ***
-ss_vegetation_binary       -51.936     44.881  -1.157 0.247417    
-ss_bike_lane_binary        317.372     72.600   4.371 1.34e-05 ***
-ss_bike_rack_binary        216.399    229.375   0.943 0.345644    
-ss_curb_binary              60.760     83.707   0.726 0.468060    
-ss_curb_cut_binary          -5.623     63.974  -0.088 0.929972    
-ss_parking_binary         -123.511     63.529  -1.944 0.052102 .  
-ss_pothole_binary         -113.460    214.287  -0.529 0.596570    
-ss_street_light_binary      20.443     38.711   0.528 0.597529    
+                             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                 2.351e+04  2.498e+04   0.941 0.346775    
+year                       -1.222e+01  1.017e+01  -1.201 0.229850    
+month                       3.580e+00  9.603e+00   0.373 0.709337    
+slope                      -1.140e+01  2.799e+00  -4.075 4.90e-05 ***
+IMD_score                   4.469e-01  2.309e+00   0.194 0.846577    
+age_0_19                   -3.175e+00  5.144e+00  -0.617 0.537249    
+age_20_39                   2.613e+00  3.865e+00   0.676 0.499095    
+age_40_59                  -7.518e+00  7.809e+00  -0.963 0.335880    
+lu_residential_community    1.219e-01  2.655e+00   0.046 0.963367    
+lu_commerce_developed       1.580e+00  1.861e+00   0.849 0.396008    
+latitude                   -1.464e+01  2.625e+02  -0.056 0.955525    
+longitude                   1.950e+01  1.235e+02   0.158 0.874541    
+ss_visual_complexity        4.630e+00  5.926e+00   0.781 0.434730    
+ss_construction             2.343e-03  3.900e+00   0.001 0.999521    
+ss_road_flat               -4.524e+00  4.078e+00  -1.109 0.267481    
+ss_marking                  1.308e+01  1.122e+01   1.166 0.243973    
+ss_nature                  -1.462e+00  8.075e+00  -0.181 0.856386    
+ss_street_object            1.196e+02  7.141e+01   1.675 0.094156 .  
+od_person_count             3.923e+01  3.366e+01   1.165 0.244064    
+od_bicycle_count            3.348e+02  1.146e+02   2.921 0.003553 ** 
+od_vehicle_count           -9.258e+00  8.604e+00  -1.076 0.282142    
+od_animal_count             4.024e+01  6.303e+02   0.064 0.949107    
+housing_price_log           1.424e+02  5.574e+01   2.554 0.010753 *  
+poi_betweenness_log        -1.243e+01  7.629e+00  -1.629 0.103478    
+poi_accessibility_log       1.341e+02  3.898e+01   3.440 0.000602 ***
+nearest_edge_speed_kph_log  1.690e+02  9.589e+01   1.762 0.078267 .  
+pop_den_log                -1.013e+02  2.622e+01  -3.864 0.000117 ***
+poi_log                     1.437e+02  2.681e+01   5.362 9.82e-08 ***
+ss_vegetation_binary       -5.054e+01  4.503e+01  -1.122 0.261898    
+ss_bike_lane_binary         3.166e+02  7.237e+01   4.374 1.32e-05 ***
+ss_bike_rack_binary         2.141e+02  2.290e+02   0.935 0.350166    
+ss_curb_binary              7.211e+01  8.351e+01   0.863 0.388055    
+ss_curb_cut_binary         -1.253e+01  6.383e+01  -0.196 0.844457    
+ss_parking_binary          -1.232e+02  6.341e+01  -1.942 0.052339 .  
+ss_pothole_binary          -9.165e+01  2.137e+02  -0.429 0.668120    
+ss_street_light_binary      1.369e+01  3.863e+01   0.354 0.723086    
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-Residual standard error: 628.2 on 1243 degrees of freedom
+Residual standard error: 625.9 on 1238 degrees of freedom
   (18 observations deleted due to missingness)
-Multiple R-squared:  0.2881,	Adjusted R-squared:  0.2709 
-F-statistic: 16.76 on 30 and 1243 DF,  p-value: < 2.2e-16
+Multiple R-squared:  0.2963,	Adjusted R-squared:  0.2764 
+F-statistic: 14.89 on 35 and 1238 DF,  p-value: < 2.2e-16
 

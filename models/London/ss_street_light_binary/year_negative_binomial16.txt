@@ -1,46 +1,46 @@
 
 Call:
-glm.nb(formula = formula, data = data, init.theta = 0.6326192911, 
+glm.nb(formula = formula, data = data, init.theta = 0.6199150659, 
     link = log)
 
 Coefficients:
                           Estimate Std. Error z value Pr(>|z|)    
-(Intercept)               4.212382   0.941794   4.473 7.72e-06 ***
-ss_street_light_binary    0.101472   0.075077   1.352   0.1765    
-year2011                 -0.757944   0.762357  -0.994   0.3201    
-year2012                 -0.792512   0.644135  -1.230   0.2186    
-year2014                 -0.477235   0.644148  -0.741   0.4588    
-year2015                  0.043632   0.638894   0.068   0.9456    
-year2016                 -0.686486   0.648644  -1.058   0.2899    
-year2017                 -0.400486   0.645087  -0.621   0.5347    
-year2018                 -0.677400   0.655292  -1.034   0.3013    
-year2019                 -0.505951   0.641216  -0.789   0.4301    
-month4                    0.310681   0.201106   1.545   0.1224    
-month5                    0.087136   0.175033   0.498   0.6186    
-month6                   -0.022598   0.176720  -0.128   0.8982    
-month7                    0.214050   0.196730   1.088   0.2766    
-month9                    0.109255   0.197303   0.554   0.5798    
-month10                  -0.139487   0.197401  -0.707   0.4798    
-month11                  -0.087938   1.272702  -0.069   0.9449    
-age_0_19                 -0.020191   0.008095  -2.494   0.0126 *  
-age_20_39                 0.005029   0.006987   0.720   0.4716    
-age_40_59                -0.017198   0.015311  -1.123   0.2613    
-lu_residential_community -0.004379   0.005297  -0.827   0.4083    
-lu_commerce_developed     0.005237   0.003455   1.516   0.1296    
-poi_log                   0.642239   0.036612  17.542  < 2e-16 ***
+(Intercept)               4.153273   0.949389   4.375 1.22e-05 ***
+ss_street_light_binary    0.097162   0.075929   1.280   0.2007    
+year2011                 -0.434377   0.769380  -0.565   0.5724    
+year2012                 -0.768322   0.650413  -1.181   0.2375    
+year2014                 -0.419991   0.650474  -0.646   0.5185    
+year2015                  0.091476   0.645185   0.142   0.8873    
+year2016                 -0.458009   0.654777  -0.699   0.4842    
+year2017                 -0.330040   0.651294  -0.507   0.6123    
+year2018                 -0.527238   0.661397  -0.797   0.4254    
+year2019                 -0.279310   0.646918  -0.432   0.6659    
+month4                    0.006873   0.203168   0.034   0.9730    
+month5                   -0.040695   0.176745  -0.230   0.8179    
+month6                   -0.138131   0.178577  -0.774   0.4392    
+month7                    0.064289   0.198712   0.324   0.7463    
+month9                   -0.059717   0.199292  -0.300   0.7644    
+month10                  -0.143830   0.199456  -0.721   0.4708    
+month11                  -0.038368   1.285997  -0.030   0.9762    
+age_0_19                 -0.035481   0.008075  -4.394 1.11e-05 ***
+age_20_39                 0.008524   0.007059   1.207   0.2272    
+age_40_59                -0.014447   0.015390  -0.939   0.3479    
+lu_residential_community -0.005177   0.005357  -0.966   0.3339    
+lu_commerce_developed     0.007099   0.003447   2.060   0.0394 *  
+poi_accessibility_log     0.772352   0.047989  16.094  < 2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-(Dispersion parameter for Negative Binomial(0.6326) family taken to be 1)
+(Dispersion parameter for Negative Binomial(0.6199) family taken to be 1)
 
-    Null deviance: 2567.0  on 1273  degrees of freedom
-Residual deviance: 1548.8  on 1251  degrees of freedom
-AIC: 15531
+    Null deviance: 2517.5  on 1273  degrees of freedom
+Residual deviance: 1551.6  on 1251  degrees of freedom
+AIC: 15563
 
 Number of Fisher Scoring iterations: 1
 
 
-              Theta:  0.6326 
-          Std. Err.:  0.0225 
+              Theta:  0.6199 
+          Std. Err.:  0.0220 
 
- 2 x log-likelihood:  -15482.7040 
+ 2 x log-likelihood:  -15514.9870 

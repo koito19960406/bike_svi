@@ -1,8 +1,6 @@
 
-              Term Contrast Estimate Std. Error      z Pr(>|z|)   S 2.5 %
- ss_parking_binary    1 - 0    -12.9       40.6 -0.316    0.752 0.4 -92.5
- 97.5 %
-   66.8
+              Term Contrast Estimate Std. Error      z Pr(>|z|)   S 2.5 % 97.5 %
+ ss_parking_binary    1 - 0      -11       39.8 -0.277    0.782 0.4   -89     67
 
 Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
 Type:  response 

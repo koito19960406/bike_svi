@@ -25,6 +25,9 @@ city_list <- city_list %>%
 
 # loop through the cities
 for (city in city_list) {
+  if (city == "Montreal"){
+    next
+  }
   # create folders for each city
   model_dir <- paste0(root_dir, "/models/", city)
   if (!dir.exists(model_dir)) {
@@ -73,6 +76,7 @@ for (city in city_list) {
       year = as.factor(year),
       month = as.factor(month) 
     ) 
+
     # remove od_person_count if city is Montreal. And remove od_bicycle_count if city is London
   # Apply conditional logic based on city value
   if (city == "Montreal") {
@@ -81,8 +85,9 @@ for (city in city_list) {
     all_var <- all_var %>% dplyr::select(-contains("od_bicycle_count"))
   }
   count_station <- read.csv(paste0(external_dir, "/count_station_clean.csv"))
+
   all_var_spatial <- all_var %>%
-    left_join(count_station, by = c("count_point_id" = "count_point_id")) %>%
+    # left_join(count_station, by = c("count_point_id" = "count_point_id")) %>%
     drop_na() %>% 
     st_as_sf(coords = c("longitude", "latitude"), crs = 4326)
   # all_var <- read.csv(paste0(processed_dir, "/all_var_joined.csv")) %>%
@@ -109,9 +114,10 @@ for (city in city_list) {
   # check overdispersion
   covariates <- names(all_var)[!str_detect(
     names(all_var),
-    paste("\\bcount\\b", "count_log", "count_point_id", "year", "month", "binary", sep = "|")
+    paste("\\bcount\\b", "count_log", "count_point_id", "year", "month", "binary", "longitude", "latitude", sep = "|")
   )]
   # OD test
+  print(covariates)
   covariates_pasted <- paste(covariates, collapse = " + ")
   formula <- as.formula(paste("count", " ~ ", covariates_pasted))
   print(formula)

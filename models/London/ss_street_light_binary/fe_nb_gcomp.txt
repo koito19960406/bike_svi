@@ -1,8 +1,6 @@
 
-                   Term Contrast Estimate Std. Error     z Pr(>|z|)   S 2.5 %
- ss_street_light_binary    1 - 0     25.2       25.4 0.989    0.322 1.6 -24.7
- 97.5 %
-     75
+                   Term Contrast Estimate Std. Error     z Pr(>|z|)   S 2.5 % 97.5 %
+ ss_street_light_binary    1 - 0       18       24.7 0.729    0.466 1.1 -30.5   66.5
 
 Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
 Type:  response 

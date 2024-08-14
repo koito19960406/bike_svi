@@ -1,46 +1,46 @@
 
 Call:
-glm.nb(formula = formula, data = data, init.theta = 0.5436946373, 
+glm.nb(formula = formula, data = data, init.theta = 0.5352027258, 
     link = log)
 
 Coefficients:
                            Estimate Std. Error z value Pr(>|z|)    
-(Intercept)               3.733e+00  1.075e+00   3.472 0.000517 ***
-slope_binary_80percent   -2.612e-01  9.648e-02  -2.707 0.006787 ** 
-year2011                  3.556e-01  8.201e-01   0.434 0.664582    
-year2012                 -4.322e-01  6.958e-01  -0.621 0.534508    
-year2014                 -7.793e-02  6.955e-01  -0.112 0.910786    
-year2015                  5.731e-01  6.896e-01   0.831 0.405947    
-year2016                 -1.834e-01  7.008e-01  -0.262 0.793603    
-year2017                  5.799e-02  6.968e-01   0.083 0.933679    
-year2018                  2.180e-01  7.045e-01   0.309 0.756999    
-year2019                  3.050e-01  6.896e-01   0.442 0.658329    
-month4                    1.179e-01  2.166e-01   0.544 0.586292    
-month5                   -1.547e-01  1.880e-01  -0.823 0.410471    
-month6                   -1.859e-01  1.905e-01  -0.976 0.329042    
-month7                    5.019e-02  2.113e-01   0.238 0.812194    
-month9                    4.559e-03  2.125e-01   0.021 0.982882    
-month10                  -3.376e-01  2.123e-01  -1.590 0.111725    
-month11                  -9.527e-01  1.372e+00  -0.694 0.487400    
-age_0_19                 -6.705e-02  8.577e-03  -7.818 5.37e-15 ***
-age_20_39                 3.029e-02  7.109e-03   4.260 2.04e-05 ***
-age_40_59                -2.273e-02  1.619e-02  -1.404 0.160406    
-lu_residential_community  9.363e-05  5.669e-03   0.017 0.986822    
-lu_commerce_developed     2.603e-02  3.562e-03   7.307 2.72e-13 ***
-ss_visual_complexity      5.238e-02  1.128e-02   4.644 3.42e-06 ***
+(Intercept)               3.939e+00  2.849e+01   0.138  0.89005    
+slope_binary_80percent   -2.888e-01  9.723e-02  -2.970  0.00297 ** 
+year2011                  2.534e-02  8.272e-01   0.031  0.97557    
+year2012                 -2.235e-01  6.992e-01  -0.320  0.74921    
+year2014                  7.360e-02  6.992e-01   0.105  0.91618    
+year2015                  7.537e-01  6.935e-01   1.087  0.27708    
+year2016                 -5.725e-04  7.042e-01  -0.001  0.99935    
+year2017                  2.646e-01  7.002e-01   0.378  0.70544    
+year2018                  2.056e-01  7.099e-01   0.290  0.77212    
+year2019                  3.229e-01  6.950e-01   0.465  0.64219    
+month4                    4.469e-02  2.184e-01   0.205  0.83784    
+month5                   -1.765e-01  1.894e-01  -0.932  0.35145    
+month6                   -2.028e-01  1.921e-01  -1.056  0.29118    
+month7                    9.418e-05  2.129e-01   0.000  0.99965    
+month9                   -4.768e-02  2.140e-01  -0.223  0.82368    
+month10                  -3.571e-01  2.139e-01  -1.669  0.09505 .  
+month11                  -1.036e+00  1.383e+00  -0.749  0.45378    
+age_0_19                 -7.018e-02  8.648e-03  -8.115 4.84e-16 ***
+age_20_39                 2.941e-02  7.194e-03   4.088 4.34e-05 ***
+age_40_59                -2.852e-02  1.654e-02  -1.725  0.08461 .  
+lu_residential_community  3.323e-03  5.699e-03   0.583  0.55981    
+lu_commerce_developed     2.714e-02  3.598e-03   7.544 4.56e-14 ***
+latitude                  3.762e-02  5.512e-01   0.068  0.94559    
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-(Dispersion parameter for Negative Binomial(0.5437) family taken to be 1)
+(Dispersion parameter for Negative Binomial(0.5352) family taken to be 1)
 
-    Null deviance: 2219.2  on 1273  degrees of freedom
-Residual deviance: 1571.4  on 1251  degrees of freedom
-AIC: 15776
+    Null deviance: 2185.9  on 1273  degrees of freedom
+Residual deviance: 1574.0  on 1251  degrees of freedom
+AIC: 15802
 
 Number of Fisher Scoring iterations: 1
 
 
-              Theta:  0.5437 
-          Std. Err.:  0.0189 
+              Theta:  0.5352 
+          Std. Err.:  0.0186 
 
- 2 x log-likelihood:  -15727.8010 
+ 2 x log-likelihood:  -15753.8140 

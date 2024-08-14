@@ -2,7 +2,7 @@ pacman::p_load(
   tidyverse, Hmisc, GGally, corrplot, RColorBrewer, ggplot2,
   hrbrthemes, stargazer, plotly, sf, basemaps, magrittr, cowplot, dotenv,
   ggnewscale, here, ggspatial, lwgeom, ggimage, cropcircles, ggrepel, osmdata,
-  ggridges
+  ggridges, scales
 )
 extrafont::loadfonts()
 
@@ -239,6 +239,9 @@ bivariate_color_scale <- tibble(
 
 # loop through the cities
 for (city in city_list) {
+  if (city == "Montreal"){
+    next
+  }
   # create folders for each city
   model_dir <- paste0(root_dir, "/models/", city)
   if (!dir.exists(model_dir)) {
@@ -264,6 +267,7 @@ for (city in city_list) {
   # od_vehicle_count: od_vehicle, od_bus, od_car, od_caravan, od_motorcycle, od_truck, od_other_vehicle, od_trailer, od_train, od_wheeled_slow, od_ego_vehicle
   # od_animal_count: od_bird, od_ground_animal
   all_var_raw <- read.csv(paste0(processed_dir, "/all_var_joined.csv"))
+  print(all_var_raw)
   all_var_with_id <- all_var_raw %>%
     dplyr::select(-contains("binary"), -contains("count_log")) %>%
     dplyr::select(-c(
@@ -303,7 +307,7 @@ for (city in city_list) {
   p.mat <- cor.mtest(all_var %>% dplyr::select(-c(year)))
   # original color: purple(#7B52AE) and green (#74B652)
   col1 <- colorRampPalette(c("#62428b", "#FFFFFF", "#5d9242"))
-  pdf(paste0(figure_dir, "/correlation_mat.pdf"), height = 7, width = 7)
+  pdf(paste0(figure_dir, "/correlation_mat.pdf"), height = 8, width = 8)
   corrplot(corrmatrix,
     method = "square", tl.col = "black", tl.cex = 1 ,
     p.mat = p.mat, sig.level = 0.05, insig = "pch", pch.cex = 1, col = col1(10),
@@ -346,18 +350,20 @@ for (city in city_list) {
   # Boxplot of "count" by "year" --------------------------------------
   count_boxplot <- all_var_raw %>%
     # convert count over 1000 to 1000
-    mutate(count = ifelse(count > 1000, 1000, count)) %>%
-    ggplot(aes(x = factor(year), y = count)) +
+    # mutate(count = ifelse(count > 1000, 1000, count)) %>%
+    ggplot(aes(x = factor(year), y = count_log)) +
     geom_boxplot(fill = "#7B52AE", color = "black", alpha = 0.5) +
     labs(
       x = "Year",
-      y = "Count",
+      y = "Count (log)",
       title = paste0("Distribution of ", target, " count by year"),
       subtitle = city,
       caption = ""
     ) +
-    # set breaks and labels: y-axis by 250
-    scale_y_continuous(breaks = seq(0, 1000, by = 250), labels = c("0", "250", "500", "750", ">=1000")) +
+  # Dynamically set breaks and labels for y-axis
+  scale_y_continuous(
+    breaks = pretty_breaks(n = 5)
+  ) +
     theme_ipsum() +
     theme(
       plot.margin = ggplot2::margin(0, 0, 0, 0),
@@ -482,7 +488,13 @@ for (city in city_list) {
     filter(year_group %in% c("2008-2014", "2015-2020")) %>%
     dplyr::select(grid_id, year_group, count) %>%
     pivot_wider(names_from = year_group, values_from = count) %>%
-    mutate(change = (`2015-2020` - `2008-2014`))
+    mutate(change = (`2015-2020` - `2008-2014`),
+      change = case_when(
+        change > 500 ~ 500,
+        change < -500 ~ -500,
+        TRUE ~ change
+      )
+    )
 
   hex_grid_joined <- hex_grid %>%
     left_join(., hex_grid_summarized, by = "grid_id") %>%
@@ -521,8 +533,8 @@ for (city in city_list) {
       size = 0.05
     ) +
     scale_fill_gradientn(colours = color_scale, 
-      breaks = scales::pretty_breaks(n = 5)(range(hex_grid_joined$change, na.rm = TRUE)),
-      labels = scales::label_number()(scales::pretty_breaks(n = 5)(range(hex_grid_joined$change, na.rm = TRUE))),
+      breaks = c(-500, -250, 0, 250, 500),
+      labels = c("<-500", "-250", "0", "250", ">500"),
       limits = range(hex_grid_joined$change, na.rm = TRUE),
       guide = guide_colourbar(direction = "horizontal",
         title.position = "bottom")
@@ -634,9 +646,9 @@ for (city in city_list) {
       mid = "white",                   # Color for the midpoint of the scale
       high = "#74B652",                    # Color for the high end of the scale
       midpoint = 0,                    # Value at which mid color should be placed
-      breaks = seq(-100, 100, by = 50),
-      labels = c("<-100%", "-50%", "0%", "50%", ">100%"),
-      limits = c(-100, 100),
+      breaks = seq(-500, 500, by = 250),
+      labels = c("<-500", "-250", "0", "250", ">500"),
+      limits = c(-500, 500),
       guide = FALSE
     ) +
     geom_sf(data = count_station_buffer, color='black', fill='white', alpha = 0.8) +

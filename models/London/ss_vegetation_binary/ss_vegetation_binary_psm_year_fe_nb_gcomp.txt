@@ -1,8 +1,6 @@
 
-                 Term Contrast Estimate Std. Error    z Pr(>|z|)   S 2.5 %
- ss_vegetation_binary    1 - 0     91.7       79.9 1.15    0.251 2.0 -64.9
- 97.5 %
-    248
+                 Term Contrast Estimate Std. Error    z Pr(>|z|)   S 2.5 % 97.5 %
+ ss_vegetation_binary    1 - 0     60.3       59.2 1.02    0.308 1.7 -55.7    176
 
 Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
 Type:  response 

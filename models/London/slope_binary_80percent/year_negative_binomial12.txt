@@ -1,46 +1,46 @@
 
 Call:
-glm.nb(formula = formula, data = data, init.theta = 0.5886594765, 
+glm.nb(formula = formula, data = data, init.theta = 0.5360909267, 
     link = log)
 
 Coefficients:
-                           Estimate Std. Error z value Pr(>|z|)    
-(Intercept)              -10.395690   1.529067  -6.799 1.06e-11 ***
-slope_binary_80percent    -0.439145   0.092976  -4.723 2.32e-06 ***
-year2011                  -0.138068   0.788205  -0.175   0.8609    
-year2012                  -0.528149   0.667758  -0.791   0.4290    
-year2014                  -0.418309   0.668904  -0.625   0.5317    
-year2015                   0.069364   0.664201   0.104   0.9168    
-year2016                  -0.761332   0.674764  -1.128   0.2592    
-year2017                  -0.556625   0.671345  -0.829   0.4070    
-year2018                  -0.641048   0.680359  -0.942   0.3461    
-year2019                  -0.379200   0.666126  -0.569   0.5692    
-month4                    -0.156711   0.208377  -0.752   0.4520    
-month5                    -0.272896   0.180734  -1.510   0.1311    
-month6                    -0.286787   0.183238  -1.565   0.1176    
-month7                    -0.110803   0.203076  -0.546   0.5853    
-month9                    -0.103552   0.204005  -0.508   0.6117    
-month10                   -0.353319   0.203893  -1.733   0.0831 .  
-month11                   -1.651312   1.319557  -1.251   0.2108    
-age_0_19                  -0.012038   0.009271  -1.298   0.1941    
-age_20_39                  0.057601   0.006947   8.292  < 2e-16 ***
-age_40_59                 -0.006071   0.015561  -0.390   0.6964    
-lu_residential_community   0.005150   0.005439   0.947   0.3437    
-lu_commerce_developed      0.014675   0.003482   4.215 2.50e-05 ***
-housing_price_log          1.098167   0.086491  12.697  < 2e-16 ***
+                          Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               5.973901   1.019545   5.859 4.65e-09 ***
+slope_binary_80percent   -0.284507   0.097062  -2.931  0.00338 ** 
+year2011                  0.033523   0.825108   0.041  0.96759    
+year2012                 -0.223251   0.698620  -0.320  0.74930    
+year2014                  0.078071   0.698560   0.112  0.91101    
+year2015                  0.762451   0.692616   1.101  0.27097    
+year2016                  0.006552   0.703463   0.009  0.99257    
+year2017                  0.271253   0.699530   0.388  0.69819    
+year2018                  0.209841   0.709290   0.296  0.76735    
+year2019                  0.314338   0.694343   0.453  0.65076    
+month4                    0.035958   0.218089   0.165  0.86904    
+month5                   -0.185156   0.189274  -0.978  0.32796    
+month6                   -0.225564   0.191856  -1.176  0.23972    
+month7                   -0.009335   0.212654  -0.044  0.96498    
+month9                   -0.057581   0.213650  -0.270  0.78754    
+month10                  -0.369862   0.213547  -1.732  0.08327 .  
+month11                  -1.056329   1.381560  -0.765  0.44451    
+age_0_19                 -0.071202   0.008642  -8.239  < 2e-16 ***
+age_20_39                 0.028772   0.007146   4.026 5.67e-05 ***
+age_40_59                -0.030276   0.016288  -1.859  0.06307 .  
+lu_residential_community  0.003743   0.005696   0.657  0.51105    
+lu_commerce_developed     0.027002   0.003587   7.529 5.13e-14 ***
+od_animal_count           1.460575   1.295686   1.127  0.25963    
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-(Dispersion parameter for Negative Binomial(0.5887) family taken to be 1)
+(Dispersion parameter for Negative Binomial(0.5361) family taken to be 1)
 
-    Null deviance: 2395.4  on 1273  degrees of freedom
-Residual deviance: 1558.7  on 1251  degrees of freedom
-AIC: 15646
+    Null deviance: 2189.4  on 1273  degrees of freedom
+Residual deviance: 1573.7  on 1251  degrees of freedom
+AIC: 15799
 
 Number of Fisher Scoring iterations: 1
 
 
-              Theta:  0.5887 
-          Std. Err.:  0.0207 
+              Theta:  0.5361 
+          Std. Err.:  0.0186 
 
- 2 x log-likelihood:  -15597.6970 
+ 2 x log-likelihood:  -15751.0620 

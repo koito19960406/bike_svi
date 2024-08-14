@@ -1,47 +1,46 @@
 
 Call:
-glm.nb(formula = formula, data = data, init.theta = 0.541679637, 
+glm.nb(formula = formula, data = data, init.theta = 0.5335889428, 
     link = log)
 
 Coefficients:
-                          Estimate Std. Error z value Pr(>|z|)    
-(Intercept)               3.550465   1.080589   3.286  0.00102 ** 
-ss_parking_binary        -0.102561   0.134153  -0.765  0.44457    
-year2011                  0.350953   0.821608   0.427  0.66927    
-year2012                 -0.498493   0.696571  -0.716  0.47422    
-year2014                 -0.101747   0.696389  -0.146  0.88384    
-year2015                  0.537597   0.690614   0.778  0.43631    
-year2016                 -0.236921   0.701769  -0.338  0.73566    
-year2017                 -0.005158   0.697728  -0.007  0.99410    
-year2018                  0.186949   0.706331   0.265  0.79126    
-year2019                  0.283754   0.691096   0.411  0.68138    
-month4                    0.059239   0.217603   0.272  0.78544    
-month5                   -0.190903   0.188714  -1.012  0.31173    
-month6                   -0.223612   0.190935  -1.171  0.24154    
-month7                    0.032233   0.212089   0.152  0.87920    
-month9                   -0.025895   0.213191  -0.121  0.90332    
-month10                  -0.356956   0.212967  -1.676  0.09372 .  
-month11                  -0.950922   1.374565  -0.692  0.48906    
-age_0_19                 -0.065073   0.008584  -7.580 3.44e-14 ***
-age_20_39                 0.031106   0.007144   4.354 1.34e-05 ***
-age_40_59                -0.021408   0.016257  -1.317  0.18791    
-lu_residential_community  0.001574   0.005676   0.277  0.78155    
-lu_commerce_developed     0.027082   0.003570   7.586 3.29e-14 ***
-ss_visual_complexity      0.054227   0.011355   4.776 1.79e-06 ***
+                           Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               5.8780105  1.0293453   5.710 1.13e-08 ***
+ss_parking_binary        -0.0784629  0.1345810  -0.583 0.559883    
+year2011                 -0.0978753  0.8271248  -0.118 0.905805    
+year2012                 -0.3075329  0.6997867  -0.439 0.660323    
+year2014                  0.0178792  0.6999113   0.026 0.979620    
+year2015                  0.6864566  0.6940059   0.989 0.322603    
+year2016                 -0.0714865  0.7048834  -0.101 0.919220    
+year2017                  0.1915713  0.7008383   0.273 0.784587    
+year2018                  0.1767636  0.7115929   0.248 0.803821    
+year2019                  0.2705005  0.6961451   0.389 0.697595    
+month4                    0.0149135  0.2193072   0.068 0.945783    
+month5                   -0.1860609  0.1904594  -0.977 0.328616    
+month6                   -0.2355871  0.1926981  -1.223 0.221492    
+month7                   -0.0003376  0.2144139  -0.002 0.998744    
+month9                   -0.0707409  0.2146238  -0.330 0.741699    
+month10                  -0.3548362  0.2149521  -1.651 0.098786 .  
+month11                  -0.8983966  1.3864092  -0.648 0.516983    
+age_0_19                 -0.0758510  0.0102371  -7.409 1.27e-13 ***
+age_20_39                 0.0268765  0.0074972   3.585 0.000337 ***
+age_40_59                -0.0256035  0.0163643  -1.565 0.117678    
+lu_residential_community  0.0042146  0.0057138   0.738 0.460741    
+lu_commerce_developed     0.0271728  0.0036849   7.374 1.66e-13 ***
+IMD_score                 0.0078674  0.0044469   1.769 0.076866 .  
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-(Dispersion parameter for Negative Binomial(0.5417) family taken to be 1)
+(Dispersion parameter for Negative Binomial(0.5336) family taken to be 1)
 
-    Null deviance: 2211.3  on 1273  degrees of freedom
-Residual deviance: 1572.0  on 1251  degrees of freedom
-AIC: 15782
+    Null deviance: 2179.5  on 1273  degrees of freedom
+Residual deviance: 1574.5  on 1251  degrees of freedom
+AIC: 15807
 
 Number of Fisher Scoring iterations: 1
 
 
-              Theta:  0.5417 
-          Std. Err.:  0.0189 
-Warning while fitting theta: alternation limit reached 
+              Theta:  0.5336 
+          Std. Err.:  0.0185 
 
- 2 x log-likelihood:  -15733.9380 
+ 2 x log-likelihood:  -15758.8400 

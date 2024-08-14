@@ -4,9 +4,9 @@
 data:  residuals(fe_nb)  
 weights: weights    
 
-Moran I statistic standard deviate = 17.873, p-value < 2.2e-16
+Moran I statistic standard deviate = 18.045, p-value < 2.2e-16
 alternative hypothesis: greater
 sample estimates:
 Moran I statistic       Expectation          Variance 
-     0.4572681333     -0.0007855460      0.0006568395 
+     0.4616949226     -0.0007855460      0.0006568871 
 

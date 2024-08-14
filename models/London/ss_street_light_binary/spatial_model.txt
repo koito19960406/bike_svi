@@ -1,61 +1,63 @@
 
-Call:
-lagsarlm(formula = formula_spatial, data = all_var_spatial, listw = weights)
+Call:lagsarlm(formula = formula_spatial, data = all_var_spatial, listw = weights)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--5.22227 -0.62159  0.12476  0.77159  3.66533 
+-5.20943 -0.60835  0.11675  0.76585  3.65428 
 
 Type: lag 
 Coefficients: (asymptotic standard errors) 
                             Estimate  Std. Error z value  Pr(>|z|)
-(Intercept)              -8.7408e-01  1.6553e+00 -0.5280  0.597469
-year2011                 -1.2618e+00  7.4073e-01 -1.7034  0.088488
-year2012                 -1.2896e+00  6.2201e-01 -2.0733  0.038146
-year2014                 -1.0556e+00  6.2259e-01 -1.6955  0.089977
-year2015                 -5.8677e-01  6.1855e-01 -0.9486  0.342813
-year2016                 -1.1301e+00  6.2828e-01 -1.7987  0.072060
-year2017                 -8.5346e-01  6.2516e-01 -1.3652  0.172193
-year2018                 -9.8857e-01  6.3352e-01 -1.5604  0.118655
-year2019                 -9.8044e-01  6.2040e-01 -1.5803  0.114029
-month4                    2.7430e-01  1.9553e-01  1.4028  0.160663
-month5                    4.4079e-02  1.6947e-01  0.2601  0.794788
-month6                   -4.6176e-02  1.7184e-01 -0.2687  0.788147
-month7                    6.2570e-02  1.9078e-01  0.3280  0.742941
-month9                    1.5467e-01  1.9208e-01  0.8052  0.420680
-month10                  -1.0868e-01  1.9160e-01 -0.5672  0.570555
-month11                  -2.1697e-01  1.2314e+00 -0.1762  0.860132
-age_0_19                 -1.2174e-03  9.9258e-03 -0.1227  0.902383
-age_20_39                 1.0179e-02  7.3229e-03  1.3901  0.164506
-age_40_59                -1.5017e-03  1.4873e-02 -0.1010  0.919578
-IMD_score                -4.9576e-03  4.2670e-03 -1.1619  0.245296
-lu_residential_community -1.5075e-04  5.1349e-03 -0.0294  0.976579
-lu_commerce_developed    -7.5323e-05  3.5805e-03 -0.0210  0.983216
-ss_visual_complexity      7.5278e-03  1.1590e-02  0.6495  0.516014
-slope                    -1.0263e-02  5.3843e-03 -1.9061  0.056631
-ss_construction          -1.6996e-02  7.3012e-03 -2.3279  0.019919
-ss_road_flat             -1.7206e-02  8.0180e-03 -2.1459  0.031881
-ss_marking                5.2719e-02  2.1666e-02  2.4333  0.014963
-ss_nature                -2.8655e-02  1.5575e-02 -1.8398  0.065797
-ss_street_object          3.8944e-01  1.3609e-01  2.8615  0.004216
-od_person_count           1.8217e-01  6.5011e-02  2.8021  0.005077
-od_vehicle_count         -3.9820e-02  1.5992e-02 -2.4900  0.012773
-od_animal_count           1.3269e+00  1.1590e+00  1.1449  0.252255
-pop_den_log               5.9657e-02  4.9558e-02  1.2038  0.228675
-housing_price_log         2.2271e-01  9.4748e-02  2.3505  0.018747
-poi_log                   3.2221e-01  4.6457e-02  6.9356 4.044e-12
-ss_street_light_binary    1.5087e-01  7.4031e-02  2.0379  0.041560
+(Intercept)              -6.4339e-01  1.9591e+00 -0.3284  0.742602
+year2011                 -1.2573e+00  7.4077e-01 -1.6972  0.089653
+year2012                 -1.2690e+00  6.2276e-01 -2.0377  0.041584
+year2014                 -1.0356e+00  6.2345e-01 -1.6611  0.096688
+year2015                 -5.6705e-01  6.1954e-01 -0.9153  0.360051
+year2016                 -1.1128e+00  6.2943e-01 -1.7680  0.077059
+year2017                 -8.3335e-01  6.2631e-01 -1.3306  0.183329
+year2018                 -9.7240e-01  6.3459e-01 -1.5323  0.125438
+year2019                 -9.6793e-01  6.2168e-01 -1.5570  0.119480
+month4                    2.7736e-01  1.9573e-01  1.4170  0.156481
+month5                    4.7379e-02  1.7005e-01  0.2786  0.780531
+month6                   -4.9657e-02  1.7239e-01 -0.2881  0.773306
+month7                    6.5506e-02  1.9151e-01  0.3421  0.732306
+month9                    1.5480e-01  1.9234e-01  0.8048  0.420913
+month10                  -1.1021e-01  1.9256e-01 -0.5723  0.567114
+month11                  -2.3901e-01  1.2328e+00 -0.1939  0.846277
+slope                    -1.0247e-02  5.4123e-03 -1.8934  0.058309
+IMD_score                -4.8404e-03  4.4150e-03 -1.0964  0.272923
+age_0_19                 -1.6002e-03  9.9503e-03 -0.1608  0.872236
+age_20_39                 1.0181e-02  7.5056e-03  1.3565  0.174937
+age_40_59                -1.4612e-03  1.5000e-02 -0.0974  0.922400
+lu_residential_community -1.0126e-04  5.1600e-03 -0.0196  0.984344
+lu_commerce_developed     2.2325e-05  3.5846e-03  0.0062  0.995031
+ss_visual_complexity      7.1480e-03  1.1668e-02  0.6126  0.540139
+ss_construction          -1.6742e-02  7.3709e-03 -2.2713  0.023127
+ss_road_flat             -1.6730e-02  8.0728e-03 -2.0724  0.038232
+ss_marking                5.2542e-02  2.1690e-02  2.4224  0.015417
+ss_nature                -2.7643e-02  1.5650e-02 -1.7663  0.077350
+ss_street_object          3.8537e-01  1.3666e-01  2.8200  0.004803
+od_person_count           1.8273e-01  6.5018e-02  2.8105  0.004946
+od_vehicle_count         -3.9614e-02  1.5995e-02 -2.4767  0.013262
+od_animal_count           1.3004e+00  1.1610e+00  1.1200  0.262717
+housing_price_log         2.2846e-01  1.0427e-01  2.1911  0.028444
+poi_betweenness_log      -8.0901e-03  1.4812e-02 -0.5462  0.584948
+poi_accessibility_log    -1.8311e-03  7.5523e-02 -0.0242  0.980656
+traffic_speed_log        -8.2996e-02  1.8582e-01 -0.4466  0.655128
+pop_den_log               5.9279e-02  5.0626e-02  1.1709  0.241627
+poi_log                   3.2181e-01  5.1851e-02  6.2065 5.416e-10
+ss_street_light_binary    1.5171e-01  7.4137e-02  2.0463  0.040727
 
-Rho: 0.45941, LR test value: 372.99, p-value: < 2.22e-16
-Asymptotic standard error: 0.019638
-    z-value: 23.394, p-value: < 2.22e-16
-Wald statistic: 547.28, p-value: < 2.22e-16
+Rho: 0.45833, LR test value: 366.68, p-value: < 2.22e-16
+Asymptotic standard error: 0.019707
+    z-value: 23.257, p-value: < 2.22e-16
+Wald statistic: 540.89, p-value: < 2.22e-16
 
-Log likelihood: -2110.334 for lag model
+Log likelihood: -2110.031 for lag model
 ML residual variance (sigma squared): 1.4721, (sigma: 1.2133)
 Number of observations: 1274 
-Number of parameters estimated: 38 
-AIC: 4296.7, (AIC for lm: 4667.7)
+Number of parameters estimated: 41 
+AIC: 4302.1, (AIC for lm: 4666.7)
 LM test for residual autocorrelation
-test value: 0.02206, p-value: 0.88193
+test value: 0.01903, p-value: 0.89028
 

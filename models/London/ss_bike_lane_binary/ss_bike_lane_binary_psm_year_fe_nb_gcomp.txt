@@ -1,8 +1,6 @@
 
-                Term Contrast Estimate Std. Error    z Pr(>|z|)   S 2.5 %
- ss_bike_lane_binary    1 - 0      344        143 2.41    0.016 6.0    64
- 97.5 %
-    624
+                Term Contrast Estimate Std. Error    z Pr(>|z|)   S 2.5 % 97.5 %
+ ss_bike_lane_binary    1 - 0      253       91.8 2.76  0.00583 7.4  73.2    433
 
 Columns: term, contrast, estimate, std.error, statistic, p.value, s.value, conf.low, conf.high 
 Type:  response 

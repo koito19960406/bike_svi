@@ -4,13 +4,13 @@ Variable splits:
 (1) split_variable: age_20_39  split_value: 23.4169 
   (2) * num_samples: 40  avg_Y: 3.67 avg_W: 0.3 
   (3) split_variable: ss_nature  split_value: 2.08595 
-    (4) split_variable: age_0_19  split_value: 17.5893 
-      (6) * num_samples: 40  avg_Y: 5.31 avg_W: 0.4 
-      (7) split_variable: ss_street_object  split_value: 0.20144 
-        (8) * num_samples: 52  avg_Y: 3.8 avg_W: 0.33 
-        (9) split_variable: lu_commerce_developed  split_value: 19.5505 
-          (10) * num_samples: 48  avg_Y: 3.65 avg_W: 0.25 
-          (11) split_variable: age_0_19  split_value: 23.1416 
-            (12) * num_samples: 38  avg_Y: 4.16 avg_W: 0.24 
-            (13) * num_samples: 65  avg_Y: 4.73 avg_W: 0.28 
+    (4) split_variable: ss_street_object  split_value: 0.213407 
+      (6) * num_samples: 59  avg_Y: 3.92 avg_W: 0.36 
+      (7) split_variable: ss_construction  split_value: 15.1239 
+        (8) split_variable: IMD_score  split_value: 20.948 
+          (10) split_variable: ss_road_flat  split_value: 32.616 
+            (12) * num_samples: 40  avg_Y: 3.87 avg_W: 0.3 
+            (13) * num_samples: 22  avg_Y: 4.09 avg_W: 0.27 
+          (11) * num_samples: 90  avg_Y: 4.38 avg_W: 0.27 
+        (9) * num_samples: 32  avg_Y: 5.66 avg_W: 0.28 
     (5) * num_samples: 35  avg_Y: 4.08 avg_W: 0.34 

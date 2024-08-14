@@ -22,6 +22,9 @@ ss_var_list <- list(
 
 # loop through the cities
 for (city in city_list){
+  if (city == "Montreal"){
+    next
+  }
   print(paste0("Processing city: ", city))
   
   # create a folder for each city

@@ -1,7 +1,8 @@
 pacman::p_load(
   tidyverse, Hmisc, GGally, corrplot, RColorBrewer, ggplot2,
   hrbrthemes, stargazer, plotly, sf, basemaps, magrittr, cowplot, dotenv,
-  ggnewscale, here, ggspatial, lwgeom, ggimage, cropcircles, ggrepel, osmdata
+  ggnewscale, here, ggspatial, lwgeom, ggimage, cropcircles, ggrepel, osmdata,
+  paletteer
 )
 
 
@@ -76,16 +77,17 @@ plot_step <- function(file_path, ind_var_name, figure_dir) {
           axis.text.y = element_text(size=14), # Bigger Y axis texts
           # bigger legend texts
           legend.text = element_text(size = 14),
-          ) + 
+          ) 
+  ggsave(paste0(figure_dir, "/", ind_var_name, "/no_title_", gsub(".csv", ".png", basename(file_path))), width = 8, height = 4.5)
+  plot <- plot + 
     labs(title = paste0("Step-wise model result for ", clean_var_name(ind_var_name)))
-
-  ggsave(paste0(figure_dir, "/", ind_var_name, "/", gsub(".csv", ".png", basename(file_path))), width = 8, height = 4)
+  ggsave(paste0(figure_dir, "/", ind_var_name, "/", gsub(".csv", ".png", basename(file_path))), width = 8, height = 5)
 }
 
 plot_importance <- function(file_path, ind_var_name, figure_dir, top_n=10){
   df <- read.csv(file_path) %>% 
     slice_max(variable_importance,n=top_n)
-  ggplot(data=df, aes(x=reorder(var_name, variable_importance), y=variable_importance)) +
+  plot <- ggplot(data=df, aes(x=reorder(var_name, variable_importance), y=variable_importance)) +
     geom_bar(stat="identity", fill = "#7B52AE", width=0.4)+
     coord_flip() +
     theme_ipsum() +
@@ -93,9 +95,11 @@ plot_importance <- function(file_path, ind_var_name, figure_dir, top_n=10){
           axis.text.y = element_text(size=10),
           plot.title = element_text(size=10,hjust=0.5),
           plot.title.position="plot") +
-    labs(title=paste0("Variable importance \n when estimating ", clean_var_name(ind_var_name), " (top ", as.character(top_n), ")"),
-         x="Variable names",
+    labs(x="Variable names",
          y="Variable importance")
+  ggsave(paste0(figure_dir, "/", ind_var_name, "/no_title_",str_replace(basename(file_path),".csv",".png")), width = 4, height = 5)
+  plot <- plot +
+    labs(title=paste0("Variable importance \n when estimating ", clean_var_name(ind_var_name), " (top ", as.character(top_n), ")"))
   ggsave(paste0(figure_dir, "/", ind_var_name, "/",str_replace(basename(file_path),".csv",".png")), width = 4, height = 5)
 }
 
@@ -162,7 +166,7 @@ plot_hte_covariate <- function(ind_var_name, model_dir, figure_dir) {
   group_colors <- c("0-33%" = "#7B52AE", "33-66%" = "#FFC107", "66-100%" = "#74B652")
 
   # Plot predictions for each group and 95% confidence intervals around them.
-  ggplot(data_pred) +
+  plot <- ggplot(data_pred) +
     geom_point(aes(x = category, y = estimate, color = category), size = 1) +
     geom_errorbar(aes(x = category, ymin = ci_low, ymax = ci_high, color = category, width = .2), size = 1) +
     geom_text(aes(x = category, y = estimate, label = round(estimate, 2)),
@@ -170,7 +174,6 @@ plot_hte_covariate <- function(ind_var_name, model_dir, figure_dir) {
     ) +
     coord_flip() +
     labs(
-      title = paste0("Subgroup CATE for ", clean_var_name(ind_var_name)),
       x = NULL,
       y = "",
       fill = ""
@@ -189,6 +192,10 @@ plot_hte_covariate <- function(ind_var_name, model_dir, figure_dir) {
     ) +
     scale_color_manual(values = group_colors) +
     facet_grid(covariate ~ ., switch = "y")
+  ggsave(paste0(figure_dir, "/", ind_var_name, "/no_title_hte_by_covariate.png"), width = 6, height = 6)
+
+  plot <- plot +
+    labs(title = paste0("Subgroup CATE for ", clean_var_name(ind_var_name)))
   ggsave(paste0(figure_dir, "/", ind_var_name, "/hte_by_covariate.png"), width = 6, height = 6)
 
   # Plot predictions for all groups and 95% confidence intervals around them.
@@ -224,7 +231,7 @@ plot_hte_covariate <- function(ind_var_name, model_dir, figure_dir) {
 
 plot_hte_ranking <- function(ind_var_name, model_dir, figure_dir) {
   cf_preds <- read.csv(paste0(model_dir, "/", ind_var_name, "/", "binary_predictions.csv"))
-  ggplot(mapping = aes(
+  plot <- ggplot(mapping = aes(
     x = rank(cf_preds$predictions),
     y = cf_preds$predictions
   )) +
@@ -241,7 +248,6 @@ plot_hte_ranking <- function(ind_var_name, model_dir, figure_dir) {
       colour = "black", linetype = "dashed", size = 3
     ) +
     labs(
-      title = paste0("Heterogeneous Treatment Effects by Ranking for ", clean_var_name(ind_var_name)),
       x = "Rank",
       y = "Estimated Treatment Effect"
     ) +
@@ -258,6 +264,9 @@ plot_hte_ranking <- function(ind_var_name, model_dir, figure_dir) {
   #       panel.grid.minor.x = element_blank(),
   #       panel.grid.major.y = element_blank(),
   #       panel.grid.minor.y = element_blank())
+  ggsave(paste0(figure_dir, "/", ind_var_name, "/no_title_hte_by_ranking.png"), width = 30, height = 10)
+  plot <- plot +
+    labs(title = paste0("Heterogeneous Treatment Effects by Ranking for ", clean_var_name(ind_var_name)))
   ggsave(paste0(figure_dir, "/", ind_var_name, "/hte_by_ranking.png"), width = 30, height = 10)
 }
 
@@ -552,4 +561,49 @@ map_propensity_score <- function(city, external_dir, treatment_var, model_dir, f
   file_path <- paste0(figure_dir, "/", treatment_var, "/", treatment_var, "_propensity_score_map.png")
   # map them
   map_grid(grid, "pr_score", file_path, city, treatment_var)
+}
+
+
+plot_boxplots_predictions <- function(treatment_var_list, model_dir, figure_dir) {
+  # Create an empty list to store data frames
+  cf_preds_list <- list()
+  
+  # Read data for each treatment variable
+  for (ind_var_name in treatment_var_list) {
+    cf_preds <- read.csv(paste0(model_dir, "/", ind_var_name, "/", "binary_predictions.csv"))
+    cf_preds$treatment_var <- clean_var_name(ind_var_name)
+    cf_preds_list[[ind_var_name]] <- cf_preds
+  }
+  
+  # Combine all data frames
+  combined_cf_preds <- do.call(rbind, cf_preds_list)
+  
+  # Create the box plot
+  plot <- ggplot(combined_cf_preds, aes(x = treatment_var, y = predictions)) +
+    geom_boxplot(aes(fill = treatment_var)) +
+    geom_hline(yintercept = 0, colour = "black", linetype = "dashed", size = 1) +
+    scale_fill_paletteer_d("nord::aurora") +
+    labs(
+      x = "",
+      y = "Estimated Treatment Effect"
+    ) +
+    theme_ipsum() +
+    theme(
+      axis.text.x = element_text(size = 30),
+      axis.text.y = element_text(size = 20),
+      axis.title.x = element_text(size = 18),
+      axis.title.y = element_text(size = 18, vjust = 3),
+      plot.title = element_text(size = 45, hjust = 0.5),
+      legend.position = "none"
+    )
+  
+  # Save the plot without title
+  ggsave(paste0(figure_dir, "/combined_hte_boxplot_no_title.png"), plot, width = 12, height = 8)
+  
+  # Add title and save
+  plot_with_title <- plot +
+    labs(title = "Heterogeneous Treatment Effects for Multiple Variables")
+  ggsave(paste0(figure_dir, "/combined_hte_boxplot.png"), plot_with_title, width = 12, height = 8)
+  
+  return(plot_with_title)
 }
