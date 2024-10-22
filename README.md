@@ -1,6 +1,6 @@
 # Examining the Causal Impacts of the Built Environment on Cycling Activities Using Time-Series Street View Imagery
 ![Workflow](reports/figures/workflow.003.png)
-*Overall workflow of the study*
+*Figure 1: Overall workflow of the study*
 
 This repository contains the code and data for the paper:
 
@@ -11,7 +11,7 @@ Ito, K., Bansal, P., & Biljecki, F. (2024). Examining the Causal Impacts of the 
 Cycling is vital for sustainable and healthy cities. To encourage such activities, understanding urban bikeability at both detailed and broad spatial scales is crucial. Street view imagery (SVI) offers in-depth insights into how street features influence micro-mobility patterns, but existing studies are mainly correlational. This research utilized historical time-series SVI, cyclist data from London, to discern the causal effects of specific urban features on cyclist numbers. We used propensity score matching to adjust for potential confounding biases and applied the causal forest to estimate the heterogeneity in causal effects. 
 
 ![London map](reports/figures/London/workflow.006.png)
-*Map of changes in cyclist count in London and street view imgaery* 
+*Figure 2: Map of changes in cyclist count in London and street view imgaery* 
 
 ## Summary of Findings
 
@@ -23,15 +23,15 @@ Our study revealed significant causal relationships between various urban design
 
 3. **Slope Impact**: As expected, steeper slopes have a negative effect on cycling activities. This effect is more pronounced among older residents and in wealthier neighborhoods, indicating the need for targeted interventions in hilly areas to maintain cycling accessibility for all ages and socioeconomic groups.
 
-![Treatment Effects](reports/figures/London/combined_hte_boxplot_no_title.png)
-*Box plots of estimated treatment effects for the five treatments*
-
-1. **Heterogeneous Effects**: Our analysis revealed substantial variations in the impact of urban design interventions across different urban contexts. This heterogeneity underscores the importance of tailored approaches to urban planning and cycling infrastructure development.
-
-![Vegetation heterogeneity](reports/figures/London/vegetation/no_title_hte_by_covariate.png)
-*Estimated treatment effects of vegetation by covariate*
+4. **Heterogeneous Effects**: Our analysis revealed substantial variations in the impact of urban design interventions across different urban contexts. This heterogeneity underscores the importance of tailored approaches to urban planning and cycling infrastructure development.
 
 5. **Policy Implications**: The study's findings provide valuable insights for urban planners and policymakers. By identifying areas where specific interventions (such as increasing vegetation or adding bike lanes) can have the most significant impact, our research supports more targeted and effective strategies for promoting cycling in urban environments.
+
+![Treatment Effects](reports/figures/London/combined_hte_boxplot_no_title.png)
+*Figure 3: Box plots of estimated treatment effects for the five treatments*
+
+![Vegetation heterogeneity](reports/figures/London/vegetation/no_title_hte_by_covariate.png)
+*Figure 4: Estimated treatment effects of vegetation by covariate*
 
 These results demonstrate the power of combining advanced causal inference techniques with rich urban data sources like street view imagery. By moving beyond correlational studies, our approach offers a more nuanced understanding of how urban design elements causally influence cycling behaviors, paving the way for more effective and data-driven urban planning strategies.
 
@@ -69,6 +69,8 @@ See `requirements.txt` for a list of required Python packages.
 
 If you use this code or data in your research, please cite our paper:
 
+Ito, K., Bansal, P., & Biljecki, F. (2024). Examining the causal impacts of the built environment on cycling activities using time-series street view imagery. Transportation Research Part A: Policy and Practice, 190, 104286. https://doi.org/10.1016/j.tra.2024.104286
+
 ```bibtex
 @article{ito_examining_2024,
   title = {Examining the Causal Impacts of the Built Environment on Cycling Activities Using Time-Series Street View Imagery},
@@ -86,3 +88,12 @@ If you use this code or data in your research, please cite our paper:
 --------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+
+--------------------------------------------------------------------------------
+<br>
+<br>
+<p align="center">
+  <a href="https://ual.sg/">
+    <img src="reports/ualsg.jpeg" width = 55% alt="Logo">
+  </a>
+</p>
