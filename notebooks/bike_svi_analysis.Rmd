@@ -1,0 +1,140 @@
+
+---
+title: "Bike SVI Analysis"
+author: "Koichi Ito"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: united
+    highlight: tango
+---
+
+
+```{r}
+# Bike SVI Analysis R Script
+
+# Load required libraries
+pacman::p_load(
+  tidyverse, stats, plm, utils, pglm, magrittr, dotenv, car,
+  Hmisc, GGally, corrplot, RColorBrewer, ggplot2,
+  hrbrthemes, stargazer, plotly, sf, basemaps, cowplot,
+  ggnewscale, here, ggspatial, lwgeom, ggimage, cropcircles, ggrepel, osmdata,
+  ggridges, MASS, progress, MatchIt, lmtest, sandwich,
+  pscl, cobalt, grf, AER, DiagrammeRsvg, rsvg, WeightIt, gbm, CBPS, caret,
+  notifier, randomForest, pdp, doMC, doParallel, marginaleffects, extrafont
+)
+
+# Source utility functions
+source(here("bike_svi/models/utils.R"))
+source(here("bike_svi/visualization/utils.R"))
+
+# Load environment variables
+load_dot_env()
+root_dir <- Sys.getenv("ROOT_DIR")
+if (!file.exists(root_dir)) {
+  root_dir <- here()
+}
+
+# Set seed for reproducibility
+set.seed(1234)
+
+# Load city list
+city_list <- read.csv(paste0(root_dir, "/data/external/city_list.txt"), header = FALSE, sep = "\t") %>%
+  rename(city = V1) %>%
+  mutate(city = str_replace_all(city, " ", "_")) %>%
+  as.vector() %>%
+  unlist()
+
+# Main analysis loop
+for (city in city_list) {
+  print(paste("Processing city:", city))
+  
+  # Set up directories
+  model_dir <- paste0(root_dir, "/models/", city)
+  figure_dir <- paste0("reports/figures/", city)
+  external_dir <- paste0(root_dir, "/data/external/cities/", city)
+  processed_dir <- paste0(root_dir, "/data/processed/cities/", city)
+  
+  dir.create(model_dir, showWarnings = FALSE, recursive = TRUE)
+  dir.create(figure_dir, showWarnings = FALSE, recursive = TRUE)
+  
+  # Load data
+  all_var <- read.csv(paste0(processed_dir, "/all_var_joined.csv")) %>%
+    mutate(
+      count = as.integer(count),
+      year = as.factor(year)
+    ) %>%
+    dplyr::select(-c(age_60_90, lu_others, ss_vegetation, ss_bike_lane,
+                     ss_bike_rack, ss_curb, ss_curb_cut, ss_parking,
+                     ss_pothole, ss_street_light, ss_guard_rail,
+                     ss_pedestrian_area, ss_sidewalk, ss_bench)) %>%
+    drop_na()
+  
+  # Set treatment variables
+  if (city == "London") {
+    ss_var_list <- c("ss_vegetation_binary", "ss_bike_lane_binary", "ss_parking_binary", "ss_street_light_binary")
+  } else if (city == "Montreal") {
+    ss_var_list <- c("ss_vegetation_binary", "ss_guard_rail_binary", "ss_sidewalk_binary", "ss_street_light_binary")
+  }
+  treatment_var_list <- c(ss_var_list, "slope_binary")
+  
+  # Causal Inference Models
+  for (treatment_var in treatment_var_list) {
+    print(paste("Running causal inference models for", treatment_var))
+    
+    # Run PSM
+    psm_models <- run_psm(all_var, "count", treatment_var, covariates, model_dir, figure_dir)
+    
+    # Run Negative Binomial
+    run_negative_binomial(all_var, "count", treatment_var, covariates, model_dir)
+    
+    # Additional models can be added here
+  }
+  
+  # Data Exploration and Feature Engineering
+  print("Performing data exploration and feature engineering")
+  
+  # Example: Correlation plot
+  cor_matrix <- cor(all_var %>% select_if(is.numeric))
+  corrplot(cor_matrix, method = "color", type = "upper", order = "hclust", 
+           tl.col = "black", tl.srt = 45, addCoef.col = "black")
+  
+  # Example: Distribution plot
+  ggplot(all_var, aes(x = count)) +
+    geom_histogram(bins = 30, fill = "skyblue", color = "black") +
+    theme_minimal() +
+    labs(title = paste("Distribution of Count in", city),
+         x = "Count", y = "Frequency")
+  
+  # Visualization of Model Results
+  print("Visualizing model results")
+  
+  # PSM Balance Table
+  create_psm_balance_table(model_dir, treatment_var_list, city)
+  
+  # Causal Forest Results Table
+  create_cf_results_table(model_dir, treatment_var_list, city)
+  
+  # AUTOC Table
+  create_autoc_table(model_dir, treatment_var_list, city)
+  
+  # Variable Importance Plot
+  plot_variable_importance(model_dir, figure_dir)
+  
+  # Additional visualizations
+  for (treatment_var in treatment_var_list) {
+    plot_step(paste0(model_dir, "/", treatment_var, "/year_negative_binomial_result.csv"), treatment_var, figure_dir)
+    map_propensity_score(city, external_dir, treatment_var, model_dir, figure_dir)
+    plot_importance(paste0(model_dir, "/", treatment_var, "/binary_causal_forest_var_imp.csv"), treatment_var, figure_dir)
+    plot_cate_rank(treatment_var, read_csv(paste0(model_dir, "/", treatment_var, "/rank_cate.csv")), figure_dir)
+    plot_cate_heatmap(read_csv(paste0(model_dir, "/", treatment_var, "/rank_cate_covariates.csv")), treatment_var, figure_dir)
+    plot_hte_covariate(treatment_var, model_dir, figure_dir)
+    plot_hte_ranking(treatment_var, model_dir, figure_dir)
+  }
+}
+
+print("Analysis complete for all cities.")
+```
+
