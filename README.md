@@ -1,6 +1,3 @@
-bike_SVI
-==============================
-
 # Examining the Causal Impacts of the Built Environment on Cycling Activities Using Time-Series Street View Imagery
 ![Workflow](reports/figures/workflow.003.png)
 *Overall workflow of the study*
