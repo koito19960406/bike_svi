@@ -50,7 +50,11 @@ These results demonstrate the power of combining advanced causal inference techn
   - `bike_svi_analysis.ipynb`: Jupyter notebook containing the main data construction pipeline
   - `bike_svi_analysis.Rmd`: R Markdown file containing the main analysis pipeline
 
-## Data Sources for London
+## Data
+
+The compiled dataset used in the analysis can be found [here](data/processed/cities/London/all_var_joined.csv). The raw data sources are listed below:
+
+### Data Sources in London
 
 | Data Type | Source |
 |-----------|--------|
